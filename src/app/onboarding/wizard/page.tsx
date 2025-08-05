@@ -1,56 +1,174 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import { redirect } from "next/navigation";
+'use client';
 
-export default async function OnboardingWizardPage() {
-  // Get the user's session
-  const session = await getServerSession(authOptions);
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useWizardStore } from "@/store/wizard-store";
+import { ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Step1_Professional from "@/components/onboarding/Step1_Professional";
+import Step2_About from "@/components/onboarding/Step2_About";
+import Step3_Photo from "@/components/onboarding/Step3_Photo";
+import Step4_Theme from "@/components/onboarding/Step4_Theme";
+import { updateAgentProfile } from "@/app/actions";
 
-  // If no session, redirect to sign in
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (!session || !(session as any).user || !(session as any).user.id) {
-    redirect('/api/auth/signin');
-  }
+export default function OnboardingWizardPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const wizardStore = useWizardStore();
 
-  // Query the database for the user's agent profile
-  const agent = await prisma.agent.findUnique({
-    where: { 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      userId: (session as any).user.id as string 
+  // Check authentication and subscription status
+  useEffect(() => {
+    if (status === "loading") return;
+    
+    if (!session) {
+      router.push('/api/auth/signin');
+      return;
     }
-  });
 
-  // Check if user is subscribed
-  if (!agent || !agent.isSubscribed) {
-    redirect('/subscribe');
+    // Check subscription status (you can add an API call here if needed)
+    // For now, assuming user is subscribed if they reach this page
+    setLoading(false);
+  }, [session, status, router]);
+
+  const nextStep = () => {
+    if (step < 4) setStep(step + 1);
+  };
+
+  const prevStep = () => {
+    if (step > 1) setStep(step - 1);
+  };
+
+  const handleFinish = async () => {
+    try {
+      setIsSubmitting(true);
+      
+      // Get all data from wizard store
+      const profileData = {
+        experience: wizardStore.experience,
+        specialization: wizardStore.specialization,
+        licenseNumber: wizardStore.licenseNumber,
+        bio: wizardStore.bio,
+        phone: wizardStore.phone,
+        city: wizardStore.city,
+        theme: wizardStore.theme,
+        profilePhotoUrl: wizardStore.profilePhotoUrl,
+      };
+
+      // Submit the profile data
+      console.log("Profile data to submit:", profileData);
+      await updateAgentProfile(profileData);
+      
+      // Reset the wizard store after successful submission
+      wizardStore.reset();
+      
+      // The server action will handle the redirect to the agent's profile page
+      
+    } catch (error) {
+      console.error("Error creating profile:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-zinc-500">Loading...</p>
+      </div>
+    );
   }
 
-  // User is subscribed, show the wizard
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-2xl w-full p-8 bg-white rounded-lg shadow-md">
-        <div className="text-center space-y-6">
-          <h1 
-            className="text-4xl font-bold"
-            style={{ color: "var(--primary-red)" }}
-          >
-            Welcome to the Profile Wizard!
-          </h1>
-          
-          <p className="text-xl text-gray-700">
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            Hello, {(session as any).user.name || (session as any).user.email}! 
-          </p>
-          
-          <p className="text-gray-600">
-            Let&apos;s set up your real estate agent profile to showcase your expertise and attract clients.
-          </p>
+  if (!session) {
+    return null; // Router will redirect
+  }
 
-          <div className="mt-8 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-green-800 text-sm">
-              ✅ Your subscription is active until {agent.subscriptionEndsAt?.toLocaleDateString()}
-            </p>
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-semibold text-red-600 mb-2">
+            Profile Setup Wizard
+          </h1>
+          <p className="text-zinc-600">
+            Hello, {session.user?.name || session.user?.email}! Let&apos;s build your professional profile.
+          </p>
+          
+          {/* Subscription Status */}
+          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg inline-flex items-center gap-2">
+            <CheckCircle size={16} className="text-green-600" />
+            <span className="text-green-800 text-sm">Subscription Active</span>
+          </div>
+        </div>
+
+        {/* Progress Indicator */}
+        <div className="mb-8">
+          <div className="flex justify-center mb-4">
+            <div className="flex space-x-4">
+              {[1, 2, 3, 4].map((stepNum) => (
+                <div
+                  key={stepNum}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                    stepNum === step
+                      ? 'bg-red-600 text-white'
+                      : stepNum < step
+                      ? 'bg-green-500 text-white'
+                      : 'bg-zinc-200 text-zinc-600'
+                  }`}
+                >
+                  {stepNum}
+                </div>
+              ))}
+            </div>
+          </div>
+          <p className="text-center text-sm text-zinc-600">
+            Step {step} of 4
+          </p>
+        </div>
+
+        {/* Step Content */}
+        <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md border border-zinc-200">
+          <div className="p-8">
+            {step === 1 && <Step1_Professional />}
+            {step === 2 && <Step2_About />}
+            {step === 3 && <Step3_Photo />}
+            {step === 4 && <Step4_Theme />}
+          </div>
+
+          {/* Navigation */}
+          <div className="flex justify-between items-center p-6 border-t border-zinc-200">
+            <Button
+              onClick={prevStep}
+              disabled={step === 1}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <ChevronLeft size={16} />
+              Back
+            </Button>
+
+            {step === 4 ? (
+              <Button
+                onClick={handleFinish}
+                disabled={isSubmitting}
+                className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white"
+              >
+                {isSubmitting ? 'Creating Profile...' : 'Finish & Create Profile'}
+                <ChevronRight size={16} />
+              </Button>
+            ) : (
+              <Button
+                onClick={nextStep}
+                className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white"
+              >
+                Next
+                <ChevronRight size={16} />
+              </Button>
+            )}
           </div>
         </div>
       </div>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { grantSubscription } from "@/app/actions";
+import { CheckCircle, XCircle } from "lucide-react";
 
 export default function DevPage() {
   const { data: session, status } = useSession();
@@ -17,9 +18,9 @@ export default function DevPage() {
 
     try {
       const result = await grantSubscription();
-      setMessage(`✅ Success! Agent profile updated. ${result.message}`);
+              setMessage(`Success! Agent profile updated. ${result.message}`);
     } catch (error) {
-      setMessage(`❌ Error: ${error instanceof Error ? error.message : "Something went wrong"}`);
+              setMessage(`Error: ${error instanceof Error ? error.message : "Something went wrong"}`);
     } finally {
       setIsLoading(false);
     }
@@ -84,11 +85,16 @@ export default function DevPage() {
           </button>
 
           {message && (
-            <div className={`p-4 rounded-md ${
-              message.startsWith("✅") 
+            <div className={`p-4 rounded-md flex items-center gap-2 ${
+              message.startsWith("Success") 
                 ? "bg-green-50 text-green-800 border border-green-200" 
                 : "bg-red-50 text-red-800 border border-red-200"
             }`}>
+              {message.startsWith("Success") ? (
+                <CheckCircle size={16} className="text-green-600" />
+              ) : (
+                <XCircle size={16} className="text-red-600" />
+              )}
               {message}
             </div>
           )}

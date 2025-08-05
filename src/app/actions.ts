@@ -5,6 +5,8 @@ import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { z } from "zod";
+import OpenAI from "openai";
 
 function generateSlug(name: string): string {
   return name
@@ -119,5 +121,146 @@ export async function subscribeAndRedirect() {
     // If error occurs, redirect back to subscribe page with error
     revalidatePath('/subscribe');
     redirect('/subscribe?error=' + encodeURIComponent(error instanceof Error ? error.message : "Failed to subscribe"));
+  }
+}
+
+// Validation schema for agent profile data
+const agentProfileSchema = z.object({
+  experience: z.number().min(0).max(50),
+  specialization: z.string().min(1, "Specialization is required"),
+  licenseNumber: z.string().optional(),
+  bio: z.string().max(500, "Bio must be 500 characters or less"),
+  phone: z.string().min(1, "Phone number is required"),
+  city: z.string().min(1, "City is required"),
+  theme: z.string().min(1, "Theme is required"),
+  profilePhotoUrl: z.string().optional(),
+});
+
+export async function updateAgentProfile(data: {
+  experience: number;
+  specialization: string;
+  licenseNumber: string;
+  bio: string;
+  phone: string;
+  city: string;
+  theme: string;
+  profilePhotoUrl: string;
+}) {
+  try {
+    // Get the current user's session
+    const session = await getServerSession(authOptions);
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!session || !(session as any).user || !(session as any).user.id) {
+      throw new Error("You must be signed in to update your profile");
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any).user.id as string;
+
+    // Validate the incoming data
+    const validatedData = agentProfileSchema.parse(data);
+
+    // Find existing agent profile
+    const existingAgent = await prisma.agent.findUnique({
+      where: { userId }
+    });
+
+    if (!existingAgent) {
+      throw new Error("Agent profile not found. Please subscribe first.");
+    }
+
+    // Update the agent profile
+    const updatedAgent = await prisma.agent.update({
+      where: { userId },
+      data: {
+        experience: validatedData.experience,
+        specialization: validatedData.specialization,
+        licenseNumber: validatedData.licenseNumber || null,
+        bio: validatedData.bio,
+        phone: validatedData.phone,
+        city: validatedData.city,
+        theme: validatedData.theme,
+        // profilePhotoUrl will be implemented later with file upload
+        updatedAt: new Date()
+      }
+    });
+
+    // Revalidate the agent's public profile page
+    revalidatePath(`/${updatedAgent.slug}`);
+    
+    // Redirect to the agent's public profile page
+    redirect(`/${updatedAgent.slug}`);
+
+  } catch (error) {
+    console.error("Error in updateAgentProfile:", error);
+    
+    if (error instanceof z.ZodError) {
+      throw new Error("Invalid profile data: " + error.issues.map(e => e.message).join(", "));
+    }
+    
+    throw new Error(error instanceof Error ? error.message : "Failed to update profile");
+  }
+}
+
+export async function generateBio(data: {
+  name: string;
+  experience: number;
+  specialization: string;
+  city: string;
+  licenseNumber?: string;
+}) {
+  try {
+    // Check if OpenAI API key is configured
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("OpenAI API key not configured. Please add OPENAI_API_KEY to your environment variables.");
+    }
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
+    const prompt = `Write a professional bio for a real estate agent with the following details:
+- Name: ${data.name}
+- Experience: ${data.experience} years in real estate
+- Specialization: ${data.specialization}
+- City: ${data.city}
+${data.licenseNumber ? `- License Number: ${data.licenseNumber}` : ""}
+
+The bio should be:
+- Professional and trustworthy
+- 2-3 sentences long (under 300 characters)
+- Highlight their expertise and local market knowledge
+- Suitable for a real estate agent profile page
+- Written in third person
+
+Do not include any special formatting, just plain text.`;
+
+    const completion = await openai.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: "gpt-3.5-turbo",
+      max_tokens: 150,
+      temperature: 0.7,
+    });
+
+    const generatedBio = completion.choices[0]?.message?.content?.trim();
+    
+    if (!generatedBio) {
+      throw new Error("Failed to generate bio content");
+    }
+
+    return {
+      success: true,
+      bio: generatedBio
+    };
+
+  } catch (error) {
+    console.error("Error generating bio:", error);
+    
+    if (error instanceof Error && error.message.includes("API key")) {
+      throw new Error("OpenAI API key not configured. Please add your API key to environment variables.");
+    }
+    
+    throw new Error(error instanceof Error ? error.message : "Failed to generate bio");
   }
 }
