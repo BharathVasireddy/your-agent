@@ -11,7 +11,7 @@ const authConfig = {
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
     }),
   ],
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt" as const },
   callbacks: {
     // This callback is essential to link the Agent profile to the User
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,10 +22,9 @@ const authConfig = {
       return session;
     },
   },
-} as const;
+};
 
 // @ts-expect-error NextAuth v4 type compatibility issue
-const nextAuth = NextAuth(authConfig);
+export const nextAuthHandler = NextAuth(authConfig);
 
-export const auth = nextAuth.auth;
-export default nextAuth;
+export default authConfig;

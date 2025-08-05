@@ -1,8 +1,10 @@
 "use server";
 
-import { auth } from "@/lib/auth";
+import { getServerSession } from "next-auth/next";
+import authConfig from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 function generateSlug(name: string): string {
   return name
@@ -15,7 +17,7 @@ function generateSlug(name: string): string {
 export async function grantSubscription() {
   try {
     // Get the current user's session
-    const session = await auth();
+    const session = await getServerSession(authConfig);
     
     if (!session || !session.user || !session.user.id) {
       throw new Error("You must be signed in to grant subscription");
@@ -96,5 +98,20 @@ export async function grantSubscription() {
     console.error("Error in grantSubscription:", error);
     
     throw new Error(error instanceof Error ? error.message : "Failed to grant subscription");
+  }
+}
+
+export async function subscribeAndRedirect() {
+  try {
+    // Grant the subscription
+    await grantSubscription();
+    
+    // Revalidate and redirect to wizard
+    revalidatePath('/onboarding/wizard');
+    redirect('/onboarding/wizard');
+  } catch (error) {
+    // If error occurs, redirect back to subscribe page with error
+    revalidatePath('/subscribe');
+    redirect('/subscribe?error=' + encodeURIComponent(error instanceof Error ? error.message : "Failed to subscribe"));
   }
 }
