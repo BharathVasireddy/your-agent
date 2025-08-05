@@ -97,14 +97,72 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
     }
   };
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const compressImage = (file: File): Promise<File> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new window.Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions while maintaining aspect ratio
+        const maxWidth = 1200;
+        const maxHeight = 800;
+        let { width, height } = img;
+        
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const compressedFile = new File([blob], file.name, {
+              type: 'image/jpeg',
+              lastModified: Date.now()
+            });
+            resolve(compressedFile);
+          } else {
+            resolve(file);
+          }
+        }, 'image/jpeg', 0.8);
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length + formData.photos.length > 10) {
       setErrors(prev => ({ ...prev, photos: 'Maximum 10 photos allowed' }));
       return;
     }
-    setFormData(prev => ({ ...prev, photos: [...prev.photos, ...files] }));
-    setErrors(prev => ({ ...prev, photos: '' }));
+
+    try {
+      // Compress each image
+      const compressedFiles = await Promise.all(
+        files.map(file => compressImage(file))
+      );
+      
+      setFormData(prev => ({ ...prev, photos: [...prev.photos, ...compressedFiles] }));
+      setErrors(prev => ({ ...prev, photos: '' }));
+    } catch (error) {
+      console.error('Error compressing images:', error);
+      setErrors(prev => ({ ...prev, photos: 'Error processing images. Please try again.' }));
+    }
   };
 
   const removePhoto = (index: number) => {
@@ -422,7 +480,7 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
               <p className="text-sm text-zinc-600">
                 {formData.photos.length >= 10 ? 'Maximum photos reached' : 'Click to upload photos or drag and drop'}
               </p>
-              <p className="text-xs text-zinc-400 mt-1">PNG, JPG up to 5MB each</p>
+              <p className="text-xs text-zinc-400 mt-1">PNG, JPG up to 10MB each (automatically compressed)</p>
             </label>
           </div>
 

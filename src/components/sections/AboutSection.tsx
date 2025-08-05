@@ -1,6 +1,9 @@
 'use client';
 
-import { Award, Users, Home, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import EditableWrapper from '@/components/ClientOnlyEditableWrapper';
+import { updateAgentBio } from '@/app/actions';
+import { useParams } from 'next/navigation';
 
 interface Agent {
   id: string;
@@ -19,97 +22,58 @@ interface AboutSectionProps {
 }
 
 export default function AboutSection({ agent }: AboutSectionProps) {
+  const params = useParams();
+  const agentSlug = params.agentSlug as string;
+
+  const scrollToContact = () => {
+    const element = document.querySelector('#contact');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const downloadVCard = () => {
+    // This would typically generate and download a vCard file
+    // For now, we'll just scroll to contact
+    scrollToContact();
+  };
+
+  // Default bio if none provided
+  const defaultBio = `With over ${agent.experience || 15} years of experience in luxury real estate, I specialize in helping clients find their dream homes in ${agent.city || 'the city'}'s most prestigious neighborhoods. My deep knowledge of the local market, combined with a passion for exceptional service, ensures that every client receives personalized attention and expert guidance throughout their real estate journey.`;
+
   const stats = [
     {
-      icon: Clock,
-      value: agent.experience || 0,
-      label: agent.experience === 1 ? 'Year Experience' : 'Years Experience',
-      description: 'Proven track record'
+      number: `${agent.experience || 15}+`,
+      label: 'Years Experience',
+      bgColor: 'bg-blue-200',
+      textColor: 'text-blue-900'
     },
     {
-      icon: Users,
-      value: '100+',
-      label: 'Happy Clients',
-      description: 'Successful transactions'
+      number: '200+',
+      label: 'Clients',
+      bgColor: 'bg-purple-200',
+      textColor: 'text-purple-900'
     },
     {
-      icon: Home,
-      value: '200+',
-      label: 'Properties Sold',
-      description: 'Across the city'
-    },
-    {
-      icon: Award,
-      value: 'Top 10%',
-      label: 'Market Leader',
-      description: 'In local market'
+      number: '450+',
+      label: 'Property Sold',
+      bgColor: 'bg-orange-200',
+      textColor: 'text-orange-900'
     }
   ];
 
   return (
-    <section id="about" className="py-16 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Content */}
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-zinc-950 mb-6">
-                About {agent.user.name}
-              </h2>
-              
-              <div className="text-lg text-zinc-700 mb-8 leading-relaxed">
-                {agent.bio ? (
-                  <p>{agent.bio}</p>
-                ) : (
-                  <div className="space-y-4">
-                    <p>
-                      As a dedicated real estate professional serving {agent.city}{agent.area ? ` and ${agent.area}` : ''}, 
-                      I bring {agent.experience || 'years of'} experience in helping clients find their perfect home 
-                      and make smart investment decisions.
-                    </p>
-                    <p>
-                      My commitment to excellence, deep market knowledge, and personalized approach ensure that 
-                      every client receives the highest level of service. Whether you&apos;re buying, selling, or investing, 
-                      I&apos;m here to guide you through every step of the process.
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* CTA */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button
-                  onClick={() => {
-                    const element = document.querySelector('#contact');
-                    if (element) {
-                      element.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
-                  className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-                >
-                  Let&apos;s Work Together
-                </button>
-                <button
-                  onClick={() => {
-                    const element = document.querySelector('#testimonials');
-                    if (element) {
-                      element.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
-                  className="border border-red-600 text-red-600 hover:bg-red-50 px-6 py-3 rounded-lg font-semibold transition-colors"
-                >
-                  Read Client Reviews
-                </button>
-              </div>
-            </div>
-
-            {/* Stats & Image */}
-            <div>
-              {/* Agent Image */}
-              {agent.profilePhotoUrl && (
-                <div className="mb-8 flex justify-center lg:justify-end">
-                  <div className="relative">
-                    <div className="w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden shadow-xl">
+    <section id="about" className="py-16 lg:py-24 bg-white">
+      <div className="container mx-auto px-4 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            
+            {/* Left Side - Agent Image */}
+            <div className="relative order-2 lg:order-1">
+              <div className="relative">
+                {agent.profilePhotoUrl ? (
+                  <div className="w-full max-w-md mx-auto lg:mx-0">
+                    <div className="aspect-[4/5] rounded-3xl overflow-hidden">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={agent.profilePhotoUrl}
@@ -117,30 +81,80 @@ export default function AboutSection({ agent }: AboutSectionProps) {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    
-                    {/* Experience Badge */}
-                    <div className="absolute -bottom-4 -right-4 bg-red-600 text-white px-4 py-2 rounded-full shadow-lg">
-                      <div className="text-center">
-                        <div className="text-xl font-bold">{agent.experience || 0}+</div>
-                        <div className="text-xs">Years</div>
+                  </div>
+                ) : (
+                  <div className="w-full max-w-md mx-auto lg:mx-0">
+                    <div className="aspect-[4/5] rounded-3xl bg-gray-300 flex items-center justify-center">
+                      <div className="text-gray-500 text-center">
+                        <div className="text-4xl mb-2">👤</div>
+                        <div className="text-sm">No photo available</div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+            </div>
 
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-4">
+            {/* Right Side - Content */}
+            <div className="order-1 lg:order-2">
+              {/* About Tag */}
+              <div className="inline-flex items-center px-4 py-2 bg-gray-200 rounded-full mb-6">
+                <span className="text-gray-700 text-sm font-medium">About</span>
+              </div>
+
+              {/* Agent Name */}
+              <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+                {agent.user.name || 'Agent Name'}
+              </h2>
+
+              {/* Bio Text */}
+              <EditableWrapper
+                value={agent.bio || defaultBio}
+                onSave={async (newBio) => {
+                  await updateAgentBio(agentSlug, newBio);
+                }}
+                type="textarea"
+                placeholder="Tell your story..."
+              >
+                <p className="text-gray-600 text-lg leading-relaxed mb-8">
+                  {agent.bio || defaultBio}
+                </p>
+              </EditableWrapper>
+
+              {/* Statistics Cards */}
+              <div className="grid grid-cols-3 gap-4 mb-8">
                 {stats.map((stat, index) => (
-                  <div key={index} className="bg-zinc-50 rounded-lg p-4 text-center">
-                    <div className="flex justify-center mb-2">
-                      <stat.icon className="w-6 h-6 text-red-600" />
+                  <div
+                    key={index}
+                    className={`${stat.bgColor} rounded-2xl p-8 text-center min-h-[120px] flex flex-col justify-center`}
+                  >
+                    <div className={`text-2xl lg:text-3xl font-bold ${stat.textColor} mb-1`}>
+                      {stat.number}
                     </div>
-                    <div className="text-2xl font-bold text-zinc-950 mb-1">{stat.value}</div>
-                    <div className="text-sm font-semibold text-zinc-700 mb-1">{stat.label}</div>
-                    <div className="text-xs text-zinc-500">{stat.description}</div>
+                    <div className={`text-sm ${stat.textColor} font-medium`}>
+                      {stat.label}
+                    </div>
                   </div>
                 ))}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button
+                  onClick={scrollToContact}
+                  className="bg-black hover:bg-gray-800 text-white px-12 py-4 rounded-full font-medium transition-all duration-300 text-lg"
+                  size="lg"
+                >
+                  Book a slot
+                </Button>
+                <Button
+                  onClick={downloadVCard}
+                  variant="outline"
+                  className="border-2 border-gray-900 text-gray-900 hover:bg-gray-100 px-12 py-4 rounded-full font-medium transition-all duration-300 bg-transparent text-lg"
+                  size="lg"
+                >
+                  Download visiting card
+                </Button>
               </div>
             </div>
           </div>

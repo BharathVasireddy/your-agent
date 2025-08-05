@@ -1,7 +1,8 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Bed, Bath, Home, MapPin, IndianRupee, Download } from 'lucide-react';
+import { Bed, Bath, Home, MapPin, IndianRupee } from 'lucide-react';
+import { generatePropertyBrochure } from '@/lib/pdfGenerator';
 
 interface Property {
   id: string;
@@ -21,18 +22,40 @@ interface Property {
   brochureUrl: string | null;
 }
 
-interface PropertiesSectionProps {
-  properties: Property[];
+interface Agent {
+  user: {
+    name: string | null;
+    email: string | null;
+  };
+  phone: string | null;
+  city: string | null;
+  area: string | null;
+  experience: number | null;
+  bio: string | null;
 }
 
-export default function PropertiesSection({ properties }: PropertiesSectionProps) {
+interface PropertiesSectionProps {
+  properties: Property[];
+  agent: Agent;
+}
+
+export default function PropertiesSection({ properties, agent }: PropertiesSectionProps) {
   const formatPrice = (price: number) => {
     if (price >= 10000000) {
-      return `₹${(price / 10000000).toFixed(1)} Cr`;
+      return `${(price / 10000000).toFixed(1)} Cr`;
     } else if (price >= 100000) {
-      return `₹${(price / 100000).toFixed(1)} L`;
+      return `${(price / 100000).toFixed(1)} L`;
     } else {
-      return `₹${price.toLocaleString()}`;
+      return `${price.toLocaleString()}`;
+    }
+  };
+
+  const handleDownloadBrochure = async (property: Property) => {
+    try {
+      await generatePropertyBrochure(property, agent);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Sorry, there was an error generating the brochure. Please try again.');
     }
   };
 
@@ -65,18 +88,18 @@ export default function PropertiesSection({ properties }: PropertiesSectionProps
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {properties.slice(0, 6).map((property) => (
-            <div key={property.id} className="bg-white rounded-lg shadow-sm border border-zinc-200 overflow-hidden hover:shadow-lg transition-all duration-300">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {properties.slice(0, 8).map((property) => (
+            <div key={property.id} className="bg-white rounded-2xl overflow-hidden transition-all duration-300 group">
               {/* Property Image */}
-              <div className="relative h-48 overflow-hidden">
+              <div className="relative h-56 overflow-hidden">
                 {property.photos.length > 0 ? (
                   <>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={property.photos[0]}
                       alt={property.title}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </>
                 ) : (
@@ -85,70 +108,53 @@ export default function PropertiesSection({ properties }: PropertiesSectionProps
                   </div>
                 )}
                 
-                {/* Status Badge */}
-                <div className="absolute top-3 left-3">
-                  <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                    property.status === 'Available' 
-                      ? 'bg-green-100 text-green-800' 
-                      : property.status === 'Sold'
-                      ? 'bg-red-100 text-red-800'
-                      : 'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {property.status}
-                  </span>
-                </div>
-
                 {/* Listing Type Badge */}
-                <div className="absolute top-3 right-3">
-                  <span className="bg-red-600 text-white px-2 py-1 text-xs font-semibold rounded-full">
-                    {property.listingType}
+                <div className="absolute top-4 right-4">
+                  <span className="bg-white/95 backdrop-blur-sm text-zinc-700 px-3 py-1.5 text-xs font-medium rounded-lg shadow-sm">
+                    For {property.listingType}
                   </span>
                 </div>
               </div>
 
               {/* Property Details */}
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-lg font-semibold text-zinc-950 line-clamp-1">{property.title}</h3>
-                  <div className="flex items-center text-red-600 font-bold text-lg">
-                    <IndianRupee className="w-4 h-4" />
+              <div className="p-5">
+                {/* Location */}
+                <div className="flex items-center text-zinc-500 text-sm mb-2">
+                  <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+                  <span className="line-clamp-1">{property.location}</span>
+                </div>
+
+                {/* Title */}
+                <h3 className="text-lg font-semibold text-zinc-950 mb-3 line-clamp-2 leading-snug">{property.title}</h3>
+
+                {/* Property Features */}
+                <div className="flex items-center gap-4 text-sm text-zinc-600 mb-4">
+                  <div className="flex items-center">
+                    <Bed className="w-4 h-4 mr-1" />
+                    <span>{property.bedrooms}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Bath className="w-4 h-4 mr-1" />
+                    <span>{property.bathrooms}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Home className="w-4 h-4 mr-1" />
+                    <span>{formatArea(property.area)}</span>
+                  </div>
+                </div>
+
+                {/* Price */}
+                <div className="mb-5">
+                  <div className="flex items-center text-zinc-950 font-bold text-xl">
+                    <IndianRupee className="w-5 h-5 mr-1" />
                     <span>{formatPrice(property.price)}</span>
                   </div>
                 </div>
 
-                <div className="flex items-center text-zinc-600 text-sm mb-3">
-                  <MapPin className="w-4 h-4 mr-1" />
-                  <span className="line-clamp-1">{property.location}</span>
-                </div>
-
-                <p className="text-zinc-700 text-sm mb-4 line-clamp-2">{property.description}</p>
-
-                {/* Property Features */}
-                <div className="flex items-center justify-between text-sm text-zinc-600 mb-4">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center">
-                      <Bed className="w-4 h-4 mr-1" />
-                      <span>{property.bedrooms} Bed</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Bath className="w-4 h-4 mr-1" />
-                      <span>{property.bathrooms} Bath</span>
-                    </div>
-                  </div>
-                  <div className="text-zinc-900 font-medium">
-                    {formatArea(property.area)}
-                  </div>
-                </div>
-
-                {/* Property Type */}
-                <div className="text-xs text-zinc-500 mb-4">
-                  {property.propertyType}
-                </div>
-
                 {/* Action Buttons */}
-                <div className="flex space-x-2">
+                <div className="flex flex-col gap-2">
                   <Button 
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white text-sm"
+                    className="w-full bg-zinc-950 hover:bg-zinc-800 text-white text-sm font-medium h-10 rounded-full"
                     onClick={() => {
                       const element = document.querySelector('#contact');
                       if (element) {
@@ -156,19 +162,16 @@ export default function PropertiesSection({ properties }: PropertiesSectionProps
                       }
                     }}
                   >
-                    Inquire Now
+                    View property
                   </Button>
                   
-                  {property.brochureUrl && (
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="border-red-200 text-red-600 hover:bg-red-50"
-                      onClick={() => window.open(property.brochureUrl!, '_blank')}
-                    >
-                      <Download className="w-4 h-4" />
-                    </Button>
-                  )}
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-zinc-200 text-zinc-700 hover:bg-zinc-50 text-sm font-medium h-10 rounded-full"
+                    onClick={() => handleDownloadBrochure(property)}
+                  >
+                    Download brochure
+                  </Button>
                 </div>
               </div>
             </div>
@@ -176,7 +179,7 @@ export default function PropertiesSection({ properties }: PropertiesSectionProps
         </div>
 
         {/* View All Properties Button */}
-        {properties.length > 6 && (
+        {properties.length > 8 && (
           <div className="text-center mt-12">
             <Button 
               onClick={() => {
@@ -187,7 +190,7 @@ export default function PropertiesSection({ properties }: PropertiesSectionProps
               }}
               variant="outline" 
               size="lg"
-              className="border-red-600 text-red-600 hover:bg-red-50 px-8"
+              className="border-zinc-300 text-zinc-700 hover:bg-zinc-50 px-8 rounded-full"
             >
               View All {properties.length} Properties
             </Button>

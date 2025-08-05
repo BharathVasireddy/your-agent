@@ -937,3 +937,113 @@ export async function deleteFAQ(id: string) {
     throw new Error(error instanceof Error ? error.message : "Failed to delete FAQ");
   }
 }
+
+// Profile Update Actions for Live Editing
+export async function updateAgentHeroTitle(agentSlug: string, heroTitle: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!session || !(session as any).user || !(session as any).user.id) {
+      throw new Error("You must be signed in to update profile");
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any).user.id as string;
+
+    // Find the agent and verify ownership
+    const agent = await prisma.agent.findFirst({
+      where: {
+        slug: agentSlug,
+        userId: userId
+      }
+    });
+
+    if (!agent) {
+      throw new Error("Agent not found or you don't have permission to edit");
+    }
+
+    await prisma.agent.update({
+      where: { id: agent.id },
+      data: { heroTitle }
+    });
+
+    revalidatePath(`/${agentSlug}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating hero title:", error);
+    throw new Error(error instanceof Error ? error.message : "Failed to update hero title");
+  }
+}
+
+export async function updateAgentHeroSubtitle(agentSlug: string, heroSubtitle: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!session || !(session as any).user || !(session as any).user.id) {
+      throw new Error("You must be signed in to update profile");
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any).user.id as string;
+
+    const agent = await prisma.agent.findFirst({
+      where: {
+        slug: agentSlug,
+        userId: userId
+      }
+    });
+
+    if (!agent) {
+      throw new Error("Agent not found or you don't have permission to edit");
+    }
+
+    await prisma.agent.update({
+      where: { id: agent.id },
+      data: { heroSubtitle }
+    });
+
+    revalidatePath(`/${agentSlug}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating hero subtitle:", error);
+    throw new Error(error instanceof Error ? error.message : "Failed to update hero subtitle");
+  }
+}
+
+export async function updateAgentBio(agentSlug: string, bio: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!session || !(session as any).user || !(session as any).user.id) {
+      throw new Error("You must be signed in to update profile");
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any).user.id as string;
+
+    const agent = await prisma.agent.findFirst({
+      where: {
+        slug: agentSlug,
+        userId: userId
+      }
+    });
+
+    if (!agent) {
+      throw new Error("Agent not found or you don't have permission to edit");
+    }
+
+    await prisma.agent.update({
+      where: { id: agent.id },
+      data: { bio }
+    });
+
+    revalidatePath(`/${agentSlug}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating bio:", error);
+    throw new Error(error instanceof Error ? error.message : "Failed to update bio");
+  }
+}

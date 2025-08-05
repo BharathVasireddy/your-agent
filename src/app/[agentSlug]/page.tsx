@@ -1,5 +1,7 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
 // Import the new section components
@@ -11,6 +13,8 @@ import TestimonialsSection from '@/components/sections/TestimonialsSection';
 import FaqSection from '@/components/sections/FaqSection';
 import ContactSection from '@/components/sections/ContactSection';
 import Footer from '@/components/sections/Footer';
+import { EditModeProvider } from '@/components/EditModeProvider';
+import EditToggleButton from '@/components/EditToggleButton';
 
 // Theme configuration
 function getThemeClass(theme: string): string {
@@ -74,6 +78,9 @@ export default async function AgentProfilePage({ params }: AgentProfilePageProps
   // Await the params in Next.js 15
   const { agentSlug } = await params;
   
+  // Check if user is logged in and owns this profile
+  const session = await getServerSession(authOptions);
+  
   // Find the agent by slug
   const agent = await prisma.agent.findUnique({
     where: {
@@ -82,6 +89,7 @@ export default async function AgentProfilePage({ params }: AgentProfilePageProps
     include: {
       user: {
         select: {
+          id: true,
           name: true,
           email: true,
           image: true,
@@ -97,19 +105,26 @@ export default async function AgentProfilePage({ params }: AgentProfilePageProps
     notFound();
   }
 
+  // Check if current user owns this profile
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isOwner = session && (session as any).user && (session as any).user.id === agent.user.id;
+
   // Get theme class for styling
   const themeClass = getThemeClass(agent.theme);
 
   return (
-    <main className={themeClass}>
-      <Header agent={agent} />
-      <HeroSection agent={agent} />
-      <PropertiesSection properties={agent.properties} />
-      <AboutSection agent={agent} />
-      <TestimonialsSection testimonials={agent.testimonials} />
-      <FaqSection faqs={agent.faqs} />
-      <ContactSection agent={agent} />
-      <Footer />
-    </main>
+    <EditModeProvider isOwner={!!isOwner}>
+      <main className={themeClass}>
+        <Header agent={agent} />
+        <HeroSection agent={agent} />
+        <PropertiesSection properties={agent.properties} agent={agent} />
+        <AboutSection agent={agent} />
+        <TestimonialsSection testimonials={agent.testimonials} />
+        <FaqSection faqs={agent.faqs} />
+        <ContactSection agent={agent} />
+        <Footer />
+        <EditToggleButton />
+      </main>
+    </EditModeProvider>
   );
 }
