@@ -46,7 +46,7 @@ export default function DashboardAgentHeader({ agent }: DashboardAgentHeaderProp
             </p>
             {agent?.slug && (
               <p className="text-sm text-zinc-500">
-                youragent.in/agent/{agent.slug}
+                                     youragent.in/{agent.slug}
               </p>
             )}
           </div>

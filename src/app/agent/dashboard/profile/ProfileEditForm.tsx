@@ -432,7 +432,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
             <div className="relative">
               <div className="flex">
                 <span className="inline-flex items-center px-3 text-sm text-zinc-500 bg-zinc-50 border border-r-0 border-zinc-300 rounded-l-md">
-                  youragent.in/agent/
+                  youragent.in/
                 </span>
                 <Input
                   id="slug"

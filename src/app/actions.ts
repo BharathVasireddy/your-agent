@@ -200,8 +200,8 @@ export async function updateAgentProfile(data: {
       }
     });
 
-    // Revalidate the agent's public profile page and dashboard
-    revalidatePath(`/agent/${updatedAgent.slug}`);
+      // Revalidate the agent's public profile page and dashboard
+  revalidatePath(`/${updatedAgent.slug}`);
     revalidatePath('/agent/dashboard');
     
     // Redirect to dashboard after successful onboarding
