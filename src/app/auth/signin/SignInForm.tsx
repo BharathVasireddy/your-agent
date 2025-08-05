@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -170,12 +171,12 @@ export default function SignInForm() {
 
       {/* Forgot Password */}
       <div className="text-center">
-        <a 
+        <Link 
           href="/auth/forgot-password" 
           className="text-sm text-red-600 hover:text-red-700"
         >
           Forgot your password?
-        </a>
+        </Link>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
+import Link from 'next/link';
 import SignInForm from './SignInForm';
 
 export default async function SignInPage() {
@@ -32,9 +33,9 @@ export default async function SignInPage() {
         <div className="text-center">
           <p className="text-sm text-zinc-600">
             Don&apos;t have an account?{' '}
-            <a href="/auth/register" className="text-red-600 hover:text-red-700 font-medium">
+            <Link href="/auth/register" className="text-red-600 hover:text-red-700 font-medium">
               Sign up
-            </a>
+            </Link>
           </p>
         </div>
       </div>
