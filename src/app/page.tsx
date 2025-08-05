@@ -50,13 +50,12 @@ export default function HomePage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <div className="transform scale-125">
-                <LoginButton />
-              </div>
-              <Link href="#how-it-works">
-                <Button variant="outline" className="px-8 py-4 text-lg border-zinc-300 text-zinc-700">
-                  See How It Works
-                </Button>
+              <LoginButton />
+              <Link 
+                href="#how-it-works"
+                className="flex items-center gap-2 h-10 px-6 border-2 border-red-600 text-red-600 bg-white rounded-md hover:bg-red-50 transition-all duration-200 font-medium"
+              >
+                See How It Works
               </Link>
             </div>
 
@@ -327,7 +326,7 @@ export default function HomePage() {
           </div>
 
                     <a href="#header">
-            <Button className="bg-white text-red-600 hover:bg-red-50 px-8 py-4 text-lg font-semibold">
+            <Button size="lg" className="bg-white text-red-600 hover:bg-red-50 font-medium">
               Start Your Free Profile Today
             </Button>
           </a>

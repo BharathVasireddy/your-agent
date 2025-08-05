@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
-import { LogIn, LogOut, User } from "lucide-react";
+import { LogIn, LogOut, User, LayoutDashboard } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import AuthModal from "./AuthModal";
 
 export default function LoginButton() {
@@ -17,7 +18,7 @@ export default function LoginButton() {
     );
   }
 
-  // Authenticated state - show user image and sign out button
+  // Authenticated state - show user image and dashboard button
   if (session) {
     return (
       <div className="flex items-center gap-3">
@@ -34,17 +35,16 @@ export default function LoginButton() {
             <User size={16} className="text-gray-500" />
           </div>
         )}
-        <button
-          onClick={() => signOut()}
-          className="flex items-center gap-2 px-4 py-2 bg-white border-2 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium"
-          style={{ 
-            borderColor: "var(--border-color)",
-            color: "var(--text-secondary)"
-          }}
+        <Link
+          href="/agent/dashboard"
+          className="flex items-center gap-2 h-10 px-6 text-white rounded-md transition-all duration-200 font-medium btn-primary"
+          style={{ backgroundColor: "var(--primary-red)" }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--primary-red-hover)"}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--primary-red)"}
         >
-          <LogOut size={16} />
-          Sign Out
-        </button>
+          <LayoutDashboard size={16} />
+          Go to Dashboard
+        </Link>
       </div>
     );
   }
@@ -54,7 +54,7 @@ export default function LoginButton() {
     <>
       <button
         onClick={() => setShowAuthModal(true)}
-        className="flex items-center gap-2 px-6 py-3 text-white rounded-lg transition-all duration-200 font-semibold btn-primary"
+        className="flex items-center gap-2 h-10 px-6 text-white rounded-md transition-all duration-200 font-medium btn-primary"
         style={{ backgroundColor: "var(--primary-red)" }}
         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--primary-red-hover)"}
         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--primary-red)"}
