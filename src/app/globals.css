@@ -1,7 +1,6 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *));
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   /* Color Palette - Action-Oriented, Confident, and Clean */
@@ -206,9 +205,9 @@ body {
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-zinc-200;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-white text-zinc-950;
   }
 }
