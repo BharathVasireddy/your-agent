@@ -3,8 +3,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import Google from "next-auth/providers/google";
 import prisma from "./prisma";
 
-// @ts-expect-error NextAuth v4 type compatibility issue
-export default NextAuth({
+const authConfig = {
   adapter: PrismaAdapter(prisma),
   providers: [
     Google({
@@ -23,4 +22,10 @@ export default NextAuth({
       return session;
     },
   },
-});
+} as const;
+
+// @ts-expect-error NextAuth v4 type compatibility issue
+const nextAuth = NextAuth(authConfig);
+
+export const auth = nextAuth.auth;
+export default nextAuth;

@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-
-import { makeSubscribedAgent } from "./actions";
+import { grantSubscription } from "@/app/actions";
 
 export default function DevPage() {
   const { data: session, status } = useSession();
@@ -11,21 +10,14 @@ export default function DevPage() {
   const [message, setMessage] = useState("");
 
   const handleMakeSubscribed = async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (!session?.user || !(session.user as any).id) return;
+    if (!session?.user) return;
 
     setIsLoading(true);
     setMessage("");
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = await makeSubscribedAgent((session.user as any).id);
-      
-      if (result.success) {
-        setMessage(`✅ Success! Agent profile updated. ${result.message}`);
-      } else {
-        setMessage(`❌ Error: ${result.error}`);
-      }
+      const result = await grantSubscription();
+      setMessage(`✅ Success! Agent profile updated. ${result.message}`);
     } catch (error) {
       setMessage(`❌ Error: ${error instanceof Error ? error.message : "Something went wrong"}`);
     } finally {
@@ -104,8 +96,7 @@ export default function DevPage() {
 
         <div className="text-center">
           <p className="text-sm text-gray-500">
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            User ID: {(session.user as any).id}
+            User: {session.user?.name || session.user?.email}
           </p>
         </div>
       </div>
