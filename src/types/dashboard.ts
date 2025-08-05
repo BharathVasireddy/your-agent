@@ -8,7 +8,6 @@ export interface AgentProfile {
   city: string | null;
   area: string | null;
   bio: string | null;
-  hasSeenTour: boolean;
   user: {
     id: string;
     name: string | null;

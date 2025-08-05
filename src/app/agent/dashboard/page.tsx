@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
-import DashboardWithTour from './DashboardWithTour';
+import DashboardContent from './DashboardContent';
 import type { Property } from '@/types/dashboard';
 
 export default async function DashboardPage() {
@@ -36,11 +36,8 @@ export default async function DashboardPage() {
   const rentProperties = validProperties.filter(p => p.listingType === 'Rent').length;
   const availableProperties = validProperties.filter(p => p.status === 'Available').length;
 
-  const needsTour = agent ? !agent.hasSeenTour : false;
-
   return (
-    <DashboardWithTour 
-      needsTour={needsTour}
+    <DashboardContent 
       agent={agent}
       properties={validProperties}
       saleProperties={saleProperties}

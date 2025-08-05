@@ -391,34 +391,7 @@ export async function deletePropertyAction(propertySlug: string) {
   }
 }
 
-export async function markTourAsCompleteAction() {
-  try {
-    // Get the current user's session
-    const session = await getServerSession(authOptions);
-    
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (!session || !(session as any).user || !(session as any).user.id) {
-      throw new Error("You must be signed in to complete tour");
-    }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userId = (session as any).user.id as string;
-
-    // Mark tour as complete
-    await prisma.agent.update({
-      where: { userId },
-      data: { hasSeenTour: true }
-    });
-
-    // Revalidate the dashboard page to reflect the changes
-    revalidatePath('/agent/dashboard');
-    
-    return { success: true };
-  } catch (error) {
-    console.error("Error marking tour as complete:", error);
-    throw new Error("Failed to mark tour as complete");
-  }
-}
 
 export async function grantSubscription() {
   try {
@@ -602,11 +575,11 @@ export async function updateAgentProfile(data: {
     });
 
       // Revalidate the agent's public profile page and dashboard
-  revalidatePath(`/${updatedAgent.slug}`);
+    revalidatePath(`/${updatedAgent.slug}`);
     revalidatePath('/agent/dashboard');
+    revalidatePath('/agent/dashboard/profile');
     
-    // Redirect to dashboard after successful onboarding
-    redirect('/agent/dashboard');
+    return { success: true, agent: updatedAgent };
 
   } catch (error) {
     // Check if this is a Next.js redirect (which is expected behavior)

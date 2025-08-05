@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { User, Upload, X, Loader2, Check, Sparkles, Save } from 'lucide-react';
 import { updateAgentProfile, generateBio } from '@/app/actions';
+import toast from 'react-hot-toast';
 
 interface Agent {
   id: string;
@@ -68,9 +69,32 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
     cleanSlug: ''
   });
 
+  // Indian cities
+  const indianCities = [
+    { label: "Hyderabad", value: "Hyderabad" },
+    { label: "Mumbai", value: "Mumbai" },
+    { label: "Delhi", value: "Delhi" },
+    { label: "Bangalore", value: "Bangalore" },
+    { label: "Chennai", value: "Chennai" },
+    { label: "Kolkata", value: "Kolkata" },
+    { label: "Pune", value: "Pune" },
+    { label: "Ahmedabad", value: "Ahmedabad" },
+    { label: "Jaipur", value: "Jaipur" },
+    { label: "Surat", value: "Surat" },
+    { label: "Lucknow", value: "Lucknow" },
+    { label: "Kanpur", value: "Kanpur" },
+    { label: "Nagpur", value: "Nagpur" },
+    { label: "Indore", value: "Indore" },
+    { label: "Thane", value: "Thane" },
+    { label: "Bhopal", value: "Bhopal" },
+    { label: "Visakhapatnam", value: "Visakhapatnam" },
+    { label: "Vadodara", value: "Vadodara" },
+    { label: "Firozabad", value: "Firozabad" },
+    { label: "Ludhiana", value: "Ludhiana" }
+  ];
+
   // Hyderabad areas
   const hyderabadAreas = [
-    { label: "Hyderabad", value: "Hyderabad" },
     { label: "Madhapur", value: "Madhapur" },
     { label: "Gachibowli", value: "Gachibowli" },
     { label: "Kokapet", value: "Kokapet" },
@@ -89,11 +113,68 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
     { label: "Chanda Nagar", value: "Chanda Nagar" },
     { label: "Manikonda", value: "Manikonda" },
     { label: "Nanakramguda", value: "Nanakramguda" },
-    { label: "Raidurg", value: "Raidurg" }
+    { label: "Raidurg", value: "Raidurg" },
+    { label: "Uppal", value: "Uppal" },
+    { label: "LB Nagar", value: "LB Nagar" },
+    { label: "Dilsukhnagar", value: "Dilsukhnagar" },
+    { label: "Ameerpet", value: "Ameerpet" },
+    { label: "Malakpet", value: "Malakpet" },
+    { label: "Other", value: "Other" }
   ];
 
+  // Phone validation
+  const [phoneError, setPhoneError] = useState<string | null>(null);
+
+  const validatePhone = (phone: string): boolean => {
+    // Remove all non-digit characters for validation
+    const digitsOnly = phone.replace(/\D/g, '');
+    
+    // Check if it's a valid Indian mobile number
+    if (digitsOnly.length === 10 && digitsOnly.match(/^[6-9]/)) {
+      return true; // Valid 10-digit Indian mobile
+    } else if (digitsOnly.length === 12 && digitsOnly.startsWith('91') && digitsOnly.substring(2).match(/^[6-9]/)) {
+      return true; // Valid with +91 country code
+    } else if (digitsOnly.length === 13 && digitsOnly.startsWith('091') && digitsOnly.substring(3).match(/^[6-9]/)) {
+      return true; // Valid with 091 country code
+    }
+    
+    return false;
+  };
+
+  const formatPhone = (phone: string): string => {
+    // Remove all non-digit characters
+    const digitsOnly = phone.replace(/\D/g, '');
+    
+    // Format based on length
+    if (digitsOnly.length <= 10) {
+      // Format as XXXXX XXXXX
+      return digitsOnly.replace(/(\d{5})(\d{1,5})/, '$1 $2').trim();
+    } else if (digitsOnly.length <= 12) {
+      // Format as +XX XXXXX XXXXX
+      return digitsOnly.replace(/(\d{2})(\d{5})(\d{1,5})/, '+$1 $2 $3').trim();
+    }
+    
+    return phone; // Return as-is if too long
+  };
+
   const handleInputChange = (field: string, value: string | number) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    if (field === 'phone' && typeof value === 'string') {
+      // Format phone number and validate
+      const formattedPhone = formatPhone(value);
+      const isValidPhone = validatePhone(value);
+      
+      setPhoneError(value && !isValidPhone ? 'Please enter a valid Indian mobile number' : null);
+      setFormData(prev => ({ ...prev, [field]: formattedPhone }));
+    } else if (field === 'city' && typeof value === 'string') {
+      // Reset area when city changes (unless it's Hyderabad)
+      setFormData(prev => ({ 
+        ...prev, 
+        [field]: value,
+        area: value === 'Hyderabad' ? prev.area : '' 
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    }
   };
 
   // Debounced slug validation
@@ -143,7 +224,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
 
   const handleGenerateBio = async () => {
     if (!formData.experience || !formData.city) {
-      setGenerationError('Please fill in your experience and city first.');
+      toast.error('Please fill in your experience and city first.');
       return;
     }
 
@@ -160,15 +241,16 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
 
       if (result.success && result.bio) {
         setFormData(prev => ({ ...prev, bio: result.bio }));
+        toast.success('Bio generated successfully!');
       }
 
     } catch (error) {
       console.error('Error generating bio:', error);
-      setGenerationError(
-        error instanceof Error 
-          ? error.message 
-          : 'Failed to generate bio. Please try again.'
-      );
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Failed to generate bio. Please try again.';
+      setGenerationError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsGenerating(false);
     }
@@ -176,12 +258,16 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
 
   const handleFileSelect = (file: File) => {
     if (!file.type.match(/^image\/(jpeg|png|webp)$/)) {
-      setUploadError('Please select a JPEG, PNG, or WebP image.');
+      const errorMsg = 'Please select a JPEG, PNG, or WebP image.';
+      setUploadError(errorMsg);
+      toast.error(errorMsg);
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setUploadError('Image size must be less than 5MB.');
+      const errorMsg = 'Image size must be less than 5MB.';
+      setUploadError(errorMsg);
+      toast.error(errorMsg);
       return;
     }
 
@@ -207,12 +293,17 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
       if (result.success && result.url) {
         setFormData(prev => ({ ...prev, profilePhotoUrl: result.url }));
         setPreviewUrl(result.url);
+        toast.success('Profile photo uploaded successfully!');
       } else {
-        setUploadError(result.error || 'Failed to upload image.');
+        const errorMsg = result.error || 'Failed to upload image.';
+        setUploadError(errorMsg);
+        toast.error(errorMsg);
       }
     } catch (error) {
       console.error('Error uploading image:', error);
-      setUploadError('Failed to upload image. Please try again.');
+      const errorMsg = 'Failed to upload image. Please try again.';
+      setUploadError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setIsUploading(false);
     }
@@ -240,30 +331,37 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate required fields
     if (!formData.city || !formData.phone || !formData.experience) {
-      alert('Please fill in all required fields.');
+      toast.error('Please fill in all required fields.');
+      return;
+    }
+
+    // Validate area for Hyderabad
+    if (formData.city === 'Hyderabad' && !formData.area) {
+      toast.error('Please select your area in Hyderabad.');
+      return;
+    }
+
+    // Validate phone number
+    if (!validatePhone(formData.phone)) {
+      toast.error('Please enter a valid Indian mobile number.');
       return;
     }
 
     try {
       setIsSubmitting(true);
       
-      await updateAgentProfile(formData);
+      const result = await updateAgentProfile(formData);
       
-      // The updateAgentProfile function handles the redirect automatically
-      // No need to manually redirect here
-      
-    } catch (error) {
-      // Check if this is a Next.js redirect (which is expected behavior)
-      if (error && typeof error === 'object' && 'digest' in error && 
-          typeof (error as { digest?: string }).digest === 'string' && 
-          (error as { digest: string }).digest.includes('NEXT_REDIRECT')) {
-        // This is a redirect, which is expected - don't show an error
-        return;
+      if (result.success) {
+        toast.success('Profile updated successfully!');
       }
       
+    } catch (error) {
       console.error('Error updating profile:', error);
-      alert(error instanceof Error ? error.message : 'Failed to update profile');
+      toast.error(error instanceof Error ? error.message : 'Failed to update profile');
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -361,25 +459,6 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
             />
           </div>
 
-
-
-          {/* Primary Area */}
-          <div className="space-y-2">
-            <Label htmlFor="city" className="text-zinc-600">Primary Area in Hyderabad *</Label>
-            <Select value={formData.city} onValueChange={(value) => handleInputChange('city', value)}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select your area in Hyderabad" />
-              </SelectTrigger>
-              <SelectContent className="max-h-[300px] w-full">
-                {hyderabadAreas.map((area) => (
-                  <SelectItem key={area.value} value={area.value}>
-                    {area.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
           {/* Phone */}
           <div className="space-y-2">
             <Label htmlFor="phone" className="text-zinc-600">Phone Number *</Label>
@@ -390,7 +469,57 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
               onChange={(e) => handleInputChange('phone', e.target.value)}
               placeholder="e.g., +91 98765 43210"
               required
+              className={phoneError ? 'border-red-300 focus:border-red-500' : ''}
             />
+            {phoneError && (
+              <p className="text-sm text-red-600">{phoneError}</p>
+            )}
+          </div>
+
+          {/* City */}
+          <div className="space-y-2">
+            <Label htmlFor="city" className="text-zinc-600">City *</Label>
+            <Select value={formData.city} onValueChange={(value) => handleInputChange('city', value)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select your city" />
+              </SelectTrigger>
+              <SelectContent className="max-h-[300px] w-full">
+                {indianCities.map((city) => (
+                  <SelectItem key={city.value} value={city.value}>
+                    {city.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Area */}
+          <div className="space-y-2">
+            <Label htmlFor="area" className="text-zinc-600">
+              Area {formData.city === 'Hyderabad' ? '*' : '(Optional)'}
+            </Label>
+            {formData.city === 'Hyderabad' ? (
+              <Select value={formData.area} onValueChange={(value) => handleInputChange('area', value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select your area in Hyderabad" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px] w-full">
+                  {hyderabadAreas.map((area) => (
+                    <SelectItem key={area.value} value={area.value}>
+                      {area.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input
+                id="area"
+                type="text"
+                value={formData.area}
+                onChange={(e) => handleInputChange('area', e.target.value)}
+                placeholder="Enter your area/locality"
+              />
+            )}
           </div>
 
 
@@ -447,7 +576,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
             size="sm"
             onClick={handleGenerateBio}
             disabled={isGenerating || !formData.experience || !formData.city}
-            className="text-red-600 border-red-200 hover:bg-red-50 w-[170px] justify-center"
+            className="text-red-600 border-red-200 hover:bg-red-50 min-w-[180px] justify-center px-6 py-3 h-auto"
           >
             {isGenerating ? (
               <>

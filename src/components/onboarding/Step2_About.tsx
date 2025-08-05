@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2 } from "lucide-react";
 import { generateBio } from "@/app/actions";
+import toast from 'react-hot-toast';
 
 export default function Step2_About() {
   const { data: session } = useSession();
@@ -39,7 +40,9 @@ export default function Step2_About() {
 
       // Check if we have the required data from Step 1
       if (!experience || !city) {
-        setGenerationError('Please complete Step 1 with your experience and city before generating a bio.');
+        const errorMsg = 'Please complete Step 1 with your experience and city before generating a bio.';
+        setGenerationError(errorMsg);
+        toast.error(errorMsg);
         return;
       }
 
@@ -52,15 +55,16 @@ export default function Step2_About() {
 
       if (result.success && result.bio) {
         setData({ bio: result.bio });
+        toast.success('Bio generated successfully!');
       }
 
     } catch (error) {
       console.error('Error generating bio:', error);
-      setGenerationError(
-        error instanceof Error 
-          ? error.message 
-          : 'Failed to generate bio. Please try again.'
-      );
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Failed to generate bio. Please try again.';
+      setGenerationError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsGenerating(false);
     }
@@ -89,7 +93,7 @@ export default function Step2_About() {
             size="sm"
             onClick={handleGenerateBio}
             disabled={isGenerating || !experience || !city}
-            className="text-red-600 border-red-200 hover:bg-red-50 w-[170px] justify-center"
+            className="text-red-600 border-red-200 hover:bg-red-50 min-w-[180px] justify-center px-6 py-3 h-auto"
           >
             {isGenerating ? (
               <>

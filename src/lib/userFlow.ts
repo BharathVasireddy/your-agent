@@ -6,14 +6,12 @@ export interface UserFlowStatus {
   isAuthenticated: boolean;
   needsSubscription: boolean;
   needsOnboarding: boolean;
-  needsTour: boolean;
   redirectTo: string;
   agent?: {
     id: string;
     slug: string;
     isSubscribed: boolean;
     hasCompletedOnboarding: boolean;
-    hasSeenTour: boolean;
   } | null;
 }
 
@@ -29,7 +27,6 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
       isAuthenticated: false,
       needsSubscription: false,
       needsOnboarding: false,
-      needsTour: false,
       redirectTo: '/auth/signin',
       agent: null
     };
@@ -50,7 +47,6 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
       phone: true,
       city: true,
       area: true,
-      hasSeenTour: true,
       createdAt: true,
       updatedAt: true
     }
@@ -62,7 +58,6 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
       isAuthenticated: true,
       needsSubscription: true,
       needsOnboarding: true,
-      needsTour: false,
       redirectTo: '/onboarding/welcome',
       agent: null
     };
@@ -74,14 +69,12 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
       isAuthenticated: true,
       needsSubscription: true,
       needsOnboarding: false,
-      needsTour: false,
       redirectTo: '/subscribe',
       agent: {
         id: agent.id,
         slug: agent.slug,
         isSubscribed: agent.isSubscribed,
-        hasCompletedOnboarding: false,
-        hasSeenTour: agent.hasSeenTour || false
+        hasCompletedOnboarding: false
       }
     };
   }
@@ -100,43 +93,28 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
       isAuthenticated: true,
       needsSubscription: false,
       needsOnboarding: true,
-      needsTour: false,
       redirectTo: '/onboarding/wizard',
       agent: {
         id: agent.id,
         slug: agent.slug,
         isSubscribed: agent.isSubscribed,
-        hasCompletedOnboarding: false,
-        hasSeenTour: agent.hasSeenTour || false
+        hasCompletedOnboarding: false
       }
     };
   }
 
-  // Fully onboarded but hasn't seen tour
-  const needsTour = !agent.hasSeenTour;
-
+  // Fully onboarded - ready for dashboard
   return {
     isAuthenticated: true,
     needsSubscription: false,
     needsOnboarding: false,
-    needsTour,
     redirectTo: '/agent/dashboard',
     agent: {
       id: agent.id,
       slug: agent.slug,
       isSubscribed: agent.isSubscribed,
-      hasCompletedOnboarding: true,
-      hasSeenTour: agent.hasSeenTour || false
+      hasCompletedOnboarding: true
     }
   };
 }
 
-/**
- * Marks that the user has seen the dashboard tour
- */
-export async function markTourAsComplete(userId: string): Promise<void> {
-  await prisma.agent.update({
-    where: { userId },
-    data: { hasSeenTour: true }
-  });
-}

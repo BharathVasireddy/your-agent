@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Copy, Share, Check } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface CopyShareButtonsProps {
   agentSlug: string;
@@ -23,6 +24,7 @@ export default function CopyShareButtons({ agentSlug, agentName }: CopyShareButt
     try {
       await navigator.clipboard.writeText(profileUrl);
       setCopiedRecently(true);
+      toast.success('Profile URL copied to clipboard!');
       
       // Reset the copied state after 2 seconds
       setTimeout(() => {
@@ -41,12 +43,13 @@ export default function CopyShareButtons({ agentSlug, agentName }: CopyShareButt
         document.body.removeChild(textArea);
         
         setCopiedRecently(true);
+        toast.success('Profile URL copied to clipboard!');
         setTimeout(() => {
           setCopiedRecently(false);
         }, 2000);
       } catch (fallbackError) {
         console.error('Fallback copy failed:', fallbackError);
-        alert('Failed to copy URL. Please copy manually: ' + profileUrl);
+        toast.error('Failed to copy URL. Please copy manually from the address bar.');
       }
     }
   };

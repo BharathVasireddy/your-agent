@@ -13,15 +13,47 @@ const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     ignores: [
+      // Dependencies
+      "node_modules/**",
+      
+      // Generated files
       ".next/**",
       "src/generated/**",
-      "node_modules/**",
+      "out/**",
+      
+      // Build outputs
       "dist/**",
       "build/**",
-      "out/**",
-      "coverage/**",
-      ".eslintcache",
+      
+      // Environment variables
+      ".env",
+      ".env.local",
+      ".env.development.local", 
+      ".env.test.local",
+      ".env.production.local",
+      
+      // OS generated files
+      ".DS_Store",
+      ".DS_Store?",
+      "._*",
+      ".Spotlight-V100",
+      ".Trashes",
+      "ehthumbs.db",
+      "Thumbs.db",
+      
+      // Logs
       "*.log",
+      "npm-debug.log*",
+      "yarn-debug.log*", 
+      "yarn-error.log*",
+      
+      // Coverage directory
+      "coverage/**",
+      
+      // Cache directories
+      ".cache/**",
+      ".parcel-cache/**",
+      ".eslintcache",
     ],
   },
 ];

@@ -34,7 +34,7 @@ model Agent {
   createdAt          DateTime   @default(now())
   updatedAt          DateTime   @updatedAt
   profilePhotoUrl    String?
-  hasSeenTour        Boolean    @default(false)
+
   user               User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   properties         Property[]
 
