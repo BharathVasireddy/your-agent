@@ -1,48 +1,427 @@
-import LoginButton from "@/components/LoginButton";
-import { FileText, Globe, Code } from "lucide-react";
+import Link from 'next/link';
+import { 
+  ArrowRight, 
+  CheckCircle, 
+  Users, 
+  Home, 
+  Sparkles, 
+  BarChart3, 
+  Star,
+  Phone,
+  Mail,
+  MapPin
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <div className="flex flex-col items-center justify-center text-center space-y-8">
-          <h1 
-            className="text-4xl font-semibold heading-primary"
-            style={{ color: "var(--primary-red)" }}
-          >
-            YourAgent.in
-          </h1>
-          <p 
-            className="text-lg max-w-md text-body"
-            style={{ color: "var(--text-secondary)" }}
-          >
-            Transform your real estate business with AI-powered agent profiles, property management, and client automation tools.
-          </p>
-          <LoginButton />
+    <div className="min-h-screen bg-white">
+      {/* Navigation Header */}
+      <header className="border-b border-zinc-200 bg-white">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+                <Home className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-bold text-zinc-950">YourAgent</span>
+            </div>
+            
+            <nav className="hidden md:flex items-center space-x-8">
+              <a href="#features" className="text-zinc-600 hover:text-zinc-900 transition-colors">Features</a>
+              <a href="#how-it-works" className="text-zinc-600 hover:text-zinc-900 transition-colors">How it Works</a>
+              <a href="#pricing" className="text-zinc-600 hover:text-zinc-900 transition-colors">Pricing</a>
+              <Link 
+                href="/auth/signin" 
+                className="text-zinc-600 hover:text-zinc-900 transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link href="/auth/signin">
+                <Button className="bg-red-600 hover:bg-red-700 text-white">
+                  Get Started Free
+                </Button>
+              </Link>
+            </nav>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="/about"
-        >
-          <FileText size={16} />
-          About
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="/features"
-        >
-          <Code size={16} />
-          Features
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="/contact"
-        >
-          <Globe size={16} />
-          Contact
-        </a>
+      </header>
+
+      {/* Hero Section */}
+      <section className="bg-gradient-to-br from-red-50 to-orange-50 py-20">
+        <div className="container mx-auto px-6">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-5xl md:text-6xl font-bold text-zinc-950 mb-6 leading-tight">
+              Your Professional Real Estate
+              <span className="text-red-600"> Digital Presence</span>
+          </h1>
+            <p className="text-xl text-zinc-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+              Create stunning agent profiles, manage properties effortlessly, and grow your real estate business with AI-powered tools trusted by professionals across India.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+              <Link href="/auth/signin">
+                <Button className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 text-lg">
+                  Start Your Free Profile
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <Link href="#how-it-works">
+                <Button variant="outline" className="px-8 py-4 text-lg border-zinc-300 text-zinc-700">
+                  See How It Works
+                </Button>
+              </Link>
+            </div>
+
+            {/* Trust Indicators */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-sm text-zinc-600">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span>Free to start</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span>Setup in 5 minutes</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span>No technical knowledge required</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="py-20 bg-white">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-zinc-950 mb-4">
+              Everything You Need to Succeed
+            </h2>
+            <p className="text-xl text-zinc-600 max-w-2xl mx-auto">
+              Professional tools designed specifically for real estate agents in India
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Feature 1 */}
+            <div className="bg-white border border-zinc-200 rounded-xl p-8 hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-6">
+                <Users className="w-6 h-6 text-red-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-zinc-950 mb-4">Professional Profiles</h3>
+              <p className="text-zinc-600 leading-relaxed">
+                Create stunning agent profiles with your photo, credentials, specializations, and service areas. Stand out from the competition.
+              </p>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="bg-white border border-zinc-200 rounded-xl p-8 hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                <Home className="w-6 h-6 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-zinc-950 mb-4">Property Management</h3>
+              <p className="text-zinc-600 leading-relaxed">
+                Organize and showcase your property listings with beautiful galleries and smart categorization for sales and rentals.
+              </p>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="bg-white border border-zinc-200 rounded-xl p-8 hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-6">
+                <Sparkles className="w-6 h-6 text-purple-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-zinc-950 mb-4">AI-Powered Tools</h3>
+              <p className="text-zinc-600 leading-relaxed">
+                Generate professional property descriptions and personal bios with AI assistance. Save time and create compelling content.
+              </p>
+            </div>
+
+            {/* Feature 4 */}
+            <div className="bg-white border border-zinc-200 rounded-xl p-8 hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-6">
+                <BarChart3 className="w-6 h-6 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-zinc-950 mb-4">Analytics & Insights</h3>
+              <p className="text-zinc-600 leading-relaxed">
+                Track your profile views, property engagement, and lead generation with detailed analytics to grow your business.
+              </p>
+            </div>
+
+            {/* Feature 5 */}
+            <div className="bg-white border border-zinc-200 rounded-xl p-8 hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-6">
+                <Phone className="w-6 h-6 text-orange-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-zinc-950 mb-4">Lead Generation</h3>
+              <p className="text-zinc-600 leading-relaxed">
+                Get direct calls and emails from interested clients through your professional profile. Convert visitors into leads.
+              </p>
+            </div>
+
+            {/* Feature 6 */}
+            <div className="bg-white border border-zinc-200 rounded-xl p-8 hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mb-6">
+                <MapPin className="w-6 h-6 text-cyan-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-zinc-950 mb-4">Local Expertise</h3>
+              <p className="text-zinc-600 leading-relaxed">
+                Showcase your expertise in specific Hyderabad areas like Gachibowli, Madhapur, or Kokapet. Connect with local clients.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="how-it-works" className="py-20 bg-zinc-50">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-zinc-950 mb-4">
+              Get Started in 3 Simple Steps
+            </h2>
+            <p className="text-xl text-zinc-600 max-w-2xl mx-auto">
+              Launch your professional real estate presence in minutes, not days
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Step 1 */}
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-white">1</span>
+              </div>
+              <h3 className="text-xl font-semibold text-zinc-950 mb-4">Sign Up with Google</h3>
+              <p className="text-zinc-600 leading-relaxed">
+                Quick and secure registration using your Google account. No complex forms or lengthy verification processes.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-white">2</span>
+              </div>
+              <h3 className="text-xl font-semibold text-zinc-950 mb-4">Complete Your Profile</h3>
+              <p className="text-zinc-600 leading-relaxed">
+                Add your professional details, photo, and specializations. Our AI helps you create compelling content.
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-white">3</span>
+              </div>
+              <h3 className="text-xl font-semibold text-zinc-950 mb-4">Start Adding Properties</h3>
+              <p className="text-zinc-600 leading-relaxed">
+                Upload your property listings and watch leads start flowing. Share your profile URL anywhere.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-zinc-950 mb-4">
+              Trusted by Real Estate Professionals
+            </h2>
+            <p className="text-xl text-zinc-600">
+              Join hundreds of agents who have transformed their business
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Testimonial 1 */}
+            <div className="bg-white border border-zinc-200 rounded-xl p-8">
+              <div className="flex items-center mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                ))}
+              </div>
+              <p className="text-zinc-600 mb-6 leading-relaxed">
+                &ldquo;YourAgent helped me create a professional online presence that clients trust. My lead generation has increased by 300% since I started using the platform.&rdquo;
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                  <span className="font-semibold text-red-600">RK</span>
+                </div>
+                <div>
+                  <p className="font-semibold text-zinc-950">Rajesh Kumar</p>
+                  <p className="text-sm text-zinc-600">Senior Agent, Gachibowli</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonial 2 */}
+            <div className="bg-white border border-zinc-200 rounded-xl p-8">
+              <div className="flex items-center mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                ))}
+              </div>
+              <p className="text-zinc-600 mb-6 leading-relaxed">
+                &ldquo;The AI-powered bio and property descriptions save me hours every week. The platform is intuitive and my clients love the professional presentation.&rdquo;
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                  <span className="font-semibold text-blue-600">PS</span>
+                </div>
+                <div>
+                  <p className="font-semibold text-zinc-950">Priya Sharma</p>
+                  <p className="text-sm text-zinc-600">Real Estate Consultant, Madhapur</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonial 3 */}
+            <div className="bg-white border border-zinc-200 rounded-xl p-8">
+              <div className="flex items-center mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                ))}
+              </div>
+              <p className="text-zinc-600 mb-6 leading-relaxed">
+                &ldquo;Finally, a platform designed for Indian real estate agents. The Hyderabad area specialization features help me connect with the right local clients.&rdquo;
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                  <span className="font-semibold text-green-600">AM</span>
+                </div>
+                <div>
+                  <p className="font-semibold text-zinc-950">Arjun Mehta</p>
+                  <p className="text-sm text-zinc-600">Property Advisor, Kokapet</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section id="pricing" className="py-20 bg-red-600">
+        <div className="container mx-auto px-6 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Ready to Transform Your Real Estate Business?
+          </h2>
+          <p className="text-xl text-red-100 mb-8 max-w-2xl mx-auto">
+            Join thousands of successful real estate agents who trust YourAgent for their digital presence
+          </p>
+          
+          <div className="bg-white rounded-2xl p-8 max-w-md mx-auto mb-8">
+            <h3 className="text-2xl font-bold text-zinc-950 mb-4">Free Forever Plan</h3>
+            <div className="text-4xl font-bold text-red-600 mb-4">₹0<span className="text-lg text-zinc-600">/month</span></div>
+            <ul className="text-left space-y-3 mb-6">
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
+                <span className="text-zinc-600">Professional agent profile</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
+                <span className="text-zinc-600">Unlimited property listings</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
+                <span className="text-zinc-600">AI-powered content generation</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
+                <span className="text-zinc-600">Custom profile URL</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
+                <span className="text-zinc-600">Lead generation tools</span>
+              </li>
+            </ul>
+          </div>
+
+          <Link href="/auth/signin">
+            <Button className="bg-white text-red-600 hover:bg-red-50 px-8 py-4 text-lg font-semibold">
+              Start Your Free Profile Today
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+          </Link>
+          
+          <p className="text-red-100 mt-4 text-sm">
+            No credit card required • Setup in 5 minutes • Cancel anytime
+          </p>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 bg-zinc-900 text-white">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Company Info */}
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+                  <Home className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xl font-bold">YourAgent</span>
+              </div>
+              <p className="text-zinc-400 mb-4">
+                Empowering real estate professionals with digital tools for success.
+              </p>
+              <p className="text-zinc-400 text-sm">
+                Made in India for Indian real estate agents.
+              </p>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h4 className="font-semibold mb-4">Platform</h4>
+              <ul className="space-y-2 text-zinc-400">
+                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
+                <li><a href="#how-it-works" className="hover:text-white transition-colors">How it Works</a></li>
+                <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
+                <li><Link href="/auth/signin" className="hover:text-white transition-colors">Get Started</Link></li>
+              </ul>
+            </div>
+
+            {/* Resources */}
+            <div>
+              <h4 className="font-semibold mb-4">Resources</h4>
+              <ul className="space-y-2 text-zinc-400">
+                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Tutorials</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Best Practices</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">API Documentation</a></li>
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h4 className="font-semibold mb-4">Contact</h4>
+              <ul className="space-y-2 text-zinc-400">
+                <li className="flex items-center">
+                  <Mail className="w-4 h-4 mr-2" />
+                  <a href="mailto:support@youragent.in" className="hover:text-white transition-colors">
+                    support@youragent.in
+                  </a>
+                </li>
+                <li className="flex items-center">
+                  <Phone className="w-4 h-4 mr-2" />
+                  <a href="tel:+911234567890" className="hover:text-white transition-colors">
+                    +91 12345 67890
+                  </a>
+                </li>
+                <li className="flex items-center">
+                  <MapPin className="w-4 h-4 mr-2" />
+                  <span>Hyderabad, India</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-zinc-800 mt-8 pt-8 text-center text-zinc-400">
+            <p>&copy; 2024 YourAgent. All rights reserved.</p>
+          </div>
+        </div>
       </footer>
     </div>
   );
