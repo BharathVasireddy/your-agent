@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+// Core model for authentication, managed by NextAuth.js
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?   // For email/password authentication
+  accounts      Account[]
+  sessions      Session[]
+  agentProfile  Agent? // One-to-one relation to an Agent profile
+}
+
+// Public-facing Agent profile data
+model Agent {
+  id                 String    @id @default(cuid())
+  slug               String    @unique // For youragent.in/agent-slug
+  userId             String    @unique
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  experience         Int?
+  specialization     String?
+  licenseNumber      String?
+  bio                String?   @db.Text
+  phone              String?
+  city               String?
+  theme              String    @default("professional-blue")
+  isSubscribed       Boolean   @default(false)
+  subscriptionEndsAt DateTime?
+  properties         Property[]
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  
+  @@index([city, specialization]) // Index for faster searching
+}
+
+// Property listings belonging to an agent
+model Property {
+  id          String   @id @default(cuid())
+  agentId     String
+  agent       Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  title       String
+  description String   @db.Text
+  price       Int
+  area        Int      // in sqft
+  bedrooms    Int
+  bathrooms   Int
+  location    String
+  amenities   String[]
+  photos      String[] // Array of Cloudinary URLs
+  status      String   @default("Available") // e.g., Available, Sold, Rented
+  category    String   // e.g., Sale/Rent, Residential/Commercial
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// --- NextAuth.js required models ---
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}

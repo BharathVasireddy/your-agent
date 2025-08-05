@@ -1,26 +1,73 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Color Palette - Action-Oriented, Confident, and Clean */
+  --primary-red: #DC2626; /* red-600 - for buttons, icons, links */
+  --primary-red-hover: #B91C1C; /* red-700 - for hover states */
+  --primary-red-light: #FEE2E2; /* red-100 - for subtle highlights */
+  --secondary-blue: #3B82F6; /* blue-500 - for trust/info elements */
+  
+  /* Text Colors */
+  --text-primary: #09090B; /* zinc-950 - headings */
+  --text-secondary: #18181B; /* zinc-900 - paragraphs */
+  --text-subtle: #52525B; /* zinc-600 - labels, timestamps */
+  
+  /* Backgrounds & Borders */
+  --bg-page: #FFFFFF; /* white */
+  --bg-section: #F4F4F5; /* zinc-100 */
+  --border-color: #E4E4E7; /* zinc-200 */
+  
+  /* Legacy variables for compatibility */
+  --background: var(--bg-page);
+  --foreground: var(--text-primary);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Consolas, monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-weight: 400; /* Regular weight as default */
+}
+
+/* Ensure light mode only - override any system preferences */
+* {
+  color-scheme: light only;
+}
+
+/* Typography Scale */
+.heading-primary {
+  font-weight: 600; /* Semi-bold for primary headings */
+  color: var(--text-primary);
+}
+
+.heading-secondary {
+  font-weight: 500; /* Medium for sub-headings */
+  color: var(--text-secondary);
+}
+
+.text-body {
+  font-weight: 400; /* Regular for body text */
+  color: var(--text-secondary);
+}
+
+.text-label {
+  font-weight: 500; /* Medium for labels */
+  color: var(--text-subtle);
+}
+
+.btn-primary {
+  background-color: var(--primary-red);
+  color: white;
+  font-weight: 600; /* Semi-bold for button text */
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-red-hover);
 }
