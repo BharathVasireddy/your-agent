@@ -39,6 +39,7 @@ model Agent {
   profilePhotoUrl    String?   // Cloudinary URL for profile photo
   isSubscribed       Boolean   @default(false)
   subscriptionEndsAt DateTime?
+  hasSeenTour        Boolean   @default(false) // Track if user has seen dashboard tour
   properties         Property[]
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
@@ -61,7 +62,8 @@ model Property {
   amenities   String[]
   photos      String[] // Array of Cloudinary URLs
   status      String   @default("Available") // e.g., Available, Sold, Rented
-  category    String   // e.g., Sale/Rent, Residential/Commercial
+  listingType String   // Sale or Rent
+  propertyType String  // Plots, Villas, Flats, Farms, etc.
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

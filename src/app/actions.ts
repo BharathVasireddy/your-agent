@@ -200,11 +200,12 @@ export async function updateAgentProfile(data: {
       }
     });
 
-    // Revalidate the agent's public profile page
-    revalidatePath(`/${updatedAgent.slug}`);
+    // Revalidate the agent's public profile page and dashboard
+    revalidatePath(`/agent/${updatedAgent.slug}`);
+    revalidatePath('/agent/dashboard');
     
-    // Redirect to the agent's public profile page
-    redirect(`/${updatedAgent.slug}`);
+    // Redirect to dashboard after successful onboarding
+    redirect('/agent/dashboard');
 
   } catch (error) {
     // Check if this is a Next.js redirect (which is expected behavior)

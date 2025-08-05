@@ -7,6 +7,37 @@ import prisma from "./prisma";
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
+  pages: {
+    signIn: '/auth/signin',
+  },
+  callbacks: {
+    async signIn() {
+      // Allow all sign-ins - we'll handle flow in the redirect callback
+      return true;
+    },
+    async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
+      // If it's a callback from OAuth, redirect to our flow controller
+      if (url.includes('/api/auth/callback')) {
+        return `${baseUrl}/onboarding/welcome`;
+      }
+      
+      // If user is trying to access a specific page, allow it
+      if (url.startsWith(baseUrl)) {
+        return url;
+      }
+      
+      // Default to welcome page for new sign-ins
+      return `${baseUrl}/onboarding/welcome`;
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    session: ({ session, token }: { session: any; token: any }) => ({
+      ...session,
+      user: {
+        ...session.user,
+        id: token.sub,
+      },
+    }),
+  },
   providers: [
     Google({
       clientId: process.env.AUTH_GOOGLE_ID!,
@@ -57,16 +88,6 @@ export const authOptions = {
     }),
   ],
   session: { strategy: "jwt" as const },
-  callbacks: {
-    // This callback is essential to link the Agent profile to the User
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async session({ session, token }: { session: any; token: any }) {
-      if (token && session.user) {
-        session.user.id = token.sub as string;
-      }
-      return session;
-    },
-  },
 };
 
 // @ts-expect-error NextAuth v4 type compatibility issue

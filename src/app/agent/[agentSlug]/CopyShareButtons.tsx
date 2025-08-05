@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Copy, Share, Check } from 'lucide-react';
 
 interface CopyShareButtonsProps {
@@ -10,9 +10,16 @@ interface CopyShareButtonsProps {
 
 export default function CopyShareButtons({ agentSlug, agentName }: CopyShareButtonsProps) {
   const [copiedRecently, setCopiedRecently] = useState(false);
-  const profileUrl = `${window.location.origin}/${agentSlug}`;
+  const [profileUrl, setProfileUrl] = useState('');
+
+  // Set the profile URL only on the client side
+  useEffect(() => {
+    setProfileUrl(`${window.location.origin}/${agentSlug}`);
+  }, [agentSlug]);
 
   const handleCopyUrl = async () => {
+    if (!profileUrl) return; // Don't proceed if URL isn't set yet
+    
     try {
       await navigator.clipboard.writeText(profileUrl);
       setCopiedRecently(true);
@@ -45,6 +52,8 @@ export default function CopyShareButtons({ agentSlug, agentName }: CopyShareButt
   };
 
   const handleShare = async () => {
+    if (!profileUrl) return; // Don't proceed if URL isn't set yet
+    
     const shareData = {
       title: `${agentName} - Real Estate Agent`,
       text: `Check out ${agentName}'s real estate profile`,
@@ -69,12 +78,28 @@ export default function CopyShareButtons({ agentSlug, agentName }: CopyShareButt
     }
   };
 
+  // Don't render buttons until we have the URL (avoids hydration mismatch)
+  if (!profileUrl) {
+    return (
+      <div className="flex justify-center space-x-3">
+        <div className="inline-flex items-center justify-center px-4 py-2 bg-zinc-100 text-zinc-700 rounded-lg opacity-50 w-[104px]">
+          <Copy className="w-4 h-4 mr-2" />
+          Copy URL
+        </div>
+        <div className="inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg opacity-50 w-[130px]">
+          <Share className="w-4 h-4 mr-2" />
+          Share Profile
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex justify-center space-x-3">
       {/* Copy URL Button */}
       <button
         onClick={handleCopyUrl}
-        className="inline-flex items-center px-4 py-2 bg-zinc-100 text-zinc-700 rounded-lg hover:bg-zinc-200 transition-colors"
+        className="inline-flex items-center justify-center px-4 py-2 bg-zinc-100 text-zinc-700 rounded-lg hover:bg-zinc-200 transition-colors w-[104px]"
         title="Copy profile URL"
       >
         {copiedRecently ? (
@@ -93,7 +118,7 @@ export default function CopyShareButtons({ agentSlug, agentName }: CopyShareButt
       {/* Share Button */}
       <button
         onClick={handleShare}
-        className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+        className="inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors w-[130px]"
         title="Share profile"
       >
         <Share className="w-4 h-4 mr-2" />

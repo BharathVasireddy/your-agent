@@ -91,7 +91,7 @@ export default function Step2_About() {
             size="sm"
             onClick={handleGenerateBio}
             disabled={isGenerating || !experience || !specialization || !city}
-            className="text-red-600 border-red-200 hover:bg-red-50"
+            className="text-red-600 border-red-200 hover:bg-red-50 w-[170px] justify-center"
           >
             {isGenerating ? (
               <>

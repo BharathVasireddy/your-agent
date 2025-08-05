@@ -190,10 +190,10 @@ export default function Step1_Professional() {
         <div className="space-y-2">
           <Label htmlFor="city" className="text-zinc-600">Primary Area in Hyderabad</Label>
           <Select value={city} onValueChange={(value) => handleInputChange('city', value)}>
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Select your area in Hyderabad" />
             </SelectTrigger>
-            <SelectContent className="max-h-[300px]">
+            <SelectContent className="max-h-[300px] w-full">
               {hyderabadAreas.map((area) => (
                 <SelectItem key={area.value} value={area.value}>
                   {area.label}
@@ -233,10 +233,10 @@ export default function Step1_Professional() {
         <div className="space-y-2">
           <Label htmlFor="specialization" className="text-zinc-600">Specialization</Label>
           <Select value={specialization} onValueChange={(value) => handleInputChange('specialization', value)}>
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="e.g., Residential Sales" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="w-full">
               <SelectItem value="Residential Sales">Residential Sales</SelectItem>
               <SelectItem value="Commercial Sales">Commercial Sales</SelectItem>
               <SelectItem value="Residential Lease">Residential Lease</SelectItem>
