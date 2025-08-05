@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { 
-  ArrowRight, 
   CheckCircle, 
   Users, 
   Home, 
@@ -12,12 +11,13 @@ import {
   MapPin
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import LoginButton from '@/components/LoginButton';
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation Header */}
-      <header className="border-b border-zinc-200 bg-white">
+      <header id="header" className="border-b border-zinc-200 bg-white">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
@@ -31,17 +31,7 @@ export default function HomePage() {
               <a href="#features" className="text-zinc-600 hover:text-zinc-900 transition-colors">Features</a>
               <a href="#how-it-works" className="text-zinc-600 hover:text-zinc-900 transition-colors">How it Works</a>
               <a href="#pricing" className="text-zinc-600 hover:text-zinc-900 transition-colors">Pricing</a>
-              <Link 
-                href="/auth/signin" 
-                className="text-zinc-600 hover:text-zinc-900 transition-colors"
-              >
-                Sign In
-              </Link>
-              <Link href="/auth/signin">
-                <Button className="bg-red-600 hover:bg-red-700 text-white">
-                  Get Started Free
-                </Button>
-              </Link>
+              <LoginButton />
             </nav>
           </div>
         </div>
@@ -60,12 +50,9 @@ export default function HomePage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <Link href="/auth/signin">
-                <Button className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 text-lg">
-                  Start Your Free Profile
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-              </Link>
+              <div className="transform scale-125">
+                <LoginButton />
+              </div>
               <Link href="#how-it-works">
                 <Button variant="outline" className="px-8 py-4 text-lg border-zinc-300 text-zinc-700">
                   See How It Works
@@ -339,12 +326,11 @@ export default function HomePage() {
             </ul>
           </div>
 
-          <Link href="/auth/signin">
+                    <a href="#header">
             <Button className="bg-white text-red-600 hover:bg-red-50 px-8 py-4 text-lg font-semibold">
               Start Your Free Profile Today
-              <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-          </Link>
+          </a>
           
           <p className="text-red-100 mt-4 text-sm">
             No credit card required • Setup in 5 minutes • Cancel anytime
@@ -379,7 +365,7 @@ export default function HomePage() {
                 <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
                 <li><a href="#how-it-works" className="hover:text-white transition-colors">How it Works</a></li>
                 <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><Link href="/auth/signin" className="hover:text-white transition-colors">Get Started</Link></li>
+                <li><a href="#header" className="hover:text-white transition-colors">Get Started</a></li>
               </ul>
             </div>
 
