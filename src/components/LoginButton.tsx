@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useSession, signOut } from "next-auth/react";
-import { LogIn, LogOut, User, LayoutDashboard } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { LogIn, User, LayoutDashboard } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import AuthModal from "./AuthModal";

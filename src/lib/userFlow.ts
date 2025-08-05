@@ -45,10 +45,11 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
       id: true,
       slug: true,
       isSubscribed: true,
-      specialization: true,
+      experience: true,
       bio: true,
       phone: true,
       city: true,
+      area: true,
       hasSeenTour: true,
       createdAt: true,
       updatedAt: true
@@ -87,7 +88,7 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
 
   // Check if onboarding is complete (has essential fields)
   const hasCompletedOnboarding = !!(
-    agent.specialization && 
+    agent.experience && 
     agent.phone && 
     agent.city && 
     agent.slug

@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Home, Building, User, LogOut, TrendingUp, Settings, HelpCircle } from 'lucide-react';
+import { Home, Building, User, LogOut, TrendingUp, Settings, HelpCircle, Copy } from 'lucide-react';
+import { useState } from 'react';
 import SignOutButton from './SignOutButton';
 
 interface DashboardSidebarProps {
@@ -11,10 +13,35 @@ interface DashboardSidebarProps {
     email?: string | null;
     image?: string | null;
   };
+  agent: {
+    id: string;
+    slug: string;
+    profilePhotoUrl: string | null;
+    user: {
+      id: string;
+      name: string | null;
+      email: string | null;
+      image: string | null;
+    };
+  } | null;
 }
 
-export default function DashboardSidebar({ user }: DashboardSidebarProps) {
+export default function DashboardSidebar({ user, agent }: DashboardSidebarProps) {
+  const [copied, setCopied] = useState(false);
   const pathname = usePathname();
+
+  const copyWebsiteLink = async () => {
+    if (!agent?.slug) return;
+    
+    const websiteUrl = `https://youragent.in/${agent.slug}`;
+    try {
+      await navigator.clipboard.writeText(websiteUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  };
 
   const navigationItems = [
     {
@@ -53,40 +80,26 @@ export default function DashboardSidebar({ user }: DashboardSidebarProps) {
 
   return (
     <div className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-zinc-200 flex flex-col">
-      {/* Logo/Brand Section */}
+      {/* Logo/Brand Section with User Photo */}
       <div className="p-6 border-b border-zinc-200">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
-            <span className="text-white text-sm font-bold">YA</span>
-          </div>
+          {/* User Profile Photo or Default Avatar */}
+          {user.image || agent?.profilePhotoUrl ? (
+            <Image
+              src={user.image || agent?.profilePhotoUrl || ''}
+              alt={user.name || 'User'}
+              width={32}
+              height={32}
+              className="w-8 h-8 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+              <span className="text-white text-sm font-bold">YA</span>
+            </div>
+          )}
           <div>
             <h1 className="text-lg font-bold text-zinc-950">YourAgent</h1>
             <p className="text-xs text-zinc-500">Dashboard</p>
-          </div>
-        </div>
-      </div>
-
-      {/* User Profile Section */}
-      <div className="p-6 border-b border-zinc-200">
-        <div className="flex items-center space-x-3">
-          {user.image ? (
-            <img
-              src={user.image}
-              alt={user.name || 'User'}
-              className="w-10 h-10 rounded-full object-cover"
-            />
-          ) : (
-            <div className="w-10 h-10 bg-zinc-200 rounded-full flex items-center justify-center">
-              <User className="w-5 h-5 text-zinc-600" />
-            </div>
-          )}
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-zinc-950 truncate">
-              {user.name || 'User'}
-            </p>
-            <p className="text-xs text-zinc-500 truncate">
-              {user.email}
-            </p>
           </div>
         </div>
       </div>
@@ -116,6 +129,17 @@ export default function DashboardSidebar({ user }: DashboardSidebarProps) {
 
       {/* Bottom Section */}
       <div className="p-4 border-t border-zinc-200 space-y-1">
+        {/* Copy Website Link Button */}
+        {agent?.slug && (
+          <button
+            onClick={copyWebsiteLink}
+            className="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 hover:bg-blue-50 hover:text-blue-700 transition-colors w-full text-left"
+          >
+            <Copy className="w-5 h-5 text-zinc-500" />
+            <span>{copied ? 'Copied!' : 'Copy My Website Link'}</span>
+          </button>
+        )}
+        
         <Link
           href="/agent/dashboard/help"
           className="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 transition-colors"

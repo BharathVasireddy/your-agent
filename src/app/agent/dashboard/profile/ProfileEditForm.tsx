@@ -14,11 +14,10 @@ interface Agent {
   id: string;
   slug: string;
   experience: number | null;
-  specialization: string | null;
-  licenseNumber: string | null;
   bio: string | null;
   phone: string | null;
   city: string | null;
+  area: string | null;
   theme: string;
   profilePhotoUrl: string | null;
   user: {
@@ -38,11 +37,10 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
   // Form state
   const [formData, setFormData] = useState({
     experience: agent.experience || 0,
-    specialization: agent.specialization || '',
-    licenseNumber: agent.licenseNumber || '',
     bio: agent.bio || '',
     phone: agent.phone || '',
     city: agent.city || '',
+    area: agent.area || '',
     theme: agent.theme || 'professional-blue',
     profilePhotoUrl: agent.profilePhotoUrl || '',
     slug: agent.slug || '',
@@ -144,8 +142,8 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
   }, [formData.slug, agent.slug]);
 
   const handleGenerateBio = async () => {
-    if (!formData.experience || !formData.specialization || !formData.city) {
-      setGenerationError('Please fill in your experience, specialization, and city first.');
+    if (!formData.experience || !formData.city) {
+      setGenerationError('Please fill in your experience and city first.');
       return;
     }
 
@@ -156,9 +154,8 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
       const result = await generateBio({
         name: agent.user.name || '',
         experience: formData.experience,
-        specialization: formData.specialization,
         city: formData.city,
-        licenseNumber: formData.licenseNumber
+        area: formData.area
       });
 
       if (result.success && result.bio) {
@@ -243,7 +240,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.specialization || !formData.city || !formData.phone) {
+    if (!formData.city || !formData.phone || !formData.experience) {
       alert('Please fill in all required fields.');
       return;
     }
@@ -364,25 +361,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
             />
           </div>
 
-          {/* Specialization */}
-          <div className="space-y-2">
-            <Label htmlFor="specialization" className="text-zinc-600">Specialization *</Label>
-            <Select value={formData.specialization} onValueChange={(value) => handleInputChange('specialization', value)}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="e.g., Residential Sales" />
-              </SelectTrigger>
-              <SelectContent className="w-full">
-                <SelectItem value="Residential Sales">Residential Sales</SelectItem>
-                <SelectItem value="Commercial Sales">Commercial Sales</SelectItem>
-                <SelectItem value="Residential Lease">Residential Lease</SelectItem>
-                <SelectItem value="Commercial Lease">Commercial Lease</SelectItem>
-                <SelectItem value="Property Management">Property Management</SelectItem>
-                <SelectItem value="Investment Properties">Investment Properties</SelectItem>
-                <SelectItem value="Luxury Properties">Luxury Properties</SelectItem>
-                <SelectItem value="New Construction">New Construction</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+
 
           {/* Primary Area */}
           <div className="space-y-2">
@@ -414,17 +393,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
             />
           </div>
 
-          {/* License Number */}
-          <div className="space-y-2">
-            <Label htmlFor="licenseNumber" className="text-zinc-600">RERA License Number (Optional)</Label>
-            <Input
-              id="licenseNumber"
-              type="text"
-              value={formData.licenseNumber}
-              onChange={(e) => handleInputChange('licenseNumber', e.target.value)}
-              placeholder="e.g., RE123456789"
-            />
-          </div>
+
 
           {/* Custom Profile URL */}
           <div className="space-y-2">
@@ -477,7 +446,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
             variant="outline"
             size="sm"
             onClick={handleGenerateBio}
-            disabled={isGenerating || !formData.experience || !formData.specialization || !formData.city}
+            disabled={isGenerating || !formData.experience || !formData.city}
             className="text-red-600 border-red-200 hover:bg-red-50 w-[170px] justify-center"
           >
             {isGenerating ? (

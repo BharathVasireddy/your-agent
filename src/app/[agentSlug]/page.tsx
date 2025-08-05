@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: AgentProfilePageProps): Promi
     ? agent.bio.length > 160 
       ? agent.bio.substring(0, 160) + '...'
       : agent.bio
-    : `Real estate agent specializing in ${agent.specialization} in ${agent.city}`;
+    : `Experienced real estate agent serving ${agent.city}${agent.area ? ` - ${agent.area}` : ''}`;
 
   return {
     title: `${agent.user.name} - Real Estate Agent in ${agent.city}`,

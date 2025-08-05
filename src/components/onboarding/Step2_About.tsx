@@ -14,9 +14,8 @@ export default function Step2_About() {
   const { 
     bio, 
     experience, 
-    specialization, 
     city, 
-    licenseNumber, 
+    area,
     setData 
   } = useWizardStore();
   
@@ -39,17 +38,16 @@ export default function Step2_About() {
       const userName = session?.user?.name || 'Agent';
 
       // Check if we have the required data from Step 1
-      if (!experience || !specialization || !city) {
-        setGenerationError('Please complete Step 1 with your experience, specialization, and city before generating a bio.');
+      if (!experience || !city) {
+        setGenerationError('Please complete Step 1 with your experience and city before generating a bio.');
         return;
       }
 
       const result = await generateBio({
         name: userName,
         experience,
-        specialization,
         city,
-        licenseNumber
+        area
       });
 
       if (result.success && result.bio) {
@@ -90,7 +88,7 @@ export default function Step2_About() {
             variant="outline"
             size="sm"
             onClick={handleGenerateBio}
-            disabled={isGenerating || !experience || !specialization || !city}
+            disabled={isGenerating || !experience || !city}
             className="text-red-600 border-red-200 hover:bg-red-50 w-[170px] justify-center"
           >
             {isGenerating ? (

@@ -210,4 +210,51 @@ body {
   body {
     @apply bg-white text-zinc-950;
   }
+  
+  /* Fix dropdown backgrounds */
+  select {
+    background-color: white !important;
+  }
+  
+  select option {
+    background-color: white !important;
+    color: #09090B !important;
+  }
+  
+  select:focus option {
+    background-color: white !important;
+  }
+  
+  /* Fix Radix UI Select backgrounds */
+  [data-radix-select-trigger] {
+    background-color: white !important;
+  }
+  
+  [data-radix-select-content] {
+    background-color: white !important;
+  }
+  
+  [data-radix-select-item] {
+    background-color: white !important;
+  }
+  
+  [data-radix-select-item]:hover {
+    background-color: #f4f4f5 !important;
+  }
+  
+  [data-radix-select-item]:focus {
+    background-color: #f4f4f5 !important;
+  }
+  
+  /* Force white background for all select-related elements */
+  [data-slot="select-trigger"],
+  [data-slot="select-content"],
+  [data-slot="select-item"] {
+    background-color: white !important;
+  }
+  
+  [data-slot="select-item"]:hover,
+  [data-slot="select-item"]:focus {
+    background-color: #f4f4f5 !important;
+  }
 }

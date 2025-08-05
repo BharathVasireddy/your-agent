@@ -6,15 +6,14 @@ import { useWizardStore } from "@/store/wizard-store";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Check, X, Loader2 } from "lucide-react";
+import { Check, X, Loader2, MapPin, Phone, Calendar, Link2, AlertCircle } from "lucide-react";
 
 export default function Step1_Professional() {
   const { data: session } = useSession();
   const { 
     experience, 
-    specialization, 
-    licenseNumber, 
     city, 
+    area,
     phone, 
     slug,
     setData 
@@ -32,8 +31,51 @@ export default function Step1_Professional() {
     cleanSlug: ''
   });
 
+  const [phoneValidation, setPhoneValidation] = useState<{
+    isValid: boolean;
+    message: string;
+  }>({
+    isValid: false,
+    message: ''
+  });
+
   const handleInputChange = (field: string, value: string | number) => {
     setData({ [field]: value });
+    
+    // Clear area when city changes
+    if (field === 'city') {
+      setData({ area: '' });
+    }
+  };
+
+  // Phone validation function
+  const validatePhone = (phoneNumber: string) => {
+    // Remove all spaces, dashes, and country code prefix
+    const cleanPhone = phoneNumber.replace(/[\s\-\(\)\+]/g, '');
+    
+    // Check for Indian mobile number pattern
+    const indianMobileRegex = /^(?:91)?[6-9]\d{9}$/;
+    
+    if (!phoneNumber.trim()) {
+      setPhoneValidation({ isValid: false, message: '' });
+      return;
+    }
+    
+    if (cleanPhone.length < 10) {
+      setPhoneValidation({ isValid: false, message: 'Phone number is too short' });
+      return;
+    }
+    
+    if (cleanPhone.length > 13) {
+      setPhoneValidation({ isValid: false, message: 'Phone number is too long' });
+      return;
+    }
+    
+    if (indianMobileRegex.test(cleanPhone)) {
+      setPhoneValidation({ isValid: true, message: 'Valid phone number' });
+    } else {
+      setPhoneValidation({ isValid: false, message: 'Please enter a valid Indian mobile number' });
+    }
   };
 
   // Generate initial slug from user's name
@@ -97,176 +139,208 @@ export default function Step1_Professional() {
     return () => clearTimeout(timeoutId);
   }, [slug, setData]);
 
-  // Comprehensive list of Hyderabad areas organized by zones
-  const hyderabadAreas = [
-    { label: "Hyderabad", value: "Hyderabad" },
-    
-    // West Hyderabad (IT Corridor)
-    { label: "Madhapur", value: "Madhapur" },
-    { label: "Gachibowli", value: "Gachibowli" },
-    { label: "Kondapur", value: "Kondapur" },
-    { label: "HITEC City", value: "HITEC City" },
-    { label: "Financial District", value: "Financial District" },
-    { label: "Kokapet", value: "Kokapet" },
-    { label: "Nanakramguda", value: "Nanakramguda" },
-    { label: "Manikonda", value: "Manikonda" },
-    { label: "Miyapur", value: "Miyapur" },
-    { label: "Kukatpally", value: "Kukatpally" },
-    { label: "Chanda Nagar", value: "Chanda Nagar" },
-    { label: "Bachupally", value: "Bachupally" },
-    { label: "Madinaguda", value: "Madinaguda" },
-    { label: "Hafeezpet", value: "Hafeezpet" },
-    { label: "Pragathi Nagar", value: "Pragathi Nagar" },
-    
-    // Central Hyderabad
-    { label: "Banjara Hills", value: "Banjara Hills" },
-    { label: "Jubilee Hills", value: "Jubilee Hills" },
-    { label: "Road No. 36 (Jubilee Hills)", value: "Road No. 36 (Jubilee Hills)" },
-    { label: "Filmnagar", value: "Filmnagar" },
-    { label: "Punjagutta", value: "Punjagutta" },
-    { label: "Ameerpet", value: "Ameerpet" },
-    { label: "Somajiguda", value: "Somajiguda" },
-    { label: "Begumpet", value: "Begumpet" },
-    { label: "Lakdi Ka Pul", value: "Lakdi Ka Pul" },
-    { label: "Panjagutta", value: "Panjagutta" },
-    { label: "Erragadda", value: "Erragadda" },
-    
-    // East Hyderabad
-    { label: "Secunderabad", value: "Secunderabad" },
-    { label: "Himayath Nagar", value: "Himayath Nagar" },
-    { label: "Tarnaka", value: "Tarnaka" },
-    { label: "Uppal", value: "Uppal" },
-    { label: "Boduppal", value: "Boduppal" },
-    { label: "Nagole", value: "Nagole" },
-    { label: "LB Nagar", value: "LB Nagar" },
-    { label: "Dilsukhnagar", value: "Dilsukhnagar" },
-    { label: "Vanasthalipuram", value: "Vanasthalipuram" },
-    { label: "Kompally", value: "Kompally" },
-    { label: "Alwal", value: "Alwal" },
-    { label: "Trimulgherry", value: "Trimulgherry" },
-    
-    // South Hyderabad
-    { label: "Tolichowki", value: "Tolichowki" },
-    { label: "Shaikpet", value: "Shaikpet" },
-    { label: "Golconda", value: "Golconda" },
-    { label: "Langar Houz", value: "Langar Houz" },
-    { label: "Rajendranagar", value: "Rajendranagar" },
-    { label: "Narsingi", value: "Narsingi" },
-    { label: "Gandipet", value: "Gandipet" },
-    { label: "Attapur", value: "Attapur" },
-    { label: "Mehdipatnam", value: "Mehdipatnam" },
-    
-    // Old City
-    { label: "Charminar", value: "Charminar" },
-    { label: "Laad Bazaar", value: "Laad Bazaar" },
-    { label: "Abids", value: "Abids" },
-    { label: "Sultan Bazaar", value: "Sultan Bazaar" },
-    { label: "Koti", value: "Koti" },
-    { label: "Mallepally", value: "Mallepally" },
-    { label: "Falaknuma", value: "Falaknuma" },
-    { label: "Santosh Nagar", value: "Santosh Nagar" },
-    
-    // North Hyderabad
-    { label: "Nizampet", value: "Nizampet" },
-    { label: "Quthbullapur", value: "Quthbullapur" },
-    { label: "Jeedimetla", value: "Jeedimetla" },
-    { label: "Bollaram", value: "Bollaram" },
-    { label: "Patancheru", value: "Patancheru" },
-  ];
+  // Phone validation effect
+  useEffect(() => {
+    if (phone) {
+      validatePhone(phone);
+    }
+  }, [phone]);
+
+  // Cities and their areas - this would ideally come from an API managed by admin
+  const citiesWithAreas = {
+    'Hyderabad': [
+      { label: "Madhapur", value: "Madhapur" },
+      { label: "Gachibowli", value: "Gachibowli" },
+      { label: "Kondapur", value: "Kondapur" },
+      { label: "HITEC City", value: "HITEC City" },
+      { label: "Financial District", value: "Financial District" },
+      { label: "Kokapet", value: "Kokapet" },
+      { label: "Banjara Hills", value: "Banjara Hills" },
+      { label: "Jubilee Hills", value: "Jubilee Hills" },
+      { label: "Punjagutta", value: "Punjagutta" },
+      { label: "Ameerpet", value: "Ameerpet" },
+      { label: "Secunderabad", value: "Secunderabad" },
+      { label: "Kukatpally", value: "Kukatpally" },
+      { label: "Miyapur", value: "Miyapur" },
+      { label: "Uppal", value: "Uppal" },
+      { label: "LB Nagar", value: "LB Nagar" },
+      { label: "Dilsukhnagar", value: "Dilsukhnagar" },
+      { label: "Charminar", value: "Charminar" },
+      { label: "Abids", value: "Abids" },
+    ],
+    'Bangalore': [
+      { label: "Koramangala", value: "Koramangala" },
+      { label: "Indiranagar", value: "Indiranagar" },
+      { label: "Whitefield", value: "Whitefield" },
+      { label: "Electronic City", value: "Electronic City" },
+      { label: "HSR Layout", value: "HSR Layout" },
+      { label: "BTM Layout", value: "BTM Layout" },
+      { label: "Marathahalli", value: "Marathahalli" },
+      { label: "Sarjapur Road", value: "Sarjapur Road" },
+    ],
+    'Mumbai': [
+      { label: "Bandra", value: "Bandra" },
+      { label: "Andheri", value: "Andheri" },
+      { label: "Powai", value: "Powai" },
+      { label: "Lower Parel", value: "Lower Parel" },
+      { label: "Worli", value: "Worli" },
+      { label: "Malad", value: "Malad" },
+      { label: "Thane", value: "Thane" },
+      { label: "Navi Mumbai", value: "Navi Mumbai" },
+    ]
+  } as const;
+
+  const availableCities = Object.keys(citiesWithAreas);
+  const availableAreas = city ? citiesWithAreas[city as keyof typeof citiesWithAreas] || [] : [];
 
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-semibold text-zinc-950 mb-2">
+    <div className="max-w-4xl mx-auto">
+      {/* Header Section with Better Typography */}
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+          <MapPin className="w-8 h-8 text-red-600" />
+        </div>
+        <h2 className="text-3xl font-bold text-zinc-950 mb-3">
           Professional Information
         </h2>
-        <p className="text-zinc-600">
-          Tell us about your experience and specialization in real estate.
+        <p className="text-lg text-zinc-600 max-w-2xl mx-auto">
+          Help us create your professional profile with your location and contact details.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* City/Area */}
-        <div className="space-y-2">
-          <Label htmlFor="city" className="text-zinc-600">Primary Area in Hyderabad</Label>
-          <Select value={city} onValueChange={(value) => handleInputChange('city', value)}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select your area in Hyderabad" />
-            </SelectTrigger>
-            <SelectContent className="max-h-[300px] w-full">
-              {hyderabadAreas.map((area) => (
-                <SelectItem key={area.value} value={area.value}>
-                  {area.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      {/* Form Grid with Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        
+        {/* Location Card */}
+        <div className="bg-white border border-zinc-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-red-100 rounded-lg">
+              <MapPin className="w-5 h-5 text-red-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-zinc-950">Location</h3>
+          </div>
+          
+          <div className="space-y-4">
+            {/* City Selection */}
+            <div className="space-y-2">
+              <Label htmlFor="city" className="text-sm font-medium text-zinc-700">City *</Label>
+              <Select value={city} onValueChange={(value) => handleInputChange('city', value)}>
+                <SelectTrigger className="w-full h-11">
+                  <SelectValue placeholder="Select your city" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableCities.map((cityName) => (
+                    <SelectItem key={cityName} value={cityName}>
+                      {cityName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Area Selection - Only show if city is selected */}
+            {city && (
+              <div className="space-y-2">
+                <Label htmlFor="area" className="text-sm font-medium text-zinc-700">Primary Area *</Label>
+                <Select value={area} onValueChange={(value) => handleInputChange('area', value)}>
+                  <SelectTrigger className="w-full h-11">
+                    <SelectValue placeholder={`Select area in ${city}`} />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[200px]">
+                    {availableAreas.map((areaItem) => (
+                      <SelectItem key={areaItem.value} value={areaItem.value}>
+                        {areaItem.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Phone */}
-        <div className="space-y-2">
-          <Label htmlFor="phone" className="text-zinc-600">Phone Number</Label>
-          <Input
-            id="phone"
-            type="tel"
-            value={phone}
-            onChange={(e) => handleInputChange('phone', e.target.value)}
-            placeholder="e.g., +91 98765 43210"
-          />
-        </div>
+        {/* Contact & Experience Card */}
+        <div className="bg-white border border-zinc-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-red-100 rounded-lg">
+              <Phone className="w-5 h-5 text-red-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-zinc-950">Contact & Experience</h3>
+          </div>
+          
+          <div className="space-y-4">
+            {/* Phone Number with Validation */}
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-sm font-medium text-zinc-700">Phone Number *</Label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  placeholder="+91 98765 43210"
+                  className={`pl-10 h-11 ${
+                    phoneValidation.message && !phoneValidation.isValid 
+                      ? 'border-red-300 focus:border-red-500' 
+                      : phoneValidation.isValid 
+                        ? 'border-green-300 focus:border-green-500' 
+                        : ''
+                  }`}
+                />
+                {/* Phone Validation Icon */}
+                {phone && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    {phoneValidation.isValid ? (
+                      <Check className="w-4 h-4 text-green-600" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-red-600" />
+                    )}
+                  </div>
+                )}
+              </div>
+              {phoneValidation.message && (
+                <p className={`text-xs ${phoneValidation.isValid ? 'text-green-600' : 'text-red-600'}`}>
+                  {phoneValidation.message}
+                </p>
+              )}
+            </div>
 
-        {/* Experience */}
-        <div className="space-y-2">
-          <Label htmlFor="experience" className="text-zinc-600">Years of Experience</Label>
-          <Input
-            id="experience"
-            type="number"
-            value={experience}
-            onChange={(e) => handleInputChange('experience', parseInt(e.target.value) || 0)}
-            placeholder="e.g., 5"
-            min="0"
-            max="50"
-          />
+            {/* Experience */}
+            <div className="space-y-2">
+              <Label htmlFor="experience" className="text-sm font-medium text-zinc-700">Years of Experience *</Label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                <Input
+                  id="experience"
+                  type="number"
+                  value={experience}
+                  onChange={(e) => handleInputChange('experience', parseInt(e.target.value) || 0)}
+                  placeholder="5"
+                  min="0"
+                  max="50"
+                  className="pl-10 h-11"
+                />
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
 
-        {/* Specialization */}
-        <div className="space-y-2">
-          <Label htmlFor="specialization" className="text-zinc-600">Specialization</Label>
-          <Select value={specialization} onValueChange={(value) => handleInputChange('specialization', value)}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="e.g., Residential Sales" />
-            </SelectTrigger>
-            <SelectContent className="w-full">
-              <SelectItem value="Residential Sales">Residential Sales</SelectItem>
-              <SelectItem value="Commercial Sales">Commercial Sales</SelectItem>
-              <SelectItem value="Residential Lease">Residential Lease</SelectItem>
-              <SelectItem value="Commercial Lease">Commercial Lease</SelectItem>
-              <SelectItem value="Property Management">Property Management</SelectItem>
-              <SelectItem value="Investment Properties">Investment Properties</SelectItem>
-              <SelectItem value="Luxury Properties">Luxury Properties</SelectItem>
-              <SelectItem value="New Construction">New Construction</SelectItem>
-            </SelectContent>
-          </Select>
+      {/* Profile URL Card - Full Width */}
+      <div className="bg-white border border-zinc-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow mb-8">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-red-100 rounded-lg">
+            <Link2 className="w-5 h-5 text-red-600" />
+          </div>
+          <h3 className="text-lg font-semibold text-zinc-950">Profile URL</h3>
         </div>
-
-        {/* License Number */}
+        
         <div className="space-y-2">
-          <Label htmlFor="licenseNumber" className="text-zinc-600">RERA License Number (Optional)</Label>
-          <Input
-            id="licenseNumber"
-            type="text"
-            value={licenseNumber}
-            onChange={(e) => handleInputChange('licenseNumber', e.target.value)}
-            placeholder="e.g., RE123456789"
-          />
-        </div>
-
-        {/* Custom Profile URL */}
-        <div className="space-y-2">
-          <Label htmlFor="slug" className="text-zinc-600">Your Profile URL</Label>
+          <Label htmlFor="slug" className="text-sm font-medium text-zinc-700">Your Custom Profile URL *</Label>
           <div className="relative">
             <div className="flex">
-              <span className="inline-flex items-center px-3 text-sm text-zinc-500 bg-zinc-50 border border-r-0 border-zinc-300 rounded-l-md">
+              <span className="inline-flex items-center px-4 text-sm font-medium text-zinc-600 bg-zinc-100 border border-r-0 border-zinc-300 rounded-l-lg">
                 youragent.in/
               </span>
               <Input
@@ -275,23 +349,23 @@ export default function Step1_Professional() {
                 value={slug}
                 onChange={(e) => handleInputChange('slug', e.target.value)}
                 placeholder="your-name"
-                className="rounded-l-none pr-10"
+                className="rounded-l-none pr-12 h-11"
               />
               {/* Validation Icon */}
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                 {slugValidation.checking ? (
-                  <Loader2 className="w-4 h-4 text-zinc-400 animate-spin" />
+                  <Loader2 className="w-5 h-5 text-zinc-400 animate-spin" />
                 ) : slugValidation.available === true ? (
-                  <Check className="w-4 h-4 text-green-600" />
+                  <Check className="w-5 h-5 text-green-600" />
                 ) : slugValidation.available === false ? (
-                  <X className="w-4 h-4 text-red-600" />
+                  <X className="w-5 h-5 text-red-600" />
                 ) : null}
               </div>
             </div>
           </div>
           {/* Validation Message */}
           {slugValidation.message && (
-            <p className={`text-xs ${
+            <p className={`text-sm ${
               slugValidation.available 
                 ? 'text-green-600' 
                 : 'text-red-600'
@@ -299,18 +373,26 @@ export default function Step1_Professional() {
               {slugValidation.message}
             </p>
           )}
-          <p className="text-xs text-zinc-500">
+          <p className="text-sm text-zinc-500">
             This will be your unique profile URL. Only letters, numbers, and hyphens are allowed.
           </p>
         </div>
       </div>
 
-      {/* Helper Text */}
-      <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-sm text-red-800">
-          <strong>Tip:</strong> This information will be displayed on your public agent profile. 
-          Make sure all details are accurate and professional.
-        </p>
+      {/* Info Banner */}
+      <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-xl p-6">
+        <div className="flex items-start gap-3">
+          <div className="p-2 bg-red-100 rounded-lg flex-shrink-0">
+            <AlertCircle className="w-5 h-5 text-red-600" />
+          </div>
+          <div>
+            <h4 className="font-semibold text-red-900 mb-1">Important Information</h4>
+            <p className="text-sm text-red-800">
+              This information will be displayed on your public agent profile. Make sure all details are accurate and professional. 
+              You can update these details later from your dashboard.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

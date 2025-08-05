@@ -3,14 +3,11 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { X, ArrowRight, ArrowLeft, CheckCircle, Home, Building, User, Plus } from 'lucide-react';
-import { markTourAsComplete } from '@/lib/userFlow';
-
-import type { ExtendedSession } from '@/types/dashboard';
+import { markTourAsCompleteAction } from '@/app/actions';
 
 interface DashboardTourProps {
   isVisible: boolean;
   onComplete: () => void;
-  userSession: ExtendedSession;
 }
 
 interface TourStep {
@@ -73,7 +70,7 @@ const tourSteps: TourStep[] = [
   }
 ];
 
-export default function DashboardTour({ isVisible, onComplete, userSession }: DashboardTourProps) {
+export default function DashboardTour({ isVisible, onComplete }: DashboardTourProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isCompleting, setIsCompleting] = useState(false);
 
@@ -100,7 +97,7 @@ export default function DashboardTour({ isVisible, onComplete, userSession }: Da
   const handleComplete = async () => {
     try {
       setIsCompleting(true);
-      await markTourAsComplete(userSession.user.id);
+      await markTourAsCompleteAction();
       onComplete();
     } catch (error) {
       console.error('Error completing tour:', error);

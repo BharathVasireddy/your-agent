@@ -8,8 +8,9 @@ interface AgentHeaderProps {
       name: string | null;
       image: string | null;
     };
-    specialization: string | null;
     city: string | null;
+    area: string | null;
+    experience: number | null;
     profilePhotoUrl?: string | null;
   };
 }
@@ -44,10 +45,10 @@ export default function AgentHeader({ agent }: AgentHeaderProps) {
             {agent.user.name || 'Agent'}
           </h1>
           <p className="text-lg text-muted-foreground mb-1">
-            {agent.specialization || 'Real Estate Agent'}
+            Real Estate Agent{agent.experience ? ` • ${agent.experience} years experience` : ''}
           </p>
           <p className="text-base text-muted-foreground">
-            📍 {agent.city || 'Location not specified'}
+            📍 {agent.city || 'Location not specified'}{agent.area ? ` - ${agent.area}` : ''}
           </p>
         </div>
       </div>

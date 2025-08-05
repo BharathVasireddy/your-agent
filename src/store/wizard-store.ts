@@ -2,11 +2,10 @@ import { create } from 'zustand';
 
 interface AgentProfileState {
   experience: number;
-  specialization: string;
-  licenseNumber: string;
   bio: string;
   phone: string;
   city: string;
+  area: string;
   theme: string;
   profilePhotoUrl: string;
   slug: string;
@@ -19,11 +18,10 @@ interface AgentProfileActions {
 
 const initialState: AgentProfileState = {
   experience: 0,
-  specialization: '',
-  licenseNumber: '',
   bio: '',
   phone: '',
   city: '',
+  area: '',
   theme: 'professional-blue',
   profilePhotoUrl: '',
   slug: '',

@@ -3,6 +3,7 @@ import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import DashboardWithTour from './DashboardWithTour';
+import type { Property } from '@/types/dashboard';
 
 export default async function DashboardPage() {
   // Get the current user's session
@@ -28,18 +29,20 @@ export default async function DashboardPage() {
     })
   ]);
 
-  const saleProperties = properties.filter(p => p.listingType === 'Sale').length;
-  const rentProperties = properties.filter(p => p.listingType === 'Rent').length;
-  const availableProperties = properties.filter(p => p.status === 'Available').length;
+  // Filter properties with valid slugs
+  const validProperties = properties.filter(p => p.slug !== null) as Property[];
+  
+  const saleProperties = validProperties.filter(p => p.listingType === 'Sale').length;
+  const rentProperties = validProperties.filter(p => p.listingType === 'Rent').length;
+  const availableProperties = validProperties.filter(p => p.status === 'Available').length;
 
   const needsTour = agent ? !agent.hasSeenTour : false;
 
   return (
     <DashboardWithTour 
-      session={session} 
       needsTour={needsTour}
       agent={agent}
-      properties={properties}
+      properties={validProperties}
       saleProperties={saleProperties}
       rentProperties={rentProperties}
       availableProperties={availableProperties}

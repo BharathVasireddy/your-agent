@@ -1,74 +1,68 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-// Core model for authentication, managed by NextAuth.js
 model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  password      String?   // For email/password authentication
+  password      String?
   accounts      Account[]
+  agentProfile  Agent?
   sessions      Session[]
-  agentProfile  Agent? // One-to-one relation to an Agent profile
 }
 
-// Public-facing Agent profile data
 model Agent {
-  id                 String    @id @default(cuid())
-  slug               String    @unique // For youragent.in/slug
-  userId             String    @unique
-  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                 String     @id @default(cuid())
+  slug               String     @unique
+  userId             String     @unique
   experience         Int?
-  specialization     String?
-  licenseNumber      String?
-  bio                String?   @db.Text
+  bio                String?
   phone              String?
   city               String?
-  theme              String    @default("professional-blue")
-  profilePhotoUrl    String?   // Cloudinary URL for profile photo
-  isSubscribed       Boolean   @default(false)
+  area               String?
+  theme              String     @default("professional-blue")
+  isSubscribed       Boolean    @default(false)
   subscriptionEndsAt DateTime?
-  hasSeenTour        Boolean   @default(false) // Track if user has seen dashboard tour
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  profilePhotoUrl    String?
+  hasSeenTour        Boolean    @default(false)
+  user               User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   properties         Property[]
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  
-  @@index([city, specialization]) // Index for faster searching
+
+  @@index([city, area])
 }
 
-// Property listings belonging to an agent
 model Property {
-  id          String   @id @default(cuid())
-  agentId     String
-  agent       Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  title       String
-  description String   @db.Text
-  price       Int
-  area        Int      // in sqft
-  bedrooms    Int
-  bathrooms   Int
-  location    String
-  amenities   String[]
-  photos      String[] // Array of Cloudinary URLs
-  status      String   @default("Available") // e.g., Available, Sold, Rented
-  listingType String   // Sale or Rent
-  propertyType String  // Plots, Villas, Flats, Farms, etc.
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
+  id           String   @id @default(cuid())
+  agentId      String
+  title        String
+  description  String
+  price        Int
+  area         Int
+  bedrooms     Int
+  bathrooms    Int
+  location     String
+  amenities    String[]
+  photos       String[]
+  status       String   @default("Available")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  listingType  String
+  propertyType String
+  slug         String?  @unique
+  agent        Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
-// --- NextAuth.js required models ---
+  @@index([agentId, slug])
+}
 
 model Account {
   id                String  @id @default(cuid())
@@ -76,12 +70,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 

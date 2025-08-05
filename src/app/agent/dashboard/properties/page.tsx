@@ -2,6 +2,8 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
+import { Plus, Home, Edit, Trash2, ImageIcon } from 'lucide-react';
 import prisma from '@/lib/prisma';
 
 export default async function PropertiesPage() {
@@ -27,9 +29,10 @@ export default async function PropertiesPage() {
     }
   });
 
-  // Group properties by listing type
-  const saleProperties = properties.filter(p => p.listingType === 'Sale');
-  const rentProperties = properties.filter(p => p.listingType === 'Rent');
+  // Filter properties with valid slugs and group by listing type
+  const validProperties = properties.filter(p => p.slug !== null) as Property[];
+  const saleProperties = validProperties.filter(p => p.listingType === 'Sale');
+  const rentProperties = validProperties.filter(p => p.listingType === 'Rent');
 
   return (
     <div className="container mx-auto p-6">
@@ -50,21 +53,17 @@ export default async function PropertiesPage() {
           href="/agent/dashboard/properties/new"
           className="inline-flex items-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
         >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
+          <Plus className="w-5 h-5 mr-2" />
           Add New Property
         </Link>
       </div>
 
       {/* Properties Content */}
-      {properties.length === 0 ? (
+      {validProperties.length === 0 ? (
         /* No Properties Message */
         <div className="text-center py-16">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-zinc-100 rounded-full mb-4">
-            <svg className="w-8 h-8 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0h2M7 7h10M7 11h4" />
-            </svg>
+            <Home className="w-8 h-8 text-zinc-400" />
           </div>
           <h3 className="text-xl font-semibold text-zinc-950 mb-2">No Properties Yet</h3>
           <p className="text-zinc-600 mb-6">You haven&apos;t added any properties yet.</p>
@@ -72,6 +71,7 @@ export default async function PropertiesPage() {
             href="/agent/dashboard/properties/new"
             className="inline-flex items-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
           >
+            <Plus className="w-5 h-5 mr-2" />
             Add Your First Property
           </Link>
         </div>
@@ -120,6 +120,7 @@ export default async function PropertiesPage() {
 // Property Card Component
 interface Property {
   id: string;
+  slug: string;
   title: string;
   price: number;
   photos: string[];
@@ -134,16 +135,15 @@ function PropertyCard({ property }: { property: Property }) {
       {/* Property Photo */}
       <div className="aspect-video bg-zinc-100 relative">
         {property.photos.length > 0 ? (
-          <img
+          <Image
             src={property.photos[0]}
             alt={property.title}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <svg className="w-12 h-12 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+            <ImageIcon className="w-12 h-12 text-zinc-400" />
           </div>
         )}
         
@@ -185,21 +185,17 @@ function PropertyCard({ property }: { property: Property }) {
         {/* Action Buttons */}
         <div className="flex gap-2">
           <Link
-            href={`/agent/dashboard/properties/${property.id}/edit`}
+            href={`/agent/dashboard/properties/${property.slug}/edit`}
             className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-zinc-100 text-zinc-700 rounded-lg hover:bg-zinc-200 transition-colors text-sm font-medium"
           >
-            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
+            <Edit className="w-4 h-4 mr-1" />
             Edit
           </Link>
           <Link
-            href={`/agent/dashboard/properties/${property.id}/delete`}
+            href={`/agent/dashboard/properties/${property.slug}/delete`}
             className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-sm font-medium"
           >
-            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
+            <Trash2 className="w-4 h-4 mr-1" />
             Delete
           </Link>
         </div>

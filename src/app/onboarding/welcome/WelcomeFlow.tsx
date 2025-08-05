@@ -23,7 +23,7 @@ export default function WelcomeFlow({ session, flowStatus }: WelcomeFlowProps) {
   // Auto-subscribe Google users
   useEffect(() => {
     const autoSubscribe = async () => {
-      if (flowStatus.needsSubscription && !isSubscribing) {
+      if (flowStatus.needsSubscription && !isSubscribing && !subscriptionComplete) {
         try {
           setIsSubscribing(true);
           await grantSubscription();
@@ -38,7 +38,7 @@ export default function WelcomeFlow({ session, flowStatus }: WelcomeFlowProps) {
     };
 
     autoSubscribe();
-  }, [flowStatus.needsSubscription, isSubscribing]);
+  }, [flowStatus.needsSubscription, isSubscribing, subscriptionComplete]);
 
   const handleStartOnboarding = () => {
     router.push('/onboarding/wizard');

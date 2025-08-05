@@ -4,10 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import DashboardTour from './DashboardTour';
 import DashboardContent from './DashboardContent';
-import type { ExtendedSession, AgentProfile, Property } from '@/types/dashboard';
+import type { AgentProfile, Property } from '@/types/dashboard';
 
 interface DashboardWithTourProps {
-  session: ExtendedSession;
   needsTour: boolean;
   agent: AgentProfile | null;
   properties: Property[];
@@ -17,7 +16,6 @@ interface DashboardWithTourProps {
 }
 
 export default function DashboardWithTour({
-  session,
   needsTour,
   agent,
   properties,
@@ -47,7 +45,6 @@ export default function DashboardWithTour({
       <DashboardTour
         isVisible={showTour}
         onComplete={handleTourComplete}
-        userSession={session}
       />
     </>
   );

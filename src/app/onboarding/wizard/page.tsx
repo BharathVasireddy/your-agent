@@ -49,11 +49,10 @@ export default function OnboardingWizardPage() {
       // Get all data from wizard store
       const profileData = {
         experience: wizardStore.experience,
-        specialization: wizardStore.specialization,
-        licenseNumber: wizardStore.licenseNumber,
         bio: wizardStore.bio,
         phone: wizardStore.phone,
         city: wizardStore.city,
+        area: wizardStore.area,
         theme: wizardStore.theme,
         profilePhotoUrl: wizardStore.profilePhotoUrl,
         slug: wizardStore.slug,

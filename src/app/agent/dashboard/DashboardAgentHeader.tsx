@@ -6,8 +6,9 @@ interface DashboardAgentHeaderProps {
     id: string;
     slug: string;
     profilePhotoUrl: string | null;
-    specialization: string | null;
+    experience: number | null;
     city: string | null;
+    area: string | null;
     user: {
       id: string;
       name: string | null;
@@ -42,7 +43,7 @@ export default function DashboardAgentHeader({ agent }: DashboardAgentHeaderProp
               Welcome back, {agent?.user.name || 'Agent'}!
             </h1>
             <p className="text-zinc-600">
-              {agent?.specialization || 'Real Estate Agent'} • {agent?.city || 'Location'}
+              Real Estate Agent{agent?.experience ? ` • ${agent.experience} years experience` : ''} • {agent?.city || 'Location'}{agent?.area ? ` - ${agent.area}` : ''}
             </p>
             {agent?.slug && (
               <p className="text-sm text-zinc-500">
