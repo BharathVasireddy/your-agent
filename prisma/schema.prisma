@@ -36,6 +36,7 @@ model Agent {
   phone              String?
   city               String?
   theme              String    @default("professional-blue")
+  profilePhotoUrl    String?   // Cloudinary URL for profile photo
   isSubscribed       Boolean   @default(false)
   subscriptionEndsAt DateTime?
   properties         Property[]

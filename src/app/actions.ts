@@ -181,7 +181,7 @@ export async function updateAgentProfile(data: {
         phone: validatedData.phone,
         city: validatedData.city,
         theme: validatedData.theme,
-        // profilePhotoUrl will be implemented later with file upload
+        profilePhotoUrl: validatedData.profilePhotoUrl || null,
         updatedAt: new Date()
       }
     });
@@ -232,7 +232,8 @@ The bio should be:
 - 2-3 sentences long (under 300 characters)
 - Highlight their expertise and local market knowledge
 - Suitable for a real estate agent profile page
-- Written in third person
+- Written in first person ("I" perspective) as if the agent is speaking directly to potential clients
+- Personal and engaging while maintaining professionalism
 
 Do not include any special formatting, just plain text.`;
 
