@@ -1,7 +1,7 @@
 "use server";
 
 import { getServerSession } from "next-auth/next";
-import authConfig from "@/lib/auth";
+import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -17,13 +17,15 @@ function generateSlug(name: string): string {
 export async function grantSubscription() {
   try {
     // Get the current user's session
-    const session = await getServerSession(authConfig);
+    const session = await getServerSession(authOptions);
     
-    if (!session || !session.user || !session.user.id) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!session || !(session as any).user || !(session as any).user.id) {
       throw new Error("You must be signed in to grant subscription");
     }
 
-    const userId = session.user.id as string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any).user.id as string;
 
     // Try to find existing agent profile
     let agent = await prisma.agent.findUnique({
@@ -37,10 +39,14 @@ export async function grantSubscription() {
     if (!agent) {
       // Create new agent profile
       // Generate a unique slug based on user name or email
-      const baseSlug = session.user.name 
-        ? generateSlug(session.user.name)
-        : session.user.email?.split('@')[0] 
-          ? generateSlug(session.user.email.split('@')[0])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const baseSlug = (session as any).user.name 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ? generateSlug((session as any).user.name)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        : (session as any).user.email?.split('@')[0] 
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ? generateSlug((session as any).user.email.split('@')[0])
           : 'agent';
       
       // Ensure slug is unique

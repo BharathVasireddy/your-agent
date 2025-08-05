@@ -1,21 +1,23 @@
 import { getServerSession } from "next-auth/next";
-import authConfig from "@/lib/auth";
+import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 
 export default async function OnboardingWizardPage() {
   // Get the user's session
-  const session = await getServerSession(authConfig);
+  const session = await getServerSession(authOptions);
 
   // If no session, redirect to sign in
-  if (!session || !session.user || !session.user.id) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if (!session || !(session as any).user || !(session as any).user.id) {
     redirect('/api/auth/signin');
   }
 
   // Query the database for the user's agent profile
   const agent = await prisma.agent.findUnique({
     where: { 
-      userId: session.user.id as string 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      userId: (session as any).user.id as string 
     }
   });
 
@@ -37,7 +39,8 @@ export default async function OnboardingWizardPage() {
           </h1>
           
           <p className="text-xl text-gray-700">
-            Hello, {session.user.name || session.user.email}! 
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            Hello, {(session as any).user.name || (session as any).user.email}! 
           </p>
           
           <p className="text-gray-600">

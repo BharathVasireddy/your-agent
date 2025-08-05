@@ -1,12 +1,13 @@
 import { getServerSession } from "next-auth/next";
-import authConfig from "@/lib/auth";
+import { authOptions } from "@/lib/auth";
 import { subscribeAndRedirect } from "@/app/actions";
 import { redirect } from "next/navigation";
 
 async function SubscribePage() {
-  const session = await getServerSession(authConfig);
+  const session = await getServerSession(authOptions);
 
-  if (!session || !session.user) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if (!session || !(session as any).user) {
     redirect('/api/auth/signin');
   }
 
