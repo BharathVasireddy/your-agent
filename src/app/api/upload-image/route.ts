@@ -19,9 +19,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get the uploaded file
+    // Get the uploaded file and options
     const formData = await request.formData();
     const file = formData.get('file') as File;
+    const folder = formData.get('folder') as string || 'agent-profiles';
+    const aspectRatio = formData.get('aspectRatio') as string || 'auto';
+    const maxWidth = parseInt(formData.get('maxWidth') as string || '400');
+    const maxHeight = parseInt(formData.get('maxHeight') as string || '400');
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
@@ -49,17 +53,30 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
+    // Configure transformations based on aspect ratio
+    const transformations: Array<Record<string, string | number>> = [];
+    
+    if (aspectRatio === 'square') {
+      transformations.push({ width: maxWidth, height: maxHeight, crop: 'fill', gravity: 'center' });
+    } else if (aspectRatio === 'wide') {
+      transformations.push({ width: maxWidth, height: maxHeight, crop: 'fill', gravity: 'center' });
+    } else {
+      // Auto - maintain aspect ratio but limit max dimensions
+      transformations.push({ width: maxWidth, height: maxHeight, crop: 'limit' });
+    }
+    
+    transformations.push(
+      { quality: 'auto' }, // Automatic quality optimization
+      { format: 'webp' } // Convert to WebP for better compression
+    );
+
     // Upload to Cloudinary
     const uploadResult = await new Promise<{ secure_url: string; public_id: string }>((resolve, reject) => {
       cloudinary.uploader.upload_stream(
         {
           resource_type: 'image',
-          folder: 'agent-profiles', // Organize uploads in a folder
-          transformation: [
-            { width: 400, height: 400, crop: 'fill', gravity: 'face' }, // Square crop focused on face
-            { quality: 'auto' }, // Automatic quality optimization
-            { format: 'webp' } // Convert to WebP for better compression
-          ],
+          folder: folder, // Use dynamic folder
+          transformation: transformations,
         },
         (error, result) => {
           if (error) {

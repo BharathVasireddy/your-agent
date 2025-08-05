@@ -511,6 +511,10 @@ const agentProfileSchema = z.object({
   theme: z.string().min(1, "Theme is required"),
   profilePhotoUrl: z.string().optional(),
   slug: z.string().min(3, "Profile URL must be at least 3 characters").max(50, "Profile URL must be less than 50 characters"),
+  logoUrl: z.string().optional(),
+  heroImage: z.string().optional(),
+  heroTitle: z.string().max(100, "Hero title must be 100 characters or less").optional(),
+  heroSubtitle: z.string().max(150, "Hero subtitle must be 150 characters or less").optional(),
 });
 
 export async function updateAgentProfile(data: {
@@ -522,6 +526,10 @@ export async function updateAgentProfile(data: {
   theme: string;
   profilePhotoUrl: string;
   slug: string;
+  logoUrl?: string;
+  heroImage?: string;
+  heroTitle?: string;
+  heroSubtitle?: string;
 }) {
   try {
     // Get the current user's session
@@ -570,6 +578,10 @@ export async function updateAgentProfile(data: {
         theme: validatedData.theme,
         profilePhotoUrl: validatedData.profilePhotoUrl || null,
         slug: validatedData.slug,
+        logoUrl: validatedData.logoUrl || null,
+        heroImage: validatedData.heroImage || null,
+        heroTitle: validatedData.heroTitle || null,
+        heroSubtitle: validatedData.heroSubtitle || null,
         updatedAt: new Date()
       }
     });
@@ -657,5 +669,271 @@ Do not include any special formatting, just plain text.`;
     }
     
     throw new Error(error instanceof Error ? error.message : "Failed to generate bio");
+  }
+}
+
+// Testimonial Management Actions
+export async function addTestimonial(data: { text: string; author: string; rating?: number | null }) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user) {
+      throw new Error("You must be signed in to add testimonials");
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any).user.id as string;
+
+    // Find the user's agent profile
+    const agent = await prisma.agent.findUnique({
+      where: { userId },
+      select: { id: true }
+    });
+
+    if (!agent) {
+      throw new Error("Agent profile not found");
+    }
+
+    // Create the testimonial
+    const testimonial = await prisma.testimonial.create({
+      data: {
+        agentId: agent.id,
+        text: data.text.trim(),
+        author: data.author.trim(),
+        rating: data.rating || null
+      }
+    });
+
+    revalidatePath('/agent/dashboard/profile');
+    
+    return { success: true, testimonial };
+  } catch (error) {
+    console.error("Error adding testimonial:", error);
+    throw new Error(error instanceof Error ? error.message : "Failed to add testimonial");
+  }
+}
+
+export async function updateTestimonial(id: string, data: { text: string; author: string; rating?: number | null }) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user) {
+      throw new Error("You must be signed in to update testimonials");
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any).user.id as string;
+
+    // Find the user's agent profile
+    const agent = await prisma.agent.findUnique({
+      where: { userId },
+      select: { id: true }
+    });
+
+    if (!agent) {
+      throw new Error("Agent profile not found");
+    }
+
+    // Verify the testimonial belongs to this agent
+    const existingTestimonial = await prisma.testimonial.findFirst({
+      where: { id, agentId: agent.id }
+    });
+
+    if (!existingTestimonial) {
+      throw new Error("Testimonial not found or you don't have permission to edit it");
+    }
+
+    // Update the testimonial
+    const testimonial = await prisma.testimonial.update({
+      where: { id },
+      data: {
+        text: data.text.trim(),
+        author: data.author.trim(),
+        rating: data.rating || null
+      }
+    });
+
+    revalidatePath('/agent/dashboard/profile');
+    
+    return { success: true, testimonial };
+  } catch (error) {
+    console.error("Error updating testimonial:", error);
+    throw new Error(error instanceof Error ? error.message : "Failed to update testimonial");
+  }
+}
+
+export async function deleteTestimonial(id: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user) {
+      throw new Error("You must be signed in to delete testimonials");
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any).user.id as string;
+
+    // Find the user's agent profile
+    const agent = await prisma.agent.findUnique({
+      where: { userId },
+      select: { id: true }
+    });
+
+    if (!agent) {
+      throw new Error("Agent profile not found");
+    }
+
+    // Verify the testimonial belongs to this agent
+    const existingTestimonial = await prisma.testimonial.findFirst({
+      where: { id, agentId: agent.id }
+    });
+
+    if (!existingTestimonial) {
+      throw new Error("Testimonial not found or you don't have permission to delete it");
+    }
+
+    // Delete the testimonial
+    await prisma.testimonial.delete({
+      where: { id }
+    });
+
+    revalidatePath('/agent/dashboard/profile');
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting testimonial:", error);
+    throw new Error(error instanceof Error ? error.message : "Failed to delete testimonial");
+  }
+}
+
+// FAQ Management Actions
+export async function addFAQ(data: { question: string; answer: string }) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user) {
+      throw new Error("You must be signed in to add FAQs");
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any).user.id as string;
+
+    // Find the user's agent profile
+    const agent = await prisma.agent.findUnique({
+      where: { userId },
+      select: { id: true }
+    });
+
+    if (!agent) {
+      throw new Error("Agent profile not found");
+    }
+
+    // Create the FAQ
+    const faq = await prisma.fAQ.create({
+      data: {
+        agentId: agent.id,
+        question: data.question.trim(),
+        answer: data.answer.trim()
+      }
+    });
+
+    revalidatePath('/agent/dashboard/profile');
+    
+    return { success: true, faq };
+  } catch (error) {
+    console.error("Error adding FAQ:", error);
+    throw new Error(error instanceof Error ? error.message : "Failed to add FAQ");
+  }
+}
+
+export async function updateFAQ(id: string, data: { question: string; answer: string }) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user) {
+      throw new Error("You must be signed in to update FAQs");
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any).user.id as string;
+
+    // Find the user's agent profile
+    const agent = await prisma.agent.findUnique({
+      where: { userId },
+      select: { id: true }
+    });
+
+    if (!agent) {
+      throw new Error("Agent profile not found");
+    }
+
+    // Verify the FAQ belongs to this agent
+    const existingFAQ = await prisma.fAQ.findFirst({
+      where: { id, agentId: agent.id }
+    });
+
+    if (!existingFAQ) {
+      throw new Error("FAQ not found or you don't have permission to edit it");
+    }
+
+    // Update the FAQ
+    const faq = await prisma.fAQ.update({
+      where: { id },
+      data: {
+        question: data.question.trim(),
+        answer: data.answer.trim()
+      }
+    });
+
+    revalidatePath('/agent/dashboard/profile');
+    
+    return { success: true, faq };
+  } catch (error) {
+    console.error("Error updating FAQ:", error);
+    throw new Error(error instanceof Error ? error.message : "Failed to update FAQ");
+  }
+}
+
+export async function deleteFAQ(id: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user) {
+      throw new Error("You must be signed in to delete FAQs");
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any).user.id as string;
+
+    // Find the user's agent profile
+    const agent = await prisma.agent.findUnique({
+      where: { userId },
+      select: { id: true }
+    });
+
+    if (!agent) {
+      throw new Error("Agent profile not found");
+    }
+
+    // Verify the FAQ belongs to this agent
+    const existingFAQ = await prisma.fAQ.findFirst({
+      where: { id, agentId: agent.id }
+    });
+
+    if (!existingFAQ) {
+      throw new Error("FAQ not found or you don't have permission to delete it");
+    }
+
+    // Delete the FAQ
+    await prisma.fAQ.delete({
+      where: { id }
+    });
+
+    revalidatePath('/agent/dashboard/profile');
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting FAQ:", error);
+    throw new Error(error instanceof Error ? error.message : "Failed to delete FAQ");
   }
 }

@@ -7,9 +7,23 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { User, Upload, X, Loader2, Check, Sparkles, Save } from 'lucide-react';
-import { updateAgentProfile, generateBio } from '@/app/actions';
+import { User, Upload, X, Loader2, Check, Sparkles, Save, Plus, Edit2, Trash2, Star } from 'lucide-react';
+import { updateAgentProfile, generateBio, addTestimonial, updateTestimonial, deleteTestimonial, addFAQ, updateFAQ, deleteFAQ } from '@/app/actions';
+import ImageUploader from '@/components/ImageUploader';
 import toast from 'react-hot-toast';
+
+interface Testimonial {
+  id: string;
+  text: string;
+  author: string;
+  rating: number | null;
+}
+
+interface FAQ {
+  id: string;
+  question: string;
+  answer: string;
+}
 
 interface Agent {
   id: string;
@@ -21,6 +35,12 @@ interface Agent {
   area: string | null;
   theme: string;
   profilePhotoUrl: string | null;
+  logoUrl: string | null;
+  heroImage: string | null;
+  heroTitle: string | null;
+  heroSubtitle: string | null;
+  testimonials: Testimonial[];
+  faqs: FAQ[];
   user: {
     id: string;
     name: string | null;
@@ -45,7 +65,15 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
     theme: agent.theme || 'professional-blue',
     profilePhotoUrl: agent.profilePhotoUrl || '',
     slug: agent.slug || '',
+    logoUrl: agent.logoUrl || '',
+    heroImage: agent.heroImage || '',
+    heroTitle: agent.heroTitle || '',
+    heroSubtitle: agent.heroSubtitle || '',
   });
+
+  // Content management state
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(agent.testimonials || []);
+  const [faqs, setFaqs] = useState<FAQ[]>(agent.faqs || []);
 
   // UI state
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,6 +83,23 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Testimonial form state
+  const [testimonialForm, setTestimonialForm] = useState({
+    text: '',
+    author: '',
+    rating: null as number | null,
+    editingId: null as string | null
+  });
+  const [isSubmittingTestimonial, setIsSubmittingTestimonial] = useState(false);
+
+  // FAQ form state
+  const [faqForm, setFaqForm] = useState({
+    question: '',
+    answer: '',
+    editingId: null as string | null
+  });
+  const [isSubmittingFaq, setIsSubmittingFaq] = useState(false);
 
   // Slug validation state
   const [slugValidation, setSlugValidation] = useState<{
@@ -328,6 +373,155 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
     }
   };
 
+  // Testimonial management functions
+  const handleTestimonialSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!testimonialForm.text.trim() || !testimonialForm.author.trim()) {
+      toast.error('Please fill in all testimonial fields.');
+      return;
+    }
+
+    try {
+      setIsSubmittingTestimonial(true);
+      
+      const data = {
+        text: testimonialForm.text,
+        author: testimonialForm.author,
+        rating: testimonialForm.rating
+      };
+
+      if (testimonialForm.editingId) {
+        // Update existing testimonial
+        const result = await updateTestimonial(testimonialForm.editingId, data);
+        if (result.success) {
+          setTestimonials(prev => prev.map(t => 
+            t.id === testimonialForm.editingId ? { ...t, ...data } : t
+          ));
+          toast.success('Testimonial updated successfully!');
+        }
+      } else {
+        // Add new testimonial
+        const result = await addTestimonial(data);
+        if (result.success && result.testimonial) {
+          setTestimonials(prev => [...prev, result.testimonial]);
+          toast.success('Testimonial added successfully!');
+        }
+      }
+      
+      // Reset form
+      setTestimonialForm({
+        text: '',
+        author: '',
+        rating: null,
+        editingId: null
+      });
+      
+    } catch (error) {
+      console.error('Error with testimonial:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to save testimonial');
+    } finally {
+      setIsSubmittingTestimonial(false);
+    }
+  };
+
+  const handleEditTestimonial = (testimonial: Testimonial) => {
+    setTestimonialForm({
+      text: testimonial.text,
+      author: testimonial.author,
+      rating: testimonial.rating,
+      editingId: testimonial.id
+    });
+  };
+
+  const handleDeleteTestimonial = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this testimonial?')) return;
+    
+    try {
+      const result = await deleteTestimonial(id);
+      if (result.success) {
+        setTestimonials(prev => prev.filter(t => t.id !== id));
+        toast.success('Testimonial deleted successfully!');
+      }
+    } catch (error) {
+      console.error('Error deleting testimonial:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to delete testimonial');
+    }
+  };
+
+  // FAQ management functions
+  const handleFaqSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!faqForm.question.trim() || !faqForm.answer.trim()) {
+      toast.error('Please fill in both question and answer.');
+      return;
+    }
+
+    try {
+      setIsSubmittingFaq(true);
+      
+      const data = {
+        question: faqForm.question,
+        answer: faqForm.answer
+      };
+
+      if (faqForm.editingId) {
+        // Update existing FAQ
+        const result = await updateFAQ(faqForm.editingId, data);
+        if (result.success) {
+          setFaqs(prev => prev.map(f => 
+            f.id === faqForm.editingId ? { ...f, ...data } : f
+          ));
+          toast.success('FAQ updated successfully!');
+        }
+      } else {
+        // Add new FAQ
+        const result = await addFAQ(data);
+        if (result.success && result.faq) {
+          setFaqs(prev => [...prev, result.faq]);
+          toast.success('FAQ added successfully!');
+        }
+      }
+      
+      // Reset form
+      setFaqForm({
+        question: '',
+        answer: '',
+        editingId: null
+      });
+      
+    } catch (error) {
+      console.error('Error with FAQ:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to save FAQ');
+    } finally {
+      setIsSubmittingFaq(false);
+    }
+  };
+
+  const handleEditFaq = (faq: FAQ) => {
+    setFaqForm({
+      question: faq.question,
+      answer: faq.answer,
+      editingId: faq.id
+    });
+  };
+
+  const handleDeleteFaq = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this FAQ?')) return;
+    
+    try {
+      const result = await deleteFAQ(id);
+      if (result.success) {
+        setFaqs(prev => prev.filter(f => f.id !== id));
+        toast.success('FAQ deleted successfully!');
+      }
+    } catch (error) {
+      console.error('Error deleting FAQ:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to delete FAQ');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -369,306 +563,633 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
   const displayImageUrl = previewUrl || formData.profilePhotoUrl;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      {/* Profile Photo Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
-        <h3 className="text-lg font-semibold text-zinc-950 mb-4">Profile Photo</h3>
-        
-        <div className="flex flex-col items-center space-y-4">
-          {/* Photo Display */}
-          <div className="relative">
-            {displayImageUrl ? (
-              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-red-100">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={displayImageUrl}
-                  alt="Profile photo"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ) : (
-              <div className="w-32 h-32 rounded-full bg-zinc-100 border-4 border-red-100 flex items-center justify-center">
-                <User className="w-16 h-16 text-zinc-400" />
-              </div>
-            )}
-            
-            {displayImageUrl && (
-              <button
-                type="button"
-                onClick={handleRemovePhoto}
-                className="absolute -top-2 -right-2 w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-
-          {/* Upload Controls */}
-          <div className="text-center">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={handleFileInputChange}
-              className="hidden"
-            />
-            
-            <Button
-              type="button"
-              onClick={handleUploadClick}
-              disabled={isUploading}
-              variant="outline"
-              className="text-red-600 border-red-200 hover:bg-red-50"
-            >
-              {isUploading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Uploading...
-                </>
+    <div className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-8">
+        {/* Profile Photo Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
+          <h3 className="text-lg font-semibold text-zinc-950 mb-4">Profile Photo</h3>
+          
+          <div className="flex flex-col items-center space-y-4">
+            {/* Photo Display */}
+            <div className="relative">
+              {displayImageUrl ? (
+                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-red-100">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={displayImageUrl}
+                    alt="Profile photo"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               ) : (
-                <>
-                  <Upload className="w-4 h-4 mr-2" />
-                  {displayImageUrl ? 'Change Photo' : 'Upload Photo'}
-                </>
+                <div className="w-32 h-32 rounded-full bg-zinc-100 border-4 border-red-100 flex items-center justify-center">
+                  <User className="w-16 h-16 text-zinc-400" />
+                </div>
               )}
-            </Button>
-            
-            {uploadError && (
-              <p className="text-sm text-red-600 mt-2">{uploadError}</p>
-            )}
+              
+              {displayImageUrl && (
+                <button
+                  type="button"
+                  onClick={handleRemovePhoto}
+                  className="absolute -top-2 -right-2 w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Upload Controls */}
+            <div className="text-center">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleFileInputChange}
+                className="hidden"
+              />
+              
+              <Button
+                type="button"
+                onClick={handleUploadClick}
+                disabled={isUploading}
+                variant="outline"
+                className="text-red-600 border-red-200 hover:bg-red-50"
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4 mr-2" />
+                    {displayImageUrl ? 'Change Photo' : 'Upload Photo'}
+                  </>
+                )}
+              </Button>
+              
+              {uploadError && (
+                <p className="text-sm text-red-600 mt-2">{uploadError}</p>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Professional Details */}
-      <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
-        <h3 className="text-lg font-semibold text-zinc-950 mb-4">Professional Details</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Experience */}
-          <div className="space-y-2">
-            <Label htmlFor="experience" className="text-zinc-600">Years of Experience *</Label>
-            <Input
-              id="experience"
-              type="number"
-              min="0"
-              max="50"
-              value={formData.experience}
-              onChange={(e) => handleInputChange('experience', parseInt(e.target.value) || 0)}
-              required
-            />
+        {/* Branding Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
+          <h3 className="text-lg font-semibold text-zinc-950 mb-4">Branding</h3>
+          
+          <div className="space-y-4">
+            <div>
+              <Label className="text-zinc-600 mb-2 block">Logo</Label>
+              <ImageUploader
+                currentImageUrl={formData.logoUrl}
+                onImageChange={(url) => handleInputChange('logoUrl', url)}
+                placeholder="Upload your business logo"
+                uploadFolder="agent-logos"
+                aspectRatio="square"
+                maxWidth={200}
+                maxHeight={200}
+              />
+              <p className="text-xs text-zinc-500 mt-2">
+                Recommended: Square format, 200x200px minimum
+              </p>
+            </div>
           </div>
+        </div>
 
-          {/* Phone */}
-          <div className="space-y-2">
-            <Label htmlFor="phone" className="text-zinc-600">Phone Number *</Label>
-            <Input
-              id="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => handleInputChange('phone', e.target.value)}
-              placeholder="e.g., +91 98765 43210"
-              required
-              className={phoneError ? 'border-red-300 focus:border-red-500' : ''}
-            />
-            {phoneError && (
-              <p className="text-sm text-red-600">{phoneError}</p>
-            )}
+        {/* Hero Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
+          <h3 className="text-lg font-semibold text-zinc-950 mb-4">Hero Section</h3>
+          
+          <div className="space-y-6">
+            <div>
+              <Label className="text-zinc-600 mb-2 block">Hero Image</Label>
+              <ImageUploader
+                currentImageUrl={formData.heroImage}
+                onImageChange={(url) => handleInputChange('heroImage', url)}
+                placeholder="Upload a hero background image"
+                uploadFolder="agent-hero"
+                aspectRatio="wide"
+                maxWidth={1200}
+                maxHeight={600}
+              />
+              <p className="text-xs text-zinc-500 mt-2">
+                Recommended: Wide format (16:9), 1200x600px minimum
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="heroTitle" className="text-zinc-600">Hero Title</Label>
+                <Input
+                  id="heroTitle"
+                  type="text"
+                  value={formData.heroTitle}
+                  onChange={(e) => handleInputChange('heroTitle', e.target.value)}
+                  placeholder="e.g., Trusted Real Estate Advisor in Hyderabad"
+                  maxLength={100}
+                />
+                <p className="text-xs text-zinc-500">
+                  {formData.heroTitle.length}/100 characters
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="heroSubtitle" className="text-zinc-600">Hero Subtitle</Label>
+                <Input
+                  id="heroSubtitle"
+                  type="text"
+                  value={formData.heroSubtitle}
+                  onChange={(e) => handleInputChange('heroSubtitle', e.target.value)}
+                  placeholder="e.g., Luxury Homes & Premium Properties"
+                  maxLength={150}
+                />
+                <p className="text-xs text-zinc-500">
+                  {formData.heroSubtitle.length}/150 characters
+                </p>
+              </div>
+            </div>
           </div>
+        </div>
 
-          {/* City */}
-          <div className="space-y-2">
-            <Label htmlFor="city" className="text-zinc-600">City *</Label>
-            <Select value={formData.city} onValueChange={(value) => handleInputChange('city', value)}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select your city" />
-              </SelectTrigger>
-              <SelectContent className="max-h-[300px] w-full">
-                {indianCities.map((city) => (
-                  <SelectItem key={city.value} value={city.value}>
-                    {city.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Professional Details */}
+        <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
+          <h3 className="text-lg font-semibold text-zinc-950 mb-4">Professional Details</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Experience */}
+            <div className="space-y-2">
+              <Label htmlFor="experience" className="text-zinc-600">Years of Experience *</Label>
+              <Input
+                id="experience"
+                type="number"
+                min="0"
+                max="50"
+                value={formData.experience}
+                onChange={(e) => handleInputChange('experience', parseInt(e.target.value) || 0)}
+                required
+              />
+            </div>
 
-          {/* Area */}
-          <div className="space-y-2">
-            <Label htmlFor="area" className="text-zinc-600">
-              Area {formData.city === 'Hyderabad' ? '*' : '(Optional)'}
-            </Label>
-            {formData.city === 'Hyderabad' ? (
-              <Select value={formData.area} onValueChange={(value) => handleInputChange('area', value)}>
+            {/* Phone */}
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-zinc-600">Phone Number *</Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
+                placeholder="e.g., +91 98765 43210"
+                required
+                className={phoneError ? 'border-red-300 focus:border-red-500' : ''}
+              />
+              {phoneError && (
+                <p className="text-sm text-red-600">{phoneError}</p>
+              )}
+            </div>
+
+            {/* City */}
+            <div className="space-y-2">
+              <Label htmlFor="city" className="text-zinc-600">City *</Label>
+              <Select value={formData.city} onValueChange={(value) => handleInputChange('city', value)}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select your area in Hyderabad" />
+                  <SelectValue placeholder="Select your city" />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px] w-full">
-                  {hyderabadAreas.map((area) => (
-                    <SelectItem key={area.value} value={area.value}>
-                      {area.label}
+                  {indianCities.map((city) => (
+                    <SelectItem key={city.value} value={city.value}>
+                      {city.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            ) : (
-              <Input
-                id="area"
-                type="text"
-                value={formData.area}
-                onChange={(e) => handleInputChange('area', e.target.value)}
-                placeholder="Enter your area/locality"
-              />
-            )}
+            </div>
+
+            {/* Area */}
+            <div className="space-y-2">
+              <Label htmlFor="area" className="text-zinc-600">
+                Area {formData.city === 'Hyderabad' ? '*' : '(Optional)'}
+              </Label>
+              {formData.city === 'Hyderabad' ? (
+                <Select value={formData.area} onValueChange={(value) => handleInputChange('area', value)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select your area in Hyderabad" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px] w-full">
+                    {hyderabadAreas.map((area) => (
+                      <SelectItem key={area.value} value={area.value}>
+                        {area.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  id="area"
+                  type="text"
+                  value={formData.area}
+                  onChange={(e) => handleInputChange('area', e.target.value)}
+                  placeholder="Enter your area/locality"
+                />
+              )}
+            </div>
+
+            {/* Custom Profile URL */}
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="slug" className="text-zinc-600">Your Profile URL</Label>
+              <div className="relative">
+                <div className="flex">
+                  <span className="inline-flex items-center px-3 text-sm text-zinc-500 bg-zinc-50 border border-r-0 border-zinc-300 rounded-l-md">
+                    youragent.in/
+                  </span>
+                  <Input
+                    id="slug"
+                    type="text"
+                    value={formData.slug}
+                    onChange={(e) => handleInputChange('slug', e.target.value)}
+                    placeholder="your-name"
+                    className="rounded-l-none pr-10"
+                  />
+                  {/* Validation Icon */}
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    {slugValidation.checking ? (
+                      <Loader2 className="w-4 h-4 text-zinc-400 animate-spin" />
+                    ) : slugValidation.available === true ? (
+                      <Check className="w-4 h-4 text-green-600" />
+                    ) : slugValidation.available === false ? (
+                      <X className="w-4 h-4 text-red-600" />
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+              {/* Validation Message */}
+              {slugValidation.message && (
+                <p className={`text-xs ${
+                  slugValidation.available 
+                    ? 'text-green-600' 
+                    : 'text-red-600'
+                }`}>
+                  {slugValidation.message}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Bio Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-zinc-950">Professional Bio</h3>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleGenerateBio}
+              disabled={isGenerating || !formData.experience || !formData.city}
+              className="text-red-600 border-red-200 hover:bg-red-50 min-w-[180px] justify-center px-6 py-3 h-auto"
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Generate Bio with AI
+                </>
+              )}
+            </Button>
           </div>
 
+          {generationError && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg mb-4">
+              <p className="text-sm text-red-700">{generationError}</p>
+            </div>
+          )}
 
+          <Textarea
+            id="bio"
+            value={formData.bio}
+            onChange={(e) => handleInputChange('bio', e.target.value)}
+            placeholder="Tell potential clients about your background, expertise, and what sets you apart in the real estate market..."
+            className="min-h-[150px] resize-none"
+            maxLength={500}
+          />
+          <div className="flex justify-between items-center mt-2">
+            <p className="text-xs text-zinc-500">
+              This will appear on your public profile
+            </p>
+            <p className={`text-xs ${formData.bio.length > 450 ? 'text-red-600' : 'text-zinc-500'}`}>
+              {formData.bio.length}/500 characters
+            </p>
+          </div>
+        </div>
 
-          {/* Custom Profile URL */}
-          <div className="space-y-2">
-            <Label htmlFor="slug" className="text-zinc-600">Your Profile URL</Label>
-            <div className="relative">
-              <div className="flex">
-                <span className="inline-flex items-center px-3 text-sm text-zinc-500 bg-zinc-50 border border-r-0 border-zinc-300 rounded-l-md">
-                  youragent.in/
-                </span>
-                <Input
-                  id="slug"
-                  type="text"
-                  value={formData.slug}
-                  onChange={(e) => handleInputChange('slug', e.target.value)}
-                  placeholder="your-name"
-                  className="rounded-l-none pr-10"
-                />
-                {/* Validation Icon */}
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  {slugValidation.checking ? (
-                    <Loader2 className="w-4 h-4 text-zinc-400 animate-spin" />
-                  ) : slugValidation.available === true ? (
-                    <Check className="w-4 h-4 text-green-600" />
-                  ) : slugValidation.available === false ? (
-                    <X className="w-4 h-4 text-red-600" />
-                  ) : null}
+        {/* Theme Selection */}
+        <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
+          <h3 className="text-lg font-semibold text-zinc-950 mb-4">Profile Theme</h3>
+          
+          <RadioGroup value={formData.theme} onValueChange={(value) => handleInputChange('theme', value)}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
+                <RadioGroupItem value="professional-blue" id="professional-blue" />
+                <div className="flex-1">
+                  <Label htmlFor="professional-blue" className="font-medium">Professional Blue</Label>
+                  <div className="w-full h-4 bg-blue-500 rounded mt-2"></div>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
+                <RadioGroupItem value="elegant-dark" id="elegant-dark" />
+                <div className="flex-1">
+                  <Label htmlFor="elegant-dark" className="font-medium">Elegant Dark</Label>
+                  <div className="w-full h-4 bg-zinc-800 rounded mt-2"></div>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
+                <RadioGroupItem value="modern-red" id="modern-red" />
+                <div className="flex-1">
+                  <Label htmlFor="modern-red" className="font-medium">Modern Red</Label>
+                  <div className="w-full h-4 bg-red-600 rounded mt-2"></div>
                 </div>
               </div>
             </div>
-            {/* Validation Message */}
-            {slugValidation.message && (
-              <p className={`text-xs ${
-                slugValidation.available 
-                  ? 'text-green-600' 
-                  : 'text-red-600'
-              }`}>
-                {slugValidation.message}
-              </p>
-            )}
-          </div>
+          </RadioGroup>
         </div>
-      </div>
 
-      {/* Bio Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-zinc-950">Professional Bio</h3>
+        {/* Save Button */}
+        <div className="flex justify-end">
           <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleGenerateBio}
-            disabled={isGenerating || !formData.experience || !formData.city}
-            className="text-red-600 border-red-200 hover:bg-red-50 min-w-[180px] justify-center px-6 py-3 h-auto"
+            type="submit"
+            disabled={isSubmitting}
+            className="bg-red-600 hover:bg-red-700 text-white px-8 py-3"
           >
-            {isGenerating ? (
+            {isSubmitting ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Generating...
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Saving...
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 mr-2" />
-                Generate Bio with AI
+                <Save className="w-5 h-5 mr-2" />
+                Save Changes
               </>
             )}
           </Button>
         </div>
+      </form>
 
-        {generationError && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg mb-4">
-            <p className="text-sm text-red-700">{generationError}</p>
+      {/* Testimonials Management */}
+      <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
+        <h3 className="text-lg font-semibold text-zinc-950 mb-4">Client Testimonials</h3>
+        
+        {/* Add/Edit Testimonial Form */}
+        <form onSubmit={handleTestimonialSubmit} className="mb-6 p-4 bg-zinc-50 rounded-lg">
+          <h4 className="font-medium text-zinc-900 mb-3">
+            {testimonialForm.editingId ? 'Edit Testimonial' : 'Add New Testimonial'}
+          </h4>
+          
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="testimonial-text" className="text-zinc-600">Testimonial Text *</Label>
+              <Textarea
+                id="testimonial-text"
+                value={testimonialForm.text}
+                onChange={(e) => setTestimonialForm(prev => ({ ...prev, text: e.target.value }))}
+                placeholder="Enter the client's testimonial..."
+                className="min-h-[100px]"
+                required
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="testimonial-author" className="text-zinc-600">Client Name *</Label>
+                <Input
+                  id="testimonial-author"
+                  value={testimonialForm.author}
+                  onChange={(e) => setTestimonialForm(prev => ({ ...prev, author: e.target.value }))}
+                  placeholder="Client's full name"
+                  required
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="testimonial-rating" className="text-zinc-600">Rating (Optional)</Label>
+                <Select 
+                  value={testimonialForm.rating?.toString() || 'none'} 
+                  onValueChange={(value) => setTestimonialForm(prev => ({ 
+                    ...prev, 
+                    rating: value && value !== 'none' ? parseInt(value) : null 
+                  }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select rating" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No rating</SelectItem>
+                    <SelectItem value="5">5 Stars</SelectItem>
+                    <SelectItem value="4">4 Stars</SelectItem>
+                    <SelectItem value="3">3 Stars</SelectItem>
+                    <SelectItem value="2">2 Stars</SelectItem>
+                    <SelectItem value="1">1 Star</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="flex space-x-2">
+              <Button
+                type="submit"
+                disabled={isSubmittingTestimonial}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                {isSubmittingTestimonial ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {testimonialForm.editingId ? 'Updating...' : 'Adding...'}
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4 mr-2" />
+                    {testimonialForm.editingId ? 'Update Testimonial' : 'Add Testimonial'}
+                  </>
+                )}
+              </Button>
+              
+              {testimonialForm.editingId && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setTestimonialForm({
+                    text: '',
+                    author: '',
+                    rating: null,
+                    editingId: null
+                  })}
+                >
+                  Cancel
+                </Button>
+              )}
+            </div>
           </div>
-        )}
+        </form>
 
-        <Textarea
-          id="bio"
-          value={formData.bio}
-          onChange={(e) => handleInputChange('bio', e.target.value)}
-          placeholder="Tell potential clients about your background, expertise, and what sets you apart in the real estate market..."
-          className="min-h-[150px] resize-none"
-          maxLength={500}
-        />
-        <div className="flex justify-between items-center mt-2">
-          <p className="text-xs text-zinc-500">
-            This will appear on your public profile
-          </p>
-          <p className={`text-xs ${formData.bio.length > 450 ? 'text-red-600' : 'text-zinc-500'}`}>
-            {formData.bio.length}/500 characters
-          </p>
+        {/* Testimonials List */}
+        <div className="space-y-3">
+          {testimonials.length === 0 ? (
+            <p className="text-zinc-500 text-center py-4">No testimonials added yet.</p>
+          ) : (
+            testimonials.map((testimonial) => (
+              <div key={testimonial.id} className="border border-zinc-200 rounded-lg p-4">
+                <div className="flex justify-between items-start mb-2">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <h5 className="font-medium text-zinc-900">{testimonial.author}</h5>
+                      {testimonial.rating && (
+                        <div className="flex items-center">
+                          {Array.from({ length: testimonial.rating }).map((_, i) => (
+                            <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-zinc-700 text-sm">{testimonial.text}</p>
+                  </div>
+                  <div className="flex space-x-1 ml-4">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleEditTestimonial(testimonial)}
+                      className="p-1 h-8 w-8"
+                    >
+                      <Edit2 className="w-3 h-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDeleteTestimonial(testimonial.id)}
+                      className="p-1 h-8 w-8 text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
-      {/* Theme Selection */}
+      {/* FAQs Management */}
       <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
-        <h3 className="text-lg font-semibold text-zinc-950 mb-4">Profile Theme</h3>
+        <h3 className="text-lg font-semibold text-zinc-950 mb-4">Frequently Asked Questions</h3>
         
-        <RadioGroup value={formData.theme} onValueChange={(value) => handleInputChange('theme', value)}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
-              <RadioGroupItem value="professional-blue" id="professional-blue" />
-              <div className="flex-1">
-                <Label htmlFor="professional-blue" className="font-medium">Professional Blue</Label>
-                <div className="w-full h-4 bg-blue-500 rounded mt-2"></div>
-              </div>
+        {/* Add/Edit FAQ Form */}
+        <form onSubmit={handleFaqSubmit} className="mb-6 p-4 bg-zinc-50 rounded-lg">
+          <h4 className="font-medium text-zinc-900 mb-3">
+            {faqForm.editingId ? 'Edit FAQ' : 'Add New FAQ'}
+          </h4>
+          
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="faq-question" className="text-zinc-600">Question *</Label>
+              <Input
+                id="faq-question"
+                value={faqForm.question}
+                onChange={(e) => setFaqForm(prev => ({ ...prev, question: e.target.value }))}
+                placeholder="Enter the frequently asked question..."
+                required
+              />
             </div>
             
-            <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
-              <RadioGroupItem value="elegant-dark" id="elegant-dark" />
-              <div className="flex-1">
-                <Label htmlFor="elegant-dark" className="font-medium">Elegant Dark</Label>
-                <div className="w-full h-4 bg-zinc-800 rounded mt-2"></div>
-              </div>
+            <div>
+              <Label htmlFor="faq-answer" className="text-zinc-600">Answer *</Label>
+              <Textarea
+                id="faq-answer"
+                value={faqForm.answer}
+                onChange={(e) => setFaqForm(prev => ({ ...prev, answer: e.target.value }))}
+                placeholder="Enter the answer to this question..."
+                className="min-h-[100px]"
+                required
+              />
             </div>
             
-            <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
-              <RadioGroupItem value="modern-red" id="modern-red" />
-              <div className="flex-1">
-                <Label htmlFor="modern-red" className="font-medium">Modern Red</Label>
-                <div className="w-full h-4 bg-red-600 rounded mt-2"></div>
-              </div>
+            <div className="flex space-x-2">
+              <Button
+                type="submit"
+                disabled={isSubmittingFaq}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                {isSubmittingFaq ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {faqForm.editingId ? 'Updating...' : 'Adding...'}
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4 mr-2" />
+                    {faqForm.editingId ? 'Update FAQ' : 'Add FAQ'}
+                  </>
+                )}
+              </Button>
+              
+              {faqForm.editingId && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setFaqForm({
+                    question: '',
+                    answer: '',
+                    editingId: null
+                  })}
+                >
+                  Cancel
+                </Button>
+              )}
             </div>
           </div>
-        </RadioGroup>
-      </div>
+        </form>
 
-      {/* Save Button */}
-      <div className="flex justify-end">
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="bg-red-600 hover:bg-red-700 text-white px-8 py-3"
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-              Saving...
-            </>
+        {/* FAQs List */}
+        <div className="space-y-3">
+          {faqs.length === 0 ? (
+            <p className="text-zinc-500 text-center py-4">No FAQs added yet.</p>
           ) : (
-            <>
-              <Save className="w-5 h-5 mr-2" />
-              Save Changes
-            </>
+            faqs.map((faq) => (
+              <div key={faq.id} className="border border-zinc-200 rounded-lg p-4">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <h5 className="font-medium text-zinc-900 mb-1">{faq.question}</h5>
+                    <p className="text-zinc-700 text-sm">{faq.answer}</p>
+                  </div>
+                  <div className="flex space-x-1 ml-4">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleEditFaq(faq)}
+                      className="p-1 h-8 w-8"
+                    >
+                      <Edit2 className="w-3 h-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDeleteFaq(faq.id)}
+                      className="p-1 h-8 w-8 text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))
           )}
-        </Button>
+        </div>
       </div>
-    </form>
+    </div>
   );
 }

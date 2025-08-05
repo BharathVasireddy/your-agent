@@ -15,10 +15,14 @@ export default async function ProfilePage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userId = (session as any).user.id as string;
 
-  // Fetch agent profile
+  // Fetch agent profile with testimonials and FAQs
   const agent = await prisma.agent.findUnique({
     where: { userId },
-    include: { user: true }
+    include: { 
+      user: true,
+      testimonials: true,
+      faqs: true
+    }
   });
 
   if (!agent) {

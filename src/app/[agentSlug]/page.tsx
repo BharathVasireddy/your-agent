@@ -1,9 +1,30 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import prisma from '@/lib/prisma';
-import AgentHeader from '@/components/profile/AgentHeader';
-import ContactBar from '@/components/profile/ContactBar';
-import AboutSection from '@/components/profile/AboutSection';
+
+// Import the new section components
+import Header from '@/components/sections/Header';
+import HeroSection from '@/components/sections/HeroSection';
+import PropertiesSection from '@/components/sections/PropertiesSection';
+import AboutSection from '@/components/sections/AboutSection';
+import TestimonialsSection from '@/components/sections/TestimonialsSection';
+import FaqSection from '@/components/sections/FaqSection';
+import ContactSection from '@/components/sections/ContactSection';
+import Footer from '@/components/sections/Footer';
+
+// Theme configuration
+function getThemeClass(theme: string): string {
+  switch (theme) {
+    case 'professional-blue':
+      return 'theme-professional-blue';
+    case 'elegant-dark':
+      return 'theme-elegant-dark';
+    case 'modern-red':
+      return 'theme-modern-red';
+    default:
+      return 'theme-professional-blue';
+  }
+}
 
 interface AgentProfilePageProps {
   params: Promise<{
@@ -66,6 +87,9 @@ export default async function AgentProfilePage({ params }: AgentProfilePageProps
           image: true,
         },
       },
+      properties: true,
+      testimonials: true,
+      faqs: true,
     },
   });
 
@@ -73,20 +97,19 @@ export default async function AgentProfilePage({ params }: AgentProfilePageProps
     notFound();
   }
 
+  // Get theme class for styling
+  const themeClass = getThemeClass(agent.theme);
+
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-4">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {/* Agent Header */}
-          <AgentHeader agent={agent} />
-
-          {/* About Section */}
-          <AboutSection bio={agent.bio} />
-
-          {/* Contact Bar */}
-          <ContactBar agent={agent} />
-        </div>
-      </div>
-    </div>
+    <main className={themeClass}>
+      <Header agent={agent} />
+      <HeroSection agent={agent} />
+      <PropertiesSection properties={agent.properties} />
+      <AboutSection agent={agent} />
+      <TestimonialsSection testimonials={agent.testimonials} />
+      <FaqSection faqs={agent.faqs} />
+      <ContactSection agent={agent} />
+      <Footer />
+    </main>
   );
 }

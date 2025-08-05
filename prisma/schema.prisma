@@ -20,23 +20,29 @@ model User {
 }
 
 model Agent {
-  id                 String     @id @default(cuid())
-  slug               String     @unique
-  userId             String     @unique
+  id                 String        @id @default(cuid())
+  slug               String        @unique
+  userId             String        @unique
   experience         Int?
   bio                String?
   phone              String?
   city               String?
   area               String?
-  theme              String     @default("professional-blue")
-  isSubscribed       Boolean    @default(false)
+  theme              String        @default("professional-blue")
+  isSubscribed       Boolean       @default(false)
   subscriptionEndsAt DateTime?
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
   profilePhotoUrl    String?
+  logoUrl            String?
+  heroImage          String?
+  heroTitle          String?
+  heroSubtitle       String?
 
-  user               User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   properties         Property[]
+  testimonials       Testimonial[]
+  faqs               FAQ[]
 
   @@index([city, area])
 }
@@ -59,6 +65,7 @@ model Property {
   listingType  String
   propertyType String
   slug         String?  @unique
+  brochureUrl  String?
   agent        Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId, slug])
@@ -96,4 +103,21 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Testimonial {
+  id      String @id @default(cuid())
+  agentId String
+  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  text    String @db.Text
+  author  String
+  rating  Int?   // Optional 1-5 star rating
+}
+
+model FAQ {
+  id       String @id @default(cuid())
+  agentId  String
+  agent    Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  question String
+  answer   String @db.Text
 }
