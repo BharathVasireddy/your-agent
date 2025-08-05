@@ -134,6 +134,7 @@ const agentProfileSchema = z.object({
   city: z.string().min(1, "City is required"),
   theme: z.string().min(1, "Theme is required"),
   profilePhotoUrl: z.string().optional(),
+  slug: z.string().min(3, "Profile URL must be at least 3 characters").max(50, "Profile URL must be less than 50 characters"),
 });
 
 export async function updateAgentProfile(data: {
@@ -145,6 +146,7 @@ export async function updateAgentProfile(data: {
   city: string;
   theme: string;
   profilePhotoUrl: string;
+  slug: string;
 }) {
   try {
     // Get the current user's session
@@ -170,6 +172,17 @@ export async function updateAgentProfile(data: {
       throw new Error("Agent profile not found. Please subscribe first.");
     }
 
+    // Check if the custom slug is available (unless it's the same agent)
+    if (validatedData.slug !== existingAgent.slug) {
+      const slugConflict = await prisma.agent.findUnique({
+        where: { slug: validatedData.slug }
+      });
+
+      if (slugConflict) {
+        throw new Error("This profile URL is already taken. Please choose a different one.");
+      }
+    }
+
     // Update the agent profile
     const updatedAgent = await prisma.agent.update({
       where: { userId },
@@ -182,6 +195,7 @@ export async function updateAgentProfile(data: {
         city: validatedData.city,
         theme: validatedData.theme,
         profilePhotoUrl: validatedData.profilePhotoUrl || null,
+        slug: validatedData.slug,
         updatedAt: new Date()
       }
     });
@@ -193,6 +207,13 @@ export async function updateAgentProfile(data: {
     redirect(`/${updatedAgent.slug}`);
 
   } catch (error) {
+    // Check if this is a Next.js redirect (which is expected behavior)
+    if (error && typeof error === 'object' && 'digest' in error && 
+        typeof error.digest === 'string' && error.digest.includes('NEXT_REDIRECT')) {
+      // This is a redirect, which is expected - re-throw it to allow Next.js to handle it
+      throw error;
+    }
+    
     console.error("Error in updateAgentProfile:", error);
     
     if (error instanceof z.ZodError) {

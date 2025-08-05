@@ -56,6 +56,7 @@ export default function OnboardingWizardPage() {
         city: wizardStore.city,
         theme: wizardStore.theme,
         profilePhotoUrl: wizardStore.profilePhotoUrl,
+        slug: wizardStore.slug,
       };
 
       // Submit the profile data
