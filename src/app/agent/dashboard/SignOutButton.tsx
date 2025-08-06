@@ -3,7 +3,7 @@
 import { signOut } from 'next-auth/react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, X } from 'lucide-react';
 
 interface SignOutButtonProps {
   className?: string;
@@ -15,6 +15,7 @@ export default function SignOutButton({ className, children }: SignOutButtonProp
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleSignOutClick = () => {
+    console.log('Sign out clicked, showing confirmation modal');
     setShowConfirmation(true);
   };
 
@@ -50,8 +51,23 @@ export default function SignOutButton({ className, children }: SignOutButtonProp
 
       {/* Confirmation Modal */}
       {showConfirmation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+        <div 
+          className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-75 flex items-center justify-center z-[100] p-4"
+          onClick={handleCancelSignOut}
+        >
+          <div 
+            className="bg-white rounded-lg shadow-2xl max-w-md w-full p-6 relative z-[101]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={handleCancelSignOut}
+              className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600 transition-colors"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
             {/* Header */}
             <div className="flex items-center mb-4">
               <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mr-3">

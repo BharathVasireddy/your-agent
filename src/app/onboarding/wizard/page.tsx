@@ -58,17 +58,29 @@ export default function OnboardingWizardPage() {
         slug: wizardStore.slug,
       };
 
+      // Validate required fields before submission
+      if (!profileData.slug || !profileData.phone || !profileData.city) {
+        alert('Please complete all required fields before finishing.');
+        return;
+      }
+
       // Submit the profile data
       console.log("Profile data to submit:", profileData);
-      await updateAgentProfile(profileData);
+      const result = await updateAgentProfile(profileData);
       
-      // Reset the wizard store after successful submission
-      wizardStore.reset();
-      
-      // The server action will handle the redirect to the agent's profile page
+      if (result.success && result.agent?.slug) {
+        // Reset the wizard store after successful submission
+        wizardStore.reset();
+        
+        // Redirect to the agent's public profile page using their slug
+        router.push(`/${result.agent.slug}`);
+      } else {
+        alert('Profile creation failed. Please try again.');
+      }
       
     } catch (error) {
       console.error("Error creating profile:", error);
+      alert(error instanceof Error ? error.message : 'Failed to create profile. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

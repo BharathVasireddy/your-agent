@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Menu, X, Phone, Mail, Home } from 'lucide-react';
+import DashboardButton from '@/components/DashboardButton';
 
 
 // WhatsApp Icon Component
@@ -22,6 +23,7 @@ interface Agent {
   phone: string | null;
   logoUrl: string | null;
   user: {
+    id: string;
     name: string | null;
     email: string | null;
   };
@@ -91,8 +93,11 @@ export default function Header({ agent }: HeaderProps) {
             ))}
           </nav>
 
-          {/* Right - Contact Icons */}
+          {/* Right - Dashboard Button & Contact Icons */}
           <div className="flex items-center space-x-4 flex-1 justify-end">
+            {/* Dashboard Button (visible when user owns the profile) */}
+            <DashboardButton agentUserId={agent.user.id} />
+
             {/* Contact Icons (Desktop) */}
             <div className="hidden lg:flex items-center space-x-4">
               {agent.phone && (
@@ -151,6 +156,11 @@ export default function Header({ agent }: HeaderProps) {
                   {item.label}
                 </button>
               ))}
+              
+              {/* Mobile Dashboard Button */}
+              <div className="pt-4 border-t border-zinc-200">
+                <DashboardButton agentUserId={agent.user.id} />
+              </div>
               
               {/* Mobile Contact */}
               <div className="pt-4 border-t border-zinc-200 space-y-3">
