@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Home, Building, User, LogOut, TrendingUp, Settings, HelpCircle, Copy } from 'lucide-react';
 import { useState } from 'react';
 import SignOutButton from './SignOutButton';
-import { useLoading } from '@/components/LoadingProvider';
+import { useInstantNav } from '@/components/InstantNavProvider';
 
 interface DashboardSidebarProps {
   user: {
@@ -30,7 +30,7 @@ interface DashboardSidebarProps {
 export default function DashboardSidebar({ user, agent }: DashboardSidebarProps) {
   const [copied, setCopied] = useState(false);
   const pathname = usePathname();
-  const { navigateWith } = useLoading();
+  const { pendingPath, navigateInstantly } = useInstantNav();
 
   const copyWebsiteLink = async () => {
     if (!agent?.slug) return;
@@ -74,6 +74,15 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
   ];
 
   const isActiveLink = (href: string) => {
+    // Check if this is the pending navigation target (instant active state)
+    if (pendingPath) {
+      if (href === '/agent/dashboard') {
+        return pendingPath === '/agent/dashboard';
+      }
+      return pendingPath.startsWith(href);
+    }
+    
+    // Fallback to current pathname
     if (href === '/agent/dashboard') {
       return pathname === href;
     }
@@ -115,8 +124,8 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
           return (
             <button
               key={item.name}
-              onClick={() => navigateWith(item.href)}
-              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+              onClick={() => navigateInstantly(item.href)}
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                 isActive
                   ? 'bg-red-50 text-red-700 border border-red-200'
                   : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'

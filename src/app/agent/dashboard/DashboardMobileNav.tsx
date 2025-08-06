@@ -2,11 +2,11 @@
 
 import { usePathname } from 'next/navigation';
 import { Home, Building, User, TrendingUp, Settings } from 'lucide-react';
-import { useLoading } from '@/components/LoadingProvider';
+import { useInstantNav } from '@/components/InstantNavProvider';
 
 export default function DashboardMobileNav() {
   const pathname = usePathname();
-  const { navigateWith } = useLoading();
+  const { pendingPath, navigateInstantly } = useInstantNav();
 
   const navigationItems = [
     {
@@ -37,6 +37,15 @@ export default function DashboardMobileNav() {
   ];
 
   const isActiveLink = (href: string) => {
+    // Check if this is the pending navigation target (instant active state)
+    if (pendingPath) {
+      if (href === '/agent/dashboard') {
+        return pendingPath === '/agent/dashboard';
+      }
+      return pendingPath.startsWith(href);
+    }
+    
+    // Fallback to current pathname
     if (href === '/agent/dashboard') {
       return pathname === href;
     }
@@ -53,8 +62,8 @@ export default function DashboardMobileNav() {
           return (
             <button
               key={item.name}
-              onClick={() => navigateWith(item.href)}
-              className={`flex flex-col items-center justify-center space-y-1 transition-colors ${
+              onClick={() => navigateInstantly(item.href)}
+              className={`flex flex-col items-center justify-center space-y-1 transition-all duration-200 ${
                 isActive
                   ? 'text-red-600'
                   : 'text-zinc-600 hover:text-red-600'

@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import DashboardSidebar from './DashboardSidebar';
 import DashboardMobileNav from './DashboardMobileNav';
-import { LoadingProvider } from '@/components/LoadingProvider';
+import { InstantNavProvider } from '@/components/InstantNavProvider';
+import ContentLoadingWrapper from './ContentLoadingWrapper';
 
 export default async function DashboardLayout({
   children,
@@ -28,7 +29,7 @@ export default async function DashboardLayout({
   });
 
   return (
-    <LoadingProvider>
+    <InstantNavProvider>
       <div className="min-h-screen bg-zinc-50">
         {/* Desktop Layout with Sidebar */}
         <div className="hidden md:flex">
@@ -38,7 +39,9 @@ export default async function DashboardLayout({
           {/* Main Content Area */}
           <div className="flex-1 ml-64">
             <main className="p-6 max-w-7xl mx-auto">
-              {children}
+              <ContentLoadingWrapper>
+                {children}
+              </ContentLoadingWrapper>
             </main>
           </div>
         </div>
@@ -47,13 +50,15 @@ export default async function DashboardLayout({
         <div className="md:hidden pb-20">
           {/* Mobile Main Content */}
           <main className="p-4">
-            {children}
+            <ContentLoadingWrapper>
+              {children}
+            </ContentLoadingWrapper>
           </main>
 
           {/* Mobile Bottom Navigation */}
           <DashboardMobileNav />
         </div>
       </div>
-    </LoadingProvider>
+    </InstantNavProvider>
   );
 }

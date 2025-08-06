@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { User, Home, Plus, TrendingUp, Settings } from 'lucide-react';
-import { useLoading } from '@/components/LoadingProvider';
+import { useInstantNav } from '@/components/InstantNavProvider';
 import DashboardAgentHeader from './DashboardAgentHeader';
 import type { AgentProfile, Property } from '@/types/dashboard';
 
@@ -21,7 +21,7 @@ export default function DashboardContent({
   rentProperties, 
   availableProperties 
 }: DashboardContentProps) {
-  const { navigateWith } = useLoading();
+  const { navigateInstantly } = useInstantNav();
   return (
     <div className="space-y-4 md:space-y-6">
       {/* Mobile Header */}
@@ -151,7 +151,7 @@ export default function DashboardContent({
       <div className="md:hidden space-y-3">
         <button
           id="add-property-button"
-          onClick={() => navigateWith('/agent/dashboard/properties/new')}
+          onClick={() => navigateInstantly('/agent/dashboard/properties/new')}
           className="w-full flex items-center p-4 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors group"
         >
           <div className="flex items-center justify-center w-10 h-10 bg-red-100 rounded-lg mr-3">
