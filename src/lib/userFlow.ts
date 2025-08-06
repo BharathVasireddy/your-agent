@@ -39,6 +39,24 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userId = (session as any).user.id as string;
 
+  // Safeguard: Ensure User record exists
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true }
+  });
+
+  // If User record doesn't exist, the session is orphaned
+  if (!user) {
+    console.warn(`Orphaned session detected for userId: ${userId}. User record missing.`);
+    return {
+      isAuthenticated: false,
+      needsSubscription: false,
+      needsOnboarding: false,
+      redirectTo: '/auth/signin?error=session_expired',
+      agent: null
+    };
+  }
+
   // Check if user has an agent profile
   const agent = await prisma.agent.findUnique({
     where: { userId },
