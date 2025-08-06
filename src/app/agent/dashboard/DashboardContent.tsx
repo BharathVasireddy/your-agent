@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { User, Home, Plus, TrendingUp, Settings } from 'lucide-react';
 import { useLoading } from '@/components/LoadingProvider';
@@ -147,10 +149,10 @@ export default function DashboardContent({
 
       {/* Mobile Quick Actions */}
       <div className="md:hidden space-y-3">
-        <Link
+        <button
           id="add-property-button"
-          href="/agent/dashboard/properties/new"
-          className="flex items-center p-4 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors group"
+          onClick={() => navigateWith('/agent/dashboard/properties/new')}
+          className="w-full flex items-center p-4 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors group"
         >
           <div className="flex items-center justify-center w-10 h-10 bg-red-100 rounded-lg mr-3">
             <Plus className="w-5 h-5 text-red-600" />
@@ -159,7 +161,7 @@ export default function DashboardContent({
             <p className="font-medium text-zinc-950">Add New Property</p>
             <p className="text-sm text-zinc-600">Create a new listing</p>
           </div>
-        </Link>
+        </button>
         
         <Link
           href="/agent/dashboard/properties"
