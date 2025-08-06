@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, ArrowRight, Sparkles, User, Home, Settings } from 'lucide-react';
-import { grantSubscription } from '@/app/actions';
+
 import type { UserFlowStatus } from '@/lib/userFlow';
 
 import type { ExtendedSession } from '@/types/dashboard';
@@ -16,9 +16,13 @@ interface WelcomeFlowProps {
 
 export default function WelcomeFlow({ session, flowStatus }: WelcomeFlowProps) {
   const router = useRouter();
-  const [isSubscribing, setIsSubscribing] = useState(false);
-  const [subscriptionComplete, setSubscriptionComplete] = useState(!flowStatus.needsSubscription);
   const [error, setError] = useState<string | null>(null);
+  
+  // Suppress unused variable warning for setError (may be used for future error handling)
+  void setError;
+  
+  // Derive subscription state from flowStatus
+  const subscriptionComplete = !flowStatus.needsSubscription;
 
   // Redirect to subscription if needed
   useEffect(() => {
@@ -54,12 +58,10 @@ export default function WelcomeFlow({ session, flowStatus }: WelcomeFlowProps) {
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center space-x-4">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  subscriptionComplete ? 'bg-green-100' : isSubscribing ? 'bg-blue-100' : 'bg-gray-100'
+                  subscriptionComplete ? 'bg-green-100' : 'bg-gray-100'
                 }`}>
                   {subscriptionComplete ? (
                     <CheckCircle className="w-5 h-5 text-green-600" />
-                  ) : isSubscribing ? (
-                    <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <User className="w-5 h-5 text-gray-600" />
                   )}
@@ -69,8 +71,6 @@ export default function WelcomeFlow({ session, flowStatus }: WelcomeFlowProps) {
                   <p className="text-sm text-zinc-600">
                     {subscriptionComplete 
                       ? 'Your account is active and ready!' 
-                      : isSubscribing 
-                      ? 'Activating your account...' 
                       : 'Activating your professional account'}
                   </p>
                 </div>
@@ -147,7 +147,7 @@ export default function WelcomeFlow({ session, flowStatus }: WelcomeFlowProps) {
           <div className="mt-8 text-center">
             <Button
               onClick={handleStartOnboarding}
-              disabled={!subscriptionComplete || isSubscribing}
+              disabled={!subscriptionComplete}
               className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-lg"
             >
               {!subscriptionComplete ? (

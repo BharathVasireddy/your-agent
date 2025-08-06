@@ -5,36 +5,28 @@ import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
 
-// Import the new section components
-import Header from '@/components/sections/Header';
-import HeroSection from '@/components/sections/HeroSection';
-import PropertiesSection from '@/components/sections/PropertiesSection';
-import AboutSection from '@/components/sections/AboutSection';
-import TestimonialsSection from '@/components/sections/TestimonialsSection';
-import FaqSection from '@/components/sections/FaqSection';
-import ContactSection from '@/components/sections/ContactSection';
-import Footer from '@/components/sections/Footer';
+// Import the new template renderer
+import TemplateRenderer from '@/components/templates/TemplateRenderer';
 import { EditModeProvider } from '@/components/EditModeProvider';
 import EditToggleButton from '@/components/EditToggleButton';
 
-// Template configuration
-function getTemplateClass(template: string): string {
+// Template name mapping
+function getTemplateName(template: string): string {
   switch (template) {
     case 'classic-professional':
-      return 'template-classic-professional';
     case 'modern-minimal':
-      return 'template-modern-minimal';
     case 'bold-red':
-      return 'template-bold-red';
+    case 'black-white':
+      return 'legacy-pro';
+    case 'fresh-minimal':
+      return 'fresh-minimal';
     // Legacy theme support
     case 'professional-blue':
-      return 'template-classic-professional';
     case 'elegant-dark':
-      return 'template-modern-minimal';
     case 'modern-red':
-      return 'template-bold-red';
+      return 'legacy-pro';
     default:
-      return 'template-classic-professional';
+      return 'legacy-pro';
   }
 }
 
@@ -168,22 +160,13 @@ export default async function AgentProfilePage({ params }: AgentProfilePageProps
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isOwner = session && (session as any).user && (session as any).user.id === agent.user.id;
 
-  // Get template class for styling
-  const templateClass = getTemplateClass(agent.template);
+  // Get template name for rendering
+  const templateName = getTemplateName(agent.template);
 
   return (
     <EditModeProvider isOwner={!!isOwner}>
-      <main className={templateClass}>
-        <Header agent={agent} />
-        <HeroSection agent={agent} />
-        <PropertiesSection properties={agent.properties} agent={agent} />
-        <AboutSection agent={agent} />
-        <TestimonialsSection testimonials={agent.testimonials} />
-        <FaqSection faqs={agent.faqs} />
-        <ContactSection agent={agent} />
-        <Footer />
-        <EditToggleButton />
-      </main>
+      <TemplateRenderer templateName={templateName} agentData={agent} />
+      <EditToggleButton />
     </EditModeProvider>
   );
 }

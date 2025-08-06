@@ -18,6 +18,15 @@ export default function Step4_Theme() {
       borderColor: 'border-blue-200'
     },
     {
+      value: 'fresh-minimal',
+      name: 'Fresh Minimal',
+      description: 'Light, airy design with green accents and minimal aesthetic',
+      preview: 'bg-green-600',
+      textColor: 'text-green-700',
+      bgColor: 'bg-green-50',
+      borderColor: 'border-green-200'
+    },
+    {
       value: 'modern-minimal',
       name: 'Modern Minimal',
       description: 'Clean and contemporary with emphasis on whitespace',
@@ -34,6 +43,15 @@ export default function Step4_Theme() {
       textColor: 'text-red-700',
       bgColor: 'bg-red-50',
       borderColor: 'border-red-200'
+    },
+    {
+      value: 'black-white',
+      name: 'Black & White',
+      description: 'Clean monochrome with full-width header and rounded buttons',
+      preview: 'bg-black',
+      textColor: 'text-black',
+      bgColor: 'bg-gray-50',
+      borderColor: 'border-gray-200'
     }
   ];
 

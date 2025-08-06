@@ -138,6 +138,99 @@ body {
   color-scheme: light only;
 }
 
+/* ========================================
+   TEMPLATE-SPECIFIC STYLING SYSTEM
+   ======================================== */
+
+/* Template A: Legacy Pro (Modern, dark-background, blue-accent design) */
+.template-legacy-pro {
+  --font-primary: 'Inter', sans-serif;
+  --font-secondary: 'Lora', serif;
+  --color-primary: 59 130 246; /* Blue-500 */
+  --color-primary-hover: 37 99 235; /* Blue-600 */
+  --color-primary-light: 239 246 255; /* Blue-50 */
+  --color-secondary: 239 68 68; /* Red-500 */
+  --color-secondary-hover: 220 38 38; /* Red-600 */
+  --color-secondary-light: 254 242 242; /* Red-50 */
+  --color-background: 15 23 42; /* Slate-900 - Dark background */
+  --color-background-secondary: 30 41 59; /* Slate-800 */
+  --color-background-accent: 51 65 85; /* Slate-700 */
+  --color-text-primary: 248 250 252; /* Slate-50 - Light text on dark */
+  --color-text-secondary: 203 213 225; /* Slate-300 */
+  --color-text-muted: 148 163 184; /* Slate-400 */
+  --color-border: 71 85 105; /* Slate-600 */
+  --color-border-light: 100 116 139; /* Slate-500 */
+  --card-border-radius: 0.75rem; /* 12px */
+  --button-border-radius: 0.5rem; /* 8px */
+  --section-padding: 6rem; /* 96px */
+  --container-padding: 1.5rem; /* 24px */
+  --element-spacing: 2rem; /* 32px */
+  --shadow-small: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-medium: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-large: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Template B: Fresh Minimal (Light, minimalist, airy design with green accent) */
+.template-fresh-minimal {
+  --font-primary: 'Poppins', sans-serif;
+  --font-secondary: 'Poppins', sans-serif; /* Single font for minimal look */
+  --color-primary: 22 163 74; /* Green-600 */
+  --color-primary-hover: 21 128 61; /* Green-700 */
+  --color-primary-light: 240 253 244; /* Green-50 */
+  --color-secondary: 156 163 175; /* Gray-400 */
+  --color-secondary-hover: 107 114 128; /* Gray-500 */
+  --color-secondary-light: 249 250 251; /* Gray-50 */
+  --color-background: 255 255 255; /* White */
+  --color-background-secondary: 249 250 251; /* Gray-50 */
+  --color-background-accent: 243 244 246; /* Gray-100 */
+  --color-text-primary: 17 24 39; /* Gray-900 */
+  --color-text-secondary: 55 65 81; /* Gray-700 */
+  --color-text-muted: 107 114 128; /* Gray-500 */
+  --color-border: 229 231 235; /* Gray-200 */
+  --color-border-light: 243 244 246; /* Gray-100 */
+  --card-border-radius: 0.25rem; /* 4px - Sharp corners for minimal look */
+  --button-border-radius: 0.25rem; /* 4px */
+  --section-padding: 4rem; /* 64px - Less padding for airy feel */
+  --container-padding: 1rem; /* 16px */
+  --element-spacing: 1.5rem; /* 24px */
+  --shadow-small: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-medium: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-large: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* Template-aware utility classes */
+.template-legacy-pro .bg-template-primary { background-color: rgb(var(--color-primary)); }
+.template-legacy-pro .bg-template-primary-hover:hover { background-color: rgb(var(--color-primary-hover)); }
+.template-legacy-pro .bg-template-background { background-color: rgb(var(--color-background)); }
+.template-legacy-pro .bg-template-background-secondary { background-color: rgb(var(--color-background-secondary)); }
+.template-legacy-pro .text-template-primary { color: rgb(var(--color-text-primary)); }
+.template-legacy-pro .text-template-secondary { color: rgb(var(--color-text-secondary)); }
+.template-legacy-pro .text-template-muted { color: rgb(var(--color-text-muted)); }
+.template-legacy-pro .border-template { border-color: rgb(var(--color-border)); }
+.template-legacy-pro .rounded-template-card { border-radius: var(--card-border-radius); }
+.template-legacy-pro .rounded-template-button { border-radius: var(--button-border-radius); }
+.template-legacy-pro .font-template-primary { font-family: var(--font-primary); }
+.template-legacy-pro .font-template-secondary { font-family: var(--font-secondary); }
+.template-legacy-pro .shadow-template-sm { box-shadow: var(--shadow-small); }
+.template-legacy-pro .shadow-template-md { box-shadow: var(--shadow-medium); }
+.template-legacy-pro .shadow-template-lg { box-shadow: var(--shadow-large); }
+
+.template-fresh-minimal .bg-template-primary { background-color: rgb(var(--color-primary)); }
+.template-fresh-minimal .bg-template-primary-hover:hover { background-color: rgb(var(--color-primary-hover)); }
+.template-fresh-minimal .bg-template-background { background-color: rgb(var(--color-background)); }
+.template-fresh-minimal .bg-template-background-secondary { background-color: rgb(var(--color-background-secondary)); }
+.template-fresh-minimal .text-template-primary { color: rgb(var(--color-text-primary)); }
+.template-fresh-minimal .text-template-secondary { color: rgb(var(--color-text-secondary)); }
+.template-fresh-minimal .text-template-muted { color: rgb(var(--color-text-muted)); }
+.template-fresh-minimal .border-template { border-color: rgb(var(--color-border)); }
+.template-fresh-minimal .rounded-template-card { border-radius: var(--card-border-radius); }
+.template-fresh-minimal .rounded-template-button { border-radius: var(--button-border-radius); }
+.template-fresh-minimal .font-template-primary { font-family: var(--font-primary); }
+.template-fresh-minimal .font-template-secondary { font-family: var(--font-secondary); }
+.template-fresh-minimal .shadow-template-sm { box-shadow: var(--shadow-small); }
+.template-fresh-minimal .shadow-template-md { box-shadow: var(--shadow-medium); }
+.template-fresh-minimal .shadow-template-lg { box-shadow: var(--shadow-large); }
+
 /* Typography Scale */
 .heading-primary {
   font-weight: 600; /* Semi-bold for primary headings */

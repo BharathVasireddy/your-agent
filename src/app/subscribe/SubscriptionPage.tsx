@@ -32,6 +32,9 @@ export default function SubscriptionPage({ session, flowStatus }: SubscriptionPa
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Suppress unused variable warning for flowStatus (used by parent for routing logic)
+  void flowStatus;
 
   const features = [
     { icon: Globe, text: 'Professional profile with custom URL (youragent.in/your-name)' },

@@ -1,6 +1,6 @@
 /**
- * Bold Red Template Renderer
- * Energetic and attention-grabbing design with red accents
+ * Black & White Template Renderer
+ * Clean monochrome design with full-width header and rounded buttons
  */
 
 import React from 'react';
@@ -18,25 +18,25 @@ import FaqSection from '@/components/templates/legacy-pro/FaqSection';
 import ContactSection from '@/components/templates/legacy-pro/ContactSection';
 import Footer from '@/components/templates/legacy-pro/Footer';
 
-interface BoldRedRendererProps {
+interface BlackWhiteRendererProps {
   template: Template;
   agent: AgentData;
   isEditMode?: boolean;
   isOwner?: boolean;
 }
 
-export function BoldRedRenderer({ 
+export function BlackWhiteRenderer({ 
   template, 
   agent, 
   isEditMode, 
   isOwner = false 
-}: BoldRedRendererProps) {
+}: BlackWhiteRendererProps) {
   // Suppress unused variable warnings for legacy renderer
   void template;
   void isEditMode;
   return (
     <EditModeProvider isOwner={isOwner}>
-      <main className="template-bold-red">
+      <main className="template-black-white">
         <Header agent={agent} />
         <HeroSection agent={agent} />
         <AboutSection agent={agent} />

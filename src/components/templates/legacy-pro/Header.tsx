@@ -55,7 +55,7 @@ export default function Header({ agent }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm">
-      <div className="container mx-auto px-4">
+      <div className="header-container container mx-auto px-4">
         <div className="flex items-center h-20">
           {/* Left - Logo/Brand/Name */}
           <div className="flex items-center space-x-3 flex-1">

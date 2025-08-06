@@ -8,15 +8,15 @@ import { Template, AgentData } from '@/types/template';
 import { EditModeProvider } from '@/components/EditModeProvider';
 import EditToggleButton from '@/components/EditToggleButton';
 
-// Import generic section components
-import Header from '@/components/sections/Header';
-import HeroSection from '@/components/sections/HeroSection';
-import AboutSection from '@/components/sections/AboutSection';
-import PropertiesSection from '@/components/sections/PropertiesSection';
-import TestimonialsSection from '@/components/sections/TestimonialsSection';
-import FaqSection from '@/components/sections/FaqSection';
-import ContactSection from '@/components/sections/ContactSection';
-import Footer from '@/components/sections/Footer';
+// Import legacy-pro section components
+import Header from '@/components/templates/legacy-pro/Header';
+import HeroSection from '@/components/templates/legacy-pro/HeroSection';
+import AboutSection from '@/components/templates/legacy-pro/AboutSection';
+import PropertiesSection from '@/components/templates/legacy-pro/PropertiesSection';
+import TestimonialsSection from '@/components/templates/legacy-pro/TestimonialsSection';
+import FaqSection from '@/components/templates/legacy-pro/FaqSection';
+import ContactSection from '@/components/templates/legacy-pro/ContactSection';
+import Footer from '@/components/templates/legacy-pro/Footer';
 
 interface ClassicProfessionalRendererProps {
   template: Template;
@@ -28,9 +28,12 @@ interface ClassicProfessionalRendererProps {
 export function ClassicProfessionalRenderer({ 
   template, 
   agent, 
-  isEditMode = false, 
+  isEditMode, 
   isOwner = false 
 }: ClassicProfessionalRendererProps) {
+  // Suppress unused variable warnings for legacy renderer
+  void template;
+  void isEditMode;
   return (
     <EditModeProvider isOwner={isOwner}>
       <main className="template-classic-professional">

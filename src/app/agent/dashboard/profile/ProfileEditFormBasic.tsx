@@ -636,7 +636,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
           <h3 className="text-lg font-semibold text-zinc-950 mb-4">Profile Template</h3>
           
           <RadioGroup value={formData.template} onValueChange={(value) => handleInputChange('template', value)}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
                 <RadioGroupItem value="classic-professional" id="classic-professional" />
                 <div className="flex-1">
@@ -658,6 +658,14 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
                 <div className="flex-1">
                   <Label htmlFor="bold-red" className="font-medium">Bold Red</Label>
                   <div className="w-full h-4 bg-red-600 rounded mt-2"></div>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
+                <RadioGroupItem value="black-white" id="black-white" />
+                <div className="flex-1">
+                  <Label htmlFor="black-white" className="font-medium">Black & White</Label>
+                  <div className="w-full h-4 bg-black rounded mt-2"></div>
                 </div>
               </div>
             </div>

@@ -9,6 +9,8 @@ import { Template, TemplatePreview } from '@/types/template';
 import { modernMinimalTemplate } from './definitions/modern-minimal';
 import { classicProfessionalTemplate } from './definitions/classic-professional';
 import { boldRedTemplate } from './definitions/bold-red';
+import { blackWhiteTemplate } from './definitions/black-white';
+import { freshMinimalTemplate } from './definitions/fresh-minimal';
 
 /**
  * Registry of all available templates
@@ -17,6 +19,8 @@ export const TEMPLATE_REGISTRY: Record<string, Template> = {
   'modern-minimal': modernMinimalTemplate,
   'classic-professional': classicProfessionalTemplate,
   'bold-red': boldRedTemplate,
+  'black-white': blackWhiteTemplate,
+  'fresh-minimal': freshMinimalTemplate,
 };
 
 /**
