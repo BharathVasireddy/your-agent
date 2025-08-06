@@ -35,9 +35,28 @@ export default async function PropertiesPage() {
   const rentProperties = validProperties.filter(p => p.listingType === 'Rent');
 
   return (
-    <div className="container mx-auto p-6">
-      {/* Page Header */}
-      <div className="flex justify-between items-center mb-8">
+    <div className="h-full">
+      {/* Mobile Header */}
+      <div className="md:hidden bg-white border-b border-zinc-200 px-4 py-4 sticky top-0 z-10">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-zinc-950">Properties</h1>
+            <div className="flex gap-3 mt-1 text-xs text-zinc-500">
+              <span>Sale: {saleProperties.length}</span>
+              <span>Rent: {rentProperties.length}</span>
+            </div>
+          </div>
+          <Link
+            href="/agent/dashboard/properties/new"
+            className="inline-flex items-center justify-center w-10 h-10 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+          >
+            <Plus className="w-5 h-5" />
+          </Link>
+        </div>
+      </div>
+
+      {/* Desktop Header */}
+      <div className="hidden md:flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-zinc-950">My Properties</h1>
           <p className="text-zinc-600 mt-1">Manage your property listings</p>
@@ -59,60 +78,62 @@ export default async function PropertiesPage() {
       </div>
 
       {/* Properties Content */}
-      {validProperties.length === 0 ? (
-        /* No Properties Message */
-        <div className="text-center py-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-zinc-100 rounded-full mb-4">
-            <Home className="w-8 h-8 text-zinc-400" />
+      <div className="px-4 md:px-0">
+        {validProperties.length === 0 ? (
+          /* No Properties Message */
+          <div className="text-center py-12 md:py-16">
+            <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-zinc-100 rounded-full mb-4">
+              <Home className="w-6 h-6 md:w-8 md:h-8 text-zinc-400" />
+            </div>
+            <h3 className="text-lg md:text-xl font-semibold text-zinc-950 mb-2">No Properties Yet</h3>
+            <p className="text-zinc-600 mb-6 text-sm md:text-base">You haven&apos;t added any properties yet.</p>
+            <Link
+              href="/agent/dashboard/properties/new"
+              className="inline-flex items-center px-4 py-2 md:px-6 md:py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm md:text-base"
+            >
+              <Plus className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+              Add Your First Property
+            </Link>
           </div>
-          <h3 className="text-xl font-semibold text-zinc-950 mb-2">No Properties Yet</h3>
-          <p className="text-zinc-600 mb-6">You haven&apos;t added any properties yet.</p>
-          <Link
-            href="/agent/dashboard/properties/new"
-            className="inline-flex items-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Add Your First Property
-          </Link>
-        </div>
-      ) : (
-        /* Properties Organized by Category */
-        <div className="space-y-10">
-          {/* For Sale Properties */}
-          {saleProperties.length > 0 && (
-            <div>
-              <div className="flex items-center mb-6">
-                <h2 className="text-2xl font-bold text-zinc-950">For Sale</h2>
-                <span className="ml-3 px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
-                  {saleProperties.length} {saleProperties.length === 1 ? 'Property' : 'Properties'}
-                </span>
+        ) : (
+          /* Properties Organized by Category */
+          <div className="space-y-6 md:space-y-10">
+            {/* For Sale Properties */}
+            {saleProperties.length > 0 && (
+              <div>
+                <div className="flex items-center mb-4 md:mb-6">
+                  <h2 className="text-lg md:text-2xl font-bold text-zinc-950">For Sale</h2>
+                  <span className="ml-2 md:ml-3 px-2 py-1 bg-green-100 text-green-800 text-xs md:text-sm font-medium rounded-full">
+                    {saleProperties.length}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                  {saleProperties.map((property) => (
+                    <PropertyCard key={property.id} property={property} />
+                  ))}
+                </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {saleProperties.map((property) => (
-                  <PropertyCard key={property.id} property={property} />
-                ))}
-              </div>
-            </div>
-          )}
+            )}
 
-          {/* For Rent Properties */}
-          {rentProperties.length > 0 && (
-            <div>
-              <div className="flex items-center mb-6">
-                <h2 className="text-2xl font-bold text-zinc-950">For Rent</h2>
-                <span className="ml-3 px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                  {rentProperties.length} {rentProperties.length === 1 ? 'Property' : 'Properties'}
-                </span>
+            {/* For Rent Properties */}
+            {rentProperties.length > 0 && (
+              <div>
+                <div className="flex items-center mb-4 md:mb-6">
+                  <h2 className="text-lg md:text-2xl font-bold text-zinc-950">For Rent</h2>
+                  <span className="ml-2 md:ml-3 px-2 py-1 bg-blue-100 text-blue-800 text-xs md:text-sm font-medium rounded-full">
+                    {rentProperties.length}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                  {rentProperties.map((property) => (
+                    <PropertyCard key={property.id} property={property} />
+                  ))}
+                </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {rentProperties.map((property) => (
-                  <PropertyCard key={property.id} property={property} />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -131,9 +152,9 @@ interface Property {
 
 function PropertyCard({ property }: { property: Property }) {
   return (
-    <div className="bg-white rounded-lg shadow-md border border-zinc-200 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-sm border border-zinc-200 overflow-hidden hover:shadow-md transition-shadow">
       {/* Property Photo */}
-      <div className="aspect-video bg-zinc-100 relative">
+      <div className="aspect-[4/3] md:aspect-video bg-zinc-100 relative">
         {property.photos.length > 0 ? (
           <Image
             src={property.photos[0]}
@@ -143,12 +164,12 @@ function PropertyCard({ property }: { property: Property }) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <ImageIcon className="w-12 h-12 text-zinc-400" />
+            <ImageIcon className="w-8 h-8 md:w-12 md:h-12 text-zinc-400" />
           </div>
         )}
         
         {/* Status Badge */}
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-2 right-2">
           <span className={`px-2 py-1 text-xs font-medium rounded-full ${
             property.status === 'Available' 
               ? 'bg-green-100 text-green-800'
@@ -163,7 +184,7 @@ function PropertyCard({ property }: { property: Property }) {
         </div>
 
         {/* Property Type Badge */}
-        <div className="absolute top-3 left-3">
+        <div className="absolute top-2 left-2">
           <span className="px-2 py-1 text-xs font-medium bg-white/90 text-zinc-700 rounded-full">
             {property.propertyType}
           </span>
@@ -171,13 +192,13 @@ function PropertyCard({ property }: { property: Property }) {
       </div>
 
       {/* Property Details */}
-      <div className="p-4">
-        <h3 className="font-semibold text-lg text-zinc-950 mb-2 line-clamp-1">
+      <div className="p-3 md:p-4">
+        <h3 className="font-semibold text-sm md:text-lg text-zinc-950 mb-2 line-clamp-2">
           {property.title}
         </h3>
-        <p className="text-2xl font-bold text-red-600 mb-4">
+        <p className="text-lg md:text-2xl font-bold text-red-600 mb-3 md:mb-4">
           ₹{property.price.toLocaleString()}
-          <span className="text-sm font-normal text-zinc-500 ml-1">
+          <span className="text-xs md:text-sm font-normal text-zinc-500 ml-1">
             / {property.listingType === 'Rent' ? 'month' : 'total'}
           </span>
         </p>
@@ -186,16 +207,16 @@ function PropertyCard({ property }: { property: Property }) {
         <div className="flex gap-2">
           <Link
             href={`/agent/dashboard/properties/${property.slug}/edit`}
-            className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-zinc-100 text-zinc-700 rounded-lg hover:bg-zinc-200 transition-colors text-sm font-medium"
+            className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-zinc-100 text-zinc-700 rounded-lg hover:bg-zinc-200 transition-colors text-xs md:text-sm font-medium"
           >
-            <Edit className="w-4 h-4 mr-1" />
+            <Edit className="w-3 h-3 md:w-4 md:h-4 mr-1" />
             Edit
           </Link>
           <Link
             href={`/agent/dashboard/properties/${property.slug}/delete`}
-            className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-sm font-medium"
+            className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-xs md:text-sm font-medium"
           >
-            <Trash2 className="w-4 h-4 mr-1" />
+            <Trash2 className="w-3 h-3 md:w-4 md:h-4 mr-1" />
             Delete
           </Link>
         </div>

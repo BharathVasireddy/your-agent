@@ -35,7 +35,7 @@ export default async function DashboardLayout({
         
         {/* Main Content Area */}
         <div className="flex-1 ml-64">
-          <main className="p-6">
+          <main className="p-6 max-w-7xl mx-auto">
             {children}
           </main>
         </div>
@@ -43,16 +43,8 @@ export default async function DashboardLayout({
 
       {/* Mobile Layout */}
       <div className="md:hidden pb-20">
-        {/* Mobile Header */}
-        <header className="bg-white border-b border-zinc-200 px-4 py-4">
-          <h1 className="text-xl font-bold text-zinc-950">Agent Dashboard</h1>
-          <span className="text-sm text-zinc-500">
-            Welcome back, {session.user.name}
-          </span>
-        </header>
-
         {/* Mobile Main Content */}
-        <main className="p-4">
+        <main>
           {children}
         </main>
 

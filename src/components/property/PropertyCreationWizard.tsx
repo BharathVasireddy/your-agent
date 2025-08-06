@@ -44,7 +44,7 @@ export default function PropertyCreationWizard({}: PropertyCreationWizardProps) 
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div>
       {currentStep === 'type-selection' && (
         <PropertyTypeSelector
           onSelect={handleTypeSelection}
@@ -53,9 +53,9 @@ export default function PropertyCreationWizard({}: PropertyCreationWizardProps) 
       )}
       
       {currentStep === 'form' && selectedListingType && selectedPropertyType && (
-        <div className="container mx-auto p-6">
+        <div className="space-y-6">
           {/* Form will be rendered here based on property type */}
-          <div className="mb-6">
+          <div>
             <button
               onClick={handleBackToTypeSelection}
               className="text-red-600 hover:text-red-700 text-sm font-medium"
@@ -64,7 +64,7 @@ export default function PropertyCreationWizard({}: PropertyCreationWizardProps) 
             </button>
           </div>
           
-          <div className="mb-8">
+          <div>
             <h1 className="text-3xl font-bold text-zinc-950">Property Details</h1>
             <p className="text-zinc-600 mt-1">
               {selectedPropertyType} for {selectedListingType}

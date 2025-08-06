@@ -72,7 +72,7 @@ export default function PropertyTypeSelector({ onSelect, onCancel }: PropertyTyp
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="space-y-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Add New Property</h1>
         <p className="text-gray-600">Choose the listing type and property type to get started</p>
@@ -186,8 +186,19 @@ export default function PropertyTypeSelector({ onSelect, onCancel }: PropertyTyp
         </div>
       )}
 
+      {/* Selection Summary */}
+      {selectedListingType && selectedPropertyType && (
+        <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <h3 className="font-medium text-gray-900 mb-2">Selected Configuration:</h3>
+          <p className="text-gray-700">
+            <span className="font-medium">{selectedPropertyType}</span> for{' '}
+            <span className="font-medium">{selectedListingType}</span>
+          </p>
+        </div>
+      )}
+
       {/* Action Buttons */}
-      <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+      <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-6">
         <Button
           variant="outline"
           onClick={onCancel}
@@ -205,17 +216,6 @@ export default function PropertyTypeSelector({ onSelect, onCancel }: PropertyTyp
           <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
-
-      {/* Selection Summary */}
-      {selectedListingType && selectedPropertyType && (
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <h3 className="font-medium text-gray-900 mb-2">Selected Configuration:</h3>
-          <p className="text-gray-700">
-            <span className="font-medium">{selectedPropertyType}</span> for{' '}
-            <span className="font-medium">{selectedListingType}</span>
-          </p>
-        </div>
-      )}
     </div>
   );
 }
