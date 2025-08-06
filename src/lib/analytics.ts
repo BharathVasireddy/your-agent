@@ -226,10 +226,10 @@ export async function getAgentAnalytics(agentId: string, days: number = 30) {
       prisma.$queryRaw`
         SELECT 
           DATE(timestamp) as date,
-          COUNT(DISTINCT ip_address) as visitors,
+          COUNT(DISTINCT "ipAddress") as visitors,
           COUNT(CASE WHEN page = 'property' THEN 1 END) as property_views
         FROM "PageView" 
-        WHERE agent_id = ${agentId} 
+        WHERE "agentId" = ${agentId} 
         AND timestamp >= ${new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)}
         GROUP BY DATE(timestamp)
         ORDER BY date DESC

@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
 interface InstantNavContextType {
@@ -17,22 +17,24 @@ export function InstantNavProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
+  // Reset states when pathname actually changes
+  useEffect(() => {
+    if (pendingPath && pathname === pendingPath) {
+      setPendingPath(null);
+      setIsContentLoading(false);
+    }
+  }, [pathname, pendingPath]);
+
   const navigateInstantly = (path: string) => {
     // Don't navigate if already on the same path
     if (path === pathname) return;
     
-    // Immediately set the pending path (this updates active states)
+    // Immediately set the pending path (this updates active states instantly)
     setPendingPath(path);
     setIsContentLoading(true);
     
-    // Navigate in the background
+    // Navigate immediately - no delays
     router.push(path);
-    
-    // Reset state after navigation
-    setTimeout(() => {
-      setPendingPath(null);
-      setIsContentLoading(false);
-    }, 100);
   };
 
   return (
