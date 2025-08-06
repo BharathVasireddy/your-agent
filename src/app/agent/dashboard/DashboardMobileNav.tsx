@@ -2,15 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Building, User, LogOut } from 'lucide-react';
-import SignOutButton from './SignOutButton';
+import { Home, Building, User, TrendingUp, Settings } from 'lucide-react';
 
 export default function DashboardMobileNav() {
   const pathname = usePathname();
 
   const navigationItems = [
     {
-      name: 'Dashboard',
+      name: 'Home',
       href: '/agent/dashboard',
       icon: Home,
     },
@@ -20,9 +19,19 @@ export default function DashboardMobileNav() {
       icon: Building,
     },
     {
+      name: 'Analytics',
+      href: '/agent/dashboard/analytics',
+      icon: TrendingUp,
+    },
+    {
       name: 'Profile',
       href: '/agent/dashboard/profile',
       icon: User,
+    },
+    {
+      name: 'Settings',
+      href: '/agent/dashboard/settings',
+      icon: Settings,
     },
   ];
 
@@ -35,7 +44,7 @@ export default function DashboardMobileNav() {
 
   return (
     <nav id="bottom-nav" className="fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-200">
-      <div className="grid grid-cols-4 h-16">
+      <div className="grid grid-cols-5 h-16">
         {navigationItems.map((item) => {
           const Icon = item.icon;
           const isActive = isActiveLink(item.href);
@@ -50,16 +59,11 @@ export default function DashboardMobileNav() {
                   : 'text-zinc-600 hover:text-red-600'
               }`}
             >
-              <Icon className="w-5 h-5" />
+              <Icon className="w-4 h-4" />
               <span className="text-xs">{item.name}</span>
             </Link>
           );
         })}
-        
-        <SignOutButton className="flex flex-col items-center justify-center space-y-1 text-zinc-600 hover:text-red-600 transition-colors">
-          <LogOut className="w-5 h-5" />
-          <span className="text-xs">Sign Out</span>
-        </SignOutButton>
       </div>
     </nav>
   );
