@@ -642,15 +642,17 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
           <div className="space-y-4">
             <div>
               <Label className="text-zinc-600 mb-2 block">Logo</Label>
-              <ImageUploader
-                currentImageUrl={formData.logoUrl}
-                onImageChange={(url) => handleInputChange('logoUrl', url)}
-                placeholder="Upload your business logo"
-                uploadFolder="agent-logos"
-                aspectRatio="square"
-                maxWidth={200}
-                maxHeight={200}
-              />
+              <div className="w-48">
+                <ImageUploader
+                  currentImageUrl={formData.logoUrl}
+                  onImageChange={(url) => handleInputChange('logoUrl', url)}
+                  placeholder="Upload your business logo"
+                  uploadFolder="agent-logos"
+                  aspectRatio="square"
+                  maxWidth={200}
+                  maxHeight={200}
+                />
+              </div>
               <p className="text-xs text-zinc-500 mt-2">
                 Recommended: Square format, 200x200px minimum
               </p>
@@ -665,15 +667,17 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
           <div className="space-y-6">
             <div>
               <Label className="text-zinc-600 mb-2 block">Hero Image</Label>
-              <ImageUploader
-                currentImageUrl={formData.heroImage}
-                onImageChange={(url) => handleInputChange('heroImage', url)}
-                placeholder="Upload a hero background image"
-                uploadFolder="agent-hero"
-                aspectRatio="wide"
-                maxWidth={1200}
-                maxHeight={600}
-              />
+              <div className="max-w-md">
+                <ImageUploader
+                  currentImageUrl={formData.heroImage}
+                  onImageChange={(url) => handleInputChange('heroImage', url)}
+                  placeholder="Upload a hero background image"
+                  uploadFolder="agent-hero"
+                  aspectRatio="wide"
+                  maxWidth={1200}
+                  maxHeight={600}
+                />
+              </div>
               <p className="text-xs text-zinc-500 mt-2">
                 Recommended: Wide format (16:9), 1200x600px minimum
               </p>
@@ -920,12 +924,265 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
           </RadioGroup>
         </div>
 
-        {/* Save Button */}
-        <div className="flex justify-end">
+        {/* Testimonials Management */}
+        <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
+          <h3 className="text-lg font-semibold text-zinc-950 mb-4">Client Testimonials</h3>
+          
+          {/* Add/Edit Testimonial Form */}
+          <div className="mb-6 p-4 bg-zinc-50 rounded-lg">
+            <h4 className="font-medium text-zinc-900 mb-3">
+              {testimonialForm.editingId ? 'Edit Testimonial' : 'Add New Testimonial'}
+            </h4>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="testimonial-text" className="text-zinc-600 mb-2 block">Testimonial Text *</Label>
+                <Textarea
+                  id="testimonial-text"
+                  value={testimonialForm.text}
+                  onChange={(e) => setTestimonialForm(prev => ({ ...prev, text: e.target.value }))}
+                  placeholder="Enter the client's testimonial..."
+                  className="min-h-[100px]"
+                  required
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="testimonial-author" className="text-zinc-600 mb-2 block">Client Name *</Label>
+                  <Input
+                    id="testimonial-author"
+                    value={testimonialForm.author}
+                    onChange={(e) => setTestimonialForm(prev => ({ ...prev, author: e.target.value }))}
+                    placeholder="Client's full name"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="testimonial-rating" className="text-zinc-600 mb-2 block">Rating (Optional)</Label>
+                  <Select 
+                    value={testimonialForm.rating?.toString() || 'none'} 
+                    onValueChange={(value) => setTestimonialForm(prev => ({ 
+                      ...prev, 
+                      rating: value && value !== 'none' ? parseInt(value) : null 
+                    }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select rating" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">No rating</SelectItem>
+                      <SelectItem value="5">5 Stars</SelectItem>
+                      <SelectItem value="4">4 Stars</SelectItem>
+                      <SelectItem value="3">3 Stars</SelectItem>
+                      <SelectItem value="2">2 Stars</SelectItem>
+                      <SelectItem value="1">1 Star</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="flex space-x-2">
+                <Button
+                  type="button"
+                  onClick={handleTestimonialSubmit}
+                  disabled={isSubmittingTestimonial}
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                >
+                  {isSubmittingTestimonial ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      {testimonialForm.editingId ? 'Updating...' : 'Adding...'}
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4 mr-2" />
+                      {testimonialForm.editingId ? 'Update Testimonial' : 'Add Testimonial'}
+                    </>
+                  )}
+                </Button>
+                
+                {testimonialForm.editingId && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setTestimonialForm({
+                      text: '',
+                      author: '',
+                      rating: null,
+                      editingId: null
+                    })}
+                  >
+                    Cancel
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Testimonials List */}
+          <div className="space-y-3">
+            {testimonials.length === 0 ? (
+              <p className="text-zinc-500 text-center py-4">No testimonials added yet.</p>
+            ) : (
+              testimonials.map((testimonial) => (
+                <div key={testimonial.id} className="border border-zinc-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <h5 className="font-medium text-zinc-900">{testimonial.author}</h5>
+                        {testimonial.rating && (
+                          <div className="flex items-center">
+                            {Array.from({ length: testimonial.rating }).map((_, i) => (
+                              <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-zinc-700 text-sm">{testimonial.text}</p>
+                    </div>
+                    <div className="flex space-x-1 ml-4">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditTestimonial(testimonial)}
+                        className="p-1 h-8 w-8"
+                      >
+                        <Edit2 className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDeleteTestimonial(testimonial.id)}
+                        className="p-1 h-8 w-8 text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* FAQs Management */}
+        <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
+          <h3 className="text-lg font-semibold text-zinc-950 mb-4">Frequently Asked Questions</h3>
+          
+          {/* Add/Edit FAQ Form */}
+          <div className="mb-6 p-4 bg-zinc-50 rounded-lg">
+            <h4 className="font-medium text-zinc-900 mb-3">
+              {faqForm.editingId ? 'Edit FAQ' : 'Add New FAQ'}
+            </h4>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="faq-question" className="text-zinc-600 mb-2 block">Question *</Label>
+                <Input
+                  id="faq-question"
+                  value={faqForm.question}
+                  onChange={(e) => setFaqForm(prev => ({ ...prev, question: e.target.value }))}
+                  placeholder="Enter the frequently asked question..."
+                  required
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="faq-answer" className="text-zinc-600 mb-2 block">Answer *</Label>
+                <Textarea
+                  id="faq-answer"
+                  value={faqForm.answer}
+                  onChange={(e) => setFaqForm(prev => ({ ...prev, answer: e.target.value }))}
+                  placeholder="Enter the answer to this question..."
+                  className="min-h-[100px]"
+                  required
+                />
+              </div>
+              
+              <div className="flex space-x-2">
+                <Button
+                  type="button"
+                  onClick={handleFaqSubmit}
+                  disabled={isSubmittingFaq}
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                >
+                  {isSubmittingFaq ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      {faqForm.editingId ? 'Updating...' : 'Adding...'}
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4 mr-2" />
+                      {faqForm.editingId ? 'Update FAQ' : 'Add FAQ'}
+                    </>
+                  )}
+                </Button>
+                
+                {faqForm.editingId && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setFaqForm({
+                      question: '',
+                      answer: '',
+                      editingId: null
+                    })}
+                  >
+                    Cancel
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* FAQs List */}
+          <div className="space-y-3">
+            {faqs.length === 0 ? (
+              <p className="text-zinc-500 text-center py-4">No FAQs added yet.</p>
+            ) : (
+              faqs.map((faq) => (
+                <div key={faq.id} className="border border-zinc-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h5 className="font-medium text-zinc-900 mb-1">{faq.question}</h5>
+                      <p className="text-zinc-700 text-sm">{faq.answer}</p>
+                    </div>
+                    <div className="flex space-x-1 ml-4">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditFaq(faq)}
+                        className="p-1 h-8 w-8"
+                      >
+                        <Edit2 className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDeleteFaq(faq.id)}
+                        className="p-1 h-8 w-8 text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </form>
+
+      {/* Sticky Save Button */}
+      <div className="sticky bottom-6 z-50 flex justify-end">
+        <div className="bg-white rounded-full shadow-lg border border-zinc-200 px-2 py-2">
           <Button
-            type="submit"
+            onClick={handleSubmit}
             disabled={isSubmitting}
-            className="bg-red-600 hover:bg-red-700 text-white px-8 py-3"
+            className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-full shadow-lg"
           >
             {isSubmitting ? (
               <>
@@ -940,256 +1197,8 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
             )}
           </Button>
         </div>
-      </form>
-
-      {/* Testimonials Management */}
-      <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
-        <h3 className="text-lg font-semibold text-zinc-950 mb-4">Client Testimonials</h3>
-        
-        {/* Add/Edit Testimonial Form */}
-        <form onSubmit={handleTestimonialSubmit} className="mb-6 p-4 bg-zinc-50 rounded-lg">
-          <h4 className="font-medium text-zinc-900 mb-3">
-            {testimonialForm.editingId ? 'Edit Testimonial' : 'Add New Testimonial'}
-          </h4>
-          
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="testimonial-text" className="text-zinc-600">Testimonial Text *</Label>
-              <Textarea
-                id="testimonial-text"
-                value={testimonialForm.text}
-                onChange={(e) => setTestimonialForm(prev => ({ ...prev, text: e.target.value }))}
-                placeholder="Enter the client's testimonial..."
-                className="min-h-[100px]"
-                required
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="testimonial-author" className="text-zinc-600">Client Name *</Label>
-                <Input
-                  id="testimonial-author"
-                  value={testimonialForm.author}
-                  onChange={(e) => setTestimonialForm(prev => ({ ...prev, author: e.target.value }))}
-                  placeholder="Client's full name"
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="testimonial-rating" className="text-zinc-600">Rating (Optional)</Label>
-                <Select 
-                  value={testimonialForm.rating?.toString() || 'none'} 
-                  onValueChange={(value) => setTestimonialForm(prev => ({ 
-                    ...prev, 
-                    rating: value && value !== 'none' ? parseInt(value) : null 
-                  }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select rating" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">No rating</SelectItem>
-                    <SelectItem value="5">5 Stars</SelectItem>
-                    <SelectItem value="4">4 Stars</SelectItem>
-                    <SelectItem value="3">3 Stars</SelectItem>
-                    <SelectItem value="2">2 Stars</SelectItem>
-                    <SelectItem value="1">1 Star</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            
-            <div className="flex space-x-2">
-              <Button
-                type="submit"
-                disabled={isSubmittingTestimonial}
-                className="bg-red-600 hover:bg-red-700 text-white"
-              >
-                {isSubmittingTestimonial ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    {testimonialForm.editingId ? 'Updating...' : 'Adding...'}
-                  </>
-                ) : (
-                  <>
-                    <Plus className="w-4 h-4 mr-2" />
-                    {testimonialForm.editingId ? 'Update Testimonial' : 'Add Testimonial'}
-                  </>
-                )}
-              </Button>
-              
-              {testimonialForm.editingId && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setTestimonialForm({
-                    text: '',
-                    author: '',
-                    rating: null,
-                    editingId: null
-                  })}
-                >
-                  Cancel
-                </Button>
-              )}
-            </div>
-          </div>
-        </form>
-
-        {/* Testimonials List */}
-        <div className="space-y-3">
-          {testimonials.length === 0 ? (
-            <p className="text-zinc-500 text-center py-4">No testimonials added yet.</p>
-          ) : (
-            testimonials.map((testimonial) => (
-              <div key={testimonial.id} className="border border-zinc-200 rounded-lg p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-1">
-                      <h5 className="font-medium text-zinc-900">{testimonial.author}</h5>
-                      {testimonial.rating && (
-                        <div className="flex items-center">
-                          {Array.from({ length: testimonial.rating }).map((_, i) => (
-                            <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-zinc-700 text-sm">{testimonial.text}</p>
-                  </div>
-                  <div className="flex space-x-1 ml-4">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleEditTestimonial(testimonial)}
-                      className="p-1 h-8 w-8"
-                    >
-                      <Edit2 className="w-3 h-3" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleDeleteTestimonial(testimonial.id)}
-                      className="p-1 h-8 w-8 text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
       </div>
 
-      {/* FAQs Management */}
-      <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
-        <h3 className="text-lg font-semibold text-zinc-950 mb-4">Frequently Asked Questions</h3>
-        
-        {/* Add/Edit FAQ Form */}
-        <form onSubmit={handleFaqSubmit} className="mb-6 p-4 bg-zinc-50 rounded-lg">
-          <h4 className="font-medium text-zinc-900 mb-3">
-            {faqForm.editingId ? 'Edit FAQ' : 'Add New FAQ'}
-          </h4>
-          
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="faq-question" className="text-zinc-600">Question *</Label>
-              <Input
-                id="faq-question"
-                value={faqForm.question}
-                onChange={(e) => setFaqForm(prev => ({ ...prev, question: e.target.value }))}
-                placeholder="Enter the frequently asked question..."
-                required
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="faq-answer" className="text-zinc-600">Answer *</Label>
-              <Textarea
-                id="faq-answer"
-                value={faqForm.answer}
-                onChange={(e) => setFaqForm(prev => ({ ...prev, answer: e.target.value }))}
-                placeholder="Enter the answer to this question..."
-                className="min-h-[100px]"
-                required
-              />
-            </div>
-            
-            <div className="flex space-x-2">
-              <Button
-                type="submit"
-                disabled={isSubmittingFaq}
-                className="bg-red-600 hover:bg-red-700 text-white"
-              >
-                {isSubmittingFaq ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    {faqForm.editingId ? 'Updating...' : 'Adding...'}
-                  </>
-                ) : (
-                  <>
-                    <Plus className="w-4 h-4 mr-2" />
-                    {faqForm.editingId ? 'Update FAQ' : 'Add FAQ'}
-                  </>
-                )}
-              </Button>
-              
-              {faqForm.editingId && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setFaqForm({
-                    question: '',
-                    answer: '',
-                    editingId: null
-                  })}
-                >
-                  Cancel
-                </Button>
-              )}
-            </div>
-          </div>
-        </form>
-
-        {/* FAQs List */}
-        <div className="space-y-3">
-          {faqs.length === 0 ? (
-            <p className="text-zinc-500 text-center py-4">No FAQs added yet.</p>
-          ) : (
-            faqs.map((faq) => (
-              <div key={faq.id} className="border border-zinc-200 rounded-lg p-4">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h5 className="font-medium text-zinc-900 mb-1">{faq.question}</h5>
-                    <p className="text-zinc-700 text-sm">{faq.answer}</p>
-                  </div>
-                  <div className="flex space-x-1 ml-4">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleEditFaq(faq)}
-                      className="p-1 h-8 w-8"
-                    >
-                      <Edit2 className="w-3 h-3" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleDeleteFaq(faq.id)}
-                      className="p-1 h-8 w-8 text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
     </div>
   );
 }

@@ -117,7 +117,7 @@ export default function ImageUploader({
       {/* Image Display */}
       {displayImageUrl ? (
         <div className="relative">
-          <div className={`overflow-hidden border-2 border-red-100 ${
+          <div className={`overflow-hidden border-2 border-red-100 rounded-lg ${
             aspectRatio === 'square' ? 'aspect-square' :
             aspectRatio === 'wide' ? 'aspect-video' : ''
           }`}>

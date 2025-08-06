@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { User, Home, Plus, TrendingUp, Settings } from 'lucide-react';
+import { useLoading } from '@/components/LoadingProvider';
 import DashboardAgentHeader from './DashboardAgentHeader';
 import type { AgentProfile, Property } from '@/types/dashboard';
 
@@ -18,6 +19,7 @@ export default function DashboardContent({
   rentProperties, 
   availableProperties 
 }: DashboardContentProps) {
+  const { navigateWith } = useLoading();
   return (
     <div className="space-y-4 md:space-y-6">
       {/* Mobile Header */}

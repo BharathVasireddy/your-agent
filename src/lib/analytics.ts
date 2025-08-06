@@ -305,7 +305,9 @@ export async function getAgentAnalytics(agentId: string, days: number = 30) {
   } catch (error) {
     console.error('Failed to get analytics:', error);
     
-    // Return empty data structure on error
+
+    
+    // Return empty data structure for other errors
     return {
       totalVisitors: 0,
       totalPropertyViews: 0,

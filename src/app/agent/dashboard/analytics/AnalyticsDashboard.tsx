@@ -86,6 +86,24 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
         <p className="text-zinc-600 mt-1">The A-B-C Funnel: Audience → Behavior → Conversion</p>
       </div>
 
+      {/* Sample Data Notice */}
+      {data.totalVisitors === 47 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-start space-x-3">
+            <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full">
+              <BarChart3 className="w-4 h-4 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-blue-900">Analytics Preview Mode</h3>
+              <p className="text-sm text-blue-800 mt-1">
+                This dashboard is showing sample data to demonstrate the A-B-C funnel functionality. 
+                Real analytics will be captured once your site starts receiving visitors and the database is migrated.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Section 1: The "At-a-Glance" KPI Bar */}
       <div className="bg-gradient-to-r from-red-50 to-red-100 rounded-lg p-4 md:p-6 border border-red-200">
         <h2 className="text-lg md:text-xl font-bold text-red-800 mb-4">📊 At-a-Glance Health Check (Last 30 Days)</h2>

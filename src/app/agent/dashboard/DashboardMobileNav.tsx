@@ -1,11 +1,12 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Building, User, TrendingUp, Settings } from 'lucide-react';
+import { useLoading } from '@/components/LoadingProvider';
 
 export default function DashboardMobileNav() {
   const pathname = usePathname();
+  const { navigateWith } = useLoading();
 
   const navigationItems = [
     {
@@ -50,9 +51,9 @@ export default function DashboardMobileNav() {
           const isActive = isActiveLink(item.href);
           
           return (
-            <Link
+            <button
               key={item.name}
-              href={item.href}
+              onClick={() => navigateWith(item.href)}
               className={`flex flex-col items-center justify-center space-y-1 transition-colors ${
                 isActive
                   ? 'text-red-600'
@@ -61,7 +62,7 @@ export default function DashboardMobileNav() {
             >
               <Icon className="w-4 h-4" />
               <span className="text-xs">{item.name}</span>
-            </Link>
+            </button>
           );
         })}
       </div>

@@ -3,6 +3,8 @@ import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { getAgentAnalytics } from '@/lib/analytics';
 import AnalyticsDashboard from './AnalyticsDashboard';
+import { Suspense } from 'react';
+import { PageLoader } from '@/components/PageLoader';
 
 import prisma from '@/lib/prisma';
 
@@ -29,5 +31,9 @@ export default async function AnalyticsPage() {
   // Get analytics data for the last 30 days
   const analyticsData = await getAgentAnalytics(agent.id, 30);
 
-  return <AnalyticsDashboard data={analyticsData} />;
+  return (
+    <Suspense fallback={<PageLoader message="Loading analytics..." />}>
+      <AnalyticsDashboard data={analyticsData} />
+    </Suspense>
+  );
 }

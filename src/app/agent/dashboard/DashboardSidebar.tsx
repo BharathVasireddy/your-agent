@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Home, Building, User, LogOut, TrendingUp, Settings, HelpCircle, Copy } from 'lucide-react';
 import { useState } from 'react';
 import SignOutButton from './SignOutButton';
+import { useLoading } from '@/components/LoadingProvider';
 
 interface DashboardSidebarProps {
   user: {
@@ -29,6 +30,7 @@ interface DashboardSidebarProps {
 export default function DashboardSidebar({ user, agent }: DashboardSidebarProps) {
   const [copied, setCopied] = useState(false);
   const pathname = usePathname();
+  const { navigateWith } = useLoading();
 
   const copyWebsiteLink = async () => {
     if (!agent?.slug) return;
@@ -111,10 +113,10 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
           const isActive = isActiveLink(item.href);
           
           return (
-            <Link
+            <button
               key={item.name}
-              href={item.href}
-              className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+              onClick={() => navigateWith(item.href)}
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                 isActive
                   ? 'bg-red-50 text-red-700 border border-red-200'
                   : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
@@ -122,7 +124,7 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
             >
               <Icon className={`w-5 h-5 ${isActive ? 'text-red-600' : 'text-zinc-500'}`} />
               <span>{item.name}</span>
-            </Link>
+            </button>
           );
         })}
       </nav>
