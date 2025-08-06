@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Home, Building, User, LogOut, TrendingUp, Settings, HelpCircle, Copy } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SignOutButton from './SignOutButton';
 import { useInstantNav } from '@/components/InstantNavProvider';
 
@@ -30,7 +30,23 @@ interface DashboardSidebarProps {
 export default function DashboardSidebar({ user, agent }: DashboardSidebarProps) {
   const [copied, setCopied] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const { pendingPath, navigateInstantly } = useInstantNav();
+
+  // Prefetch all dashboard routes for instant navigation
+  useEffect(() => {
+    const routes = [
+      '/agent/dashboard',
+      '/agent/dashboard/properties', 
+      '/agent/dashboard/profile',
+      '/agent/dashboard/analytics',
+      '/agent/dashboard/settings'
+    ];
+    
+    routes.forEach(route => {
+      router.prefetch(route);
+    });
+  }, [router]);
 
   const copyWebsiteLink = async () => {
     if (!agent?.slug) return;

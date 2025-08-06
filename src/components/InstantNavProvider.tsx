@@ -33,8 +33,8 @@ export function InstantNavProvider({ children }: { children: ReactNode }) {
     setPendingPath(path);
     setIsContentLoading(true);
     
-    // Navigate immediately - no delays
-    router.push(path);
+    // Use replace to avoid back/forward issues and prefetch for speed
+    router.replace(path);
   };
 
   return (

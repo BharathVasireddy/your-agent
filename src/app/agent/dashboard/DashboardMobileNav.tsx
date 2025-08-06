@@ -1,12 +1,29 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Home, Building, User, TrendingUp, Settings } from 'lucide-react';
 import { useInstantNav } from '@/components/InstantNavProvider';
+import { useEffect } from 'react';
 
 export default function DashboardMobileNav() {
   const pathname = usePathname();
+  const router = useRouter();
   const { pendingPath, navigateInstantly } = useInstantNav();
+
+  // Prefetch all dashboard routes for instant mobile navigation
+  useEffect(() => {
+    const routes = [
+      '/agent/dashboard',
+      '/agent/dashboard/properties', 
+      '/agent/dashboard/profile',
+      '/agent/dashboard/analytics',
+      '/agent/dashboard/settings'
+    ];
+    
+    routes.forEach(route => {
+      router.prefetch(route);
+    });
+  }, [router]);
 
   const navigationItems = [
     {
