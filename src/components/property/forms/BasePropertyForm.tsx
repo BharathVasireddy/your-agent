@@ -58,6 +58,7 @@ export default function BasePropertyForm({
               onChange={(e) => updateFormData({ title: e.target.value })}
               placeholder="e.g., Spacious 3BHK Apartment in City Center"
               required
+              className="mt-2"
             />
           </div>
           
@@ -70,6 +71,7 @@ export default function BasePropertyForm({
               onChange={(e) => updateFormData({ price: parseInt(e.target.value) })}
               placeholder={listingType === 'Sale' ? 'Sale Price (₹)' : 'Monthly Rent (₹)'}
               required
+              className="mt-2"
             />
           </div>
         </div>
@@ -82,6 +84,7 @@ export default function BasePropertyForm({
             onChange={(e) => updateFormData({ location: e.target.value })}
             placeholder="e.g., Banjara Hills, Hyderabad"
             required
+            className="mt-2"
           />
         </div>
 
@@ -94,6 +97,7 @@ export default function BasePropertyForm({
             placeholder="Describe the property features, amenities, and highlights..."
             rows={4}
             required
+            className="mt-2"
           />
         </div>
       </div>

@@ -239,7 +239,7 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
               value={formData.title}
               onChange={(e) => handleInputChange('title', e.target.value)}
               placeholder="e.g., 3BHK Spacious Apartment in Gachibowli"
-              className={errors.title ? 'border-red-500' : ''}
+              className={`mt-2 ${errors.title ? 'border-red-500' : ''}`}
             />
             {errors.title && <p className="text-sm text-red-600 mt-1">{errors.title}</p>}
           </div>
@@ -250,7 +250,7 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
               id="listingType"
               value={formData.listingType}
               onChange={(e) => handleInputChange('listingType', e.target.value)}
-              className="w-full h-10 px-3 rounded-md border border-zinc-200 bg-white text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 appearance-none"
+              className="mt-2 w-full h-10 px-3 rounded-md border border-zinc-200 bg-white text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 appearance-none"
               style={{ backgroundColor: 'white' }}
             >
               <option value="Sale">For Sale</option>
@@ -264,7 +264,7 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
               id="propertyType"
               value={formData.propertyType}
               onChange={(e) => handleInputChange('propertyType', e.target.value)}
-              className="w-full h-10 px-3 rounded-md border border-zinc-200 bg-white text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 appearance-none"
+              className="mt-2 w-full h-10 px-3 rounded-md border border-zinc-200 bg-white text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 appearance-none"
               style={{ backgroundColor: 'white' }}
             >
               {propertyTypes.map(type => (
@@ -275,7 +275,7 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
 
           <div className="md:col-span-2">
             <Label htmlFor="location">Location *</Label>
-            <div className="relative">
+            <div className="relative mt-2">
               <MapPin className="absolute left-3 top-3 h-4 w-4 text-zinc-400" />
               <Input
                 id="location"
@@ -296,7 +296,7 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
               onChange={(e) => handleInputChange('description', e.target.value)}
               placeholder="Describe your property in detail..."
               rows={4}
-              className={errors.description ? 'border-red-500' : ''}
+              className={`mt-2 ${errors.description ? 'border-red-500' : ''}`}
             />
             {errors.description && <p className="text-sm text-red-600 mt-1">{errors.description}</p>}
           </div>
@@ -318,7 +318,7 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div>
             <Label htmlFor="price">Price ({formData.listingType === 'Rent' ? 'per month' : 'total'}) *</Label>
-            <div className="relative">
+            <div className="relative mt-2">
               <IndianRupee className="absolute left-3 top-3 h-4 w-4 text-zinc-400" />
               <Input
                 id="price"
@@ -334,7 +334,7 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
 
           <div>
             <Label htmlFor="area">Area (sq ft) *</Label>
-            <div className="relative">
+            <div className="relative mt-2">
               <Square className="absolute left-3 top-3 h-4 w-4 text-zinc-400" />
               <Input
                 id="area"
@@ -350,7 +350,7 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
 
           <div>
             <Label htmlFor="bedrooms">Bedrooms</Label>
-            <div className="relative">
+            <div className="relative mt-2">
               <Bed className="absolute left-3 top-3 h-4 w-4 text-zinc-400" />
               <Input
                 id="bedrooms"
@@ -365,7 +365,7 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
 
           <div>
             <Label htmlFor="bathrooms">Bathrooms</Label>
-            <div className="relative">
+            <div className="relative mt-2">
               <Bath className="absolute left-3 top-3 h-4 w-4 text-zinc-400" />
               <Input
                 id="bathrooms"
