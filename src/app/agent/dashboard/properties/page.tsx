@@ -12,9 +12,9 @@ interface Property {
   title: string;
   description: string;
   price: number;
-  area: number | null;
-  bedrooms: number | null;
-  bathrooms: number | null;
+  area: number;
+  bedrooms: number;
+  bathrooms: number;
   location: string;
   amenities: string[];
   photos: string[];
@@ -66,56 +66,52 @@ export default async function PropertiesPage() {
       {/* Desktop Header */}
       <div className="hidden md:flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-zinc-950">My Properties</h1>
+          <h1 className="text-3xl font-bold text-zinc-950">Properties</h1>
           <p className="text-zinc-600 mt-1">Manage your property listings</p>
-          <div className="flex gap-4 mt-3 text-sm text-zinc-500">
-            <span>For Sale: {saleProperties.length}</span>
-            <span>For Rent: {rentProperties.length}</span>
-            <span>Total: {properties.length}</span>
-          </div>
         </div>
-        
-        {/* Add New Property Button */}
         <Link
           href="/agent/dashboard/properties/new"
-          className="inline-flex items-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+          className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
         >
           <Plus className="w-5 h-5 mr-2" />
-          Add New Property
+          Add Property
         </Link>
       </div>
 
-      {/* Properties Content */}
-      {validProperties.length === 0 ? (
-        /* No Properties Message */
-        <div className="text-center py-12 md:py-16">
-          <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-zinc-100 rounded-full mb-4">
-            <Home className="w-6 h-6 md:w-8 md:h-8 text-zinc-400" />
+      {/* Mobile Tabs */}
+      <div className="md:hidden">
+        <MobilePropertiesTabs 
+          saleProperties={saleProperties}
+          rentProperties={rentProperties}
+        />
+      </div>
+
+      {/* Desktop Grid */}
+      <div className="hidden md:block">
+        <DesktopPropertiesGrid 
+          saleProperties={saleProperties}
+          rentProperties={rentProperties}
+        />
+      </div>
+
+      {/* Empty State for Desktop */}
+      {validProperties.length === 0 && (
+        <div className="hidden md:flex items-center justify-center py-12">
+          <div className="text-center max-w-md mx-auto">
+            <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Home className="w-8 h-8 text-zinc-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-zinc-900 mb-2">No properties yet</h3>
+            <p className="text-zinc-600 mb-6">Start building your property portfolio by adding your first listing.</p>
+            <Link
+              href="/agent/dashboard/properties/new"
+              className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Add Your First Property
+            </Link>
           </div>
-          <h3 className="text-lg md:text-xl font-semibold text-zinc-950 mb-2">No Properties Yet</h3>
-          <p className="text-zinc-600 mb-6 text-sm md:text-base">You haven&apos;t added any properties yet.</p>
-          <Link
-            href="/agent/dashboard/properties/new"
-            className="inline-flex items-center px-4 py-2 md:px-6 md:py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm md:text-base"
-          >
-            <Plus className="w-4 h-4 md:w-5 md:h-5 mr-2" />
-            Add Your First Property
-          </Link>
         </div>
-      ) : (
-        <>
-          {/* Mobile Tabs Component */}
-          <MobilePropertiesTabs 
-            saleProperties={saleProperties} 
-            rentProperties={rentProperties} 
-          />
-          
-          {/* Desktop Grid Component */}
-          <DesktopPropertiesGrid 
-            saleProperties={saleProperties} 
-            rentProperties={rentProperties} 
-          />
-        </>
       )}
     </div>
   );
