@@ -1,4 +1,5 @@
 import type { Session } from 'next-auth';
+import type { Prisma } from '@prisma/client';
 
 export interface AgentProfile {
   id: string;
@@ -18,20 +19,21 @@ export interface AgentProfile {
 
 export interface Property {
   id: string;
-  slug: string; // Human-friendly URL slug
+  slug: string | null; // Human-friendly URL slug
   agentId: string;
   title: string;
   description: string;
   price: number;
-  area: number; // in sqft
-  bedrooms: number;
-  bathrooms: number;
+  area: number | null; // in sqft (nullable for agricultural land)
+  bedrooms: number | null; // nullable for agricultural land
+  bathrooms: number | null; // nullable for agricultural land
   location: string;
   amenities: string[];
   photos: string[]; // Array of Cloudinary URLs
   status: string; // Available, Sold, Rented
   listingType: string; // Sale or Rent
   propertyType: string; // Plots, Villas, Flats, Farms, etc.
+  propertyData?: Prisma.JsonValue; // Property type specific data (agricultural, plot, etc.)
   createdAt: Date;
   updatedAt: Date;
 }

@@ -68,6 +68,10 @@ async function getAgentData(agentSlug: string) {
           propertyType: true,
           slug: true,
           brochureUrl: true,
+          propertyData: true,
+          agentId: true,
+          createdAt: true,
+          updatedAt: true,
         },
         orderBy: {
           createdAt: 'desc',

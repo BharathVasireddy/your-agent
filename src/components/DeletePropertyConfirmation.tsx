@@ -22,6 +22,12 @@ export default function DeletePropertyConfirmation({ property }: DeletePropertyC
     setIsDeleting(true);
     setDeleteError(null);
 
+    if (!property.slug) {
+      setDeleteError('Property slug is missing');
+      setIsDeleting(false);
+      return;
+    }
+
     try {
       const result = await deletePropertyAction(property.slug);
       

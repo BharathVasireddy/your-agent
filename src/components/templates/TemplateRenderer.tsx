@@ -6,6 +6,7 @@
 import React from 'react';
 import * as LegacyPro from './legacy-pro';
 import * as FreshMinimal from './fresh-minimal';
+import type { Prisma } from '@prisma/client';
 
 interface Agent {
   id: string;
@@ -31,9 +32,9 @@ interface Agent {
     title: string;
     description: string;
     price: number;
-    area: number;
-    bedrooms: number;
-    bathrooms: number;
+    area: number | null;
+    bedrooms: number | null;
+    bathrooms: number | null;
     location: string;
     amenities: string[];
     photos: string[];
@@ -42,6 +43,10 @@ interface Agent {
     propertyType: string;
     slug: string | null;
     brochureUrl: string | null;
+    propertyData?: Prisma.JsonValue;
+    agentId: string;
+    createdAt: Date;
+    updatedAt: Date;
   }>;
   testimonials: Array<{
     id: string;

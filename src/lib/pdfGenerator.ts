@@ -1,21 +1,6 @@
 import jsPDF from 'jspdf';
-
-interface Property {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  area: number;
-  bedrooms: number;
-  bathrooms: number;
-  location: string;
-  amenities: string[];
-  photos: string[];
-  status: string;
-  listingType: string;
-  propertyType: string;
-  slug: string | null;
-}
+import { type Property } from '@/types/dashboard';
+import { getPropertyFeatures, formatPrice } from '@/lib/property-display-utils';
 
 interface Agent {
   user: {
@@ -53,16 +38,7 @@ export async function generatePropertyBrochure(property: Property, agent: Agent)
   const margin = 20;
   const contentWidth = pageWidth - (margin * 2);
   
-  // Helper function to format price
-  const formatPrice = (price: number) => {
-    if (price >= 10000000) {
-      return `₹${(price / 10000000).toFixed(1)} Cr`;
-    } else if (price >= 100000) {
-      return `₹${(price / 100000).toFixed(1)} L`;
-    } else {
-      return `₹${price.toLocaleString()}`;
-    }
-  };
+
 
   // Modern color scheme
   const colors = {
@@ -140,41 +116,28 @@ export async function generatePropertyBrochure(property: Property, agent: Agent)
   pdf.setFont('helvetica', 'bold');
   pdf.text(property.location, margin + 10, yPos + 22);
 
-  // Property specs - horizontal layout
+  // Property specs - horizontal layout with dynamic features
   const specStartX = margin + 10;
   const specY = yPos + 35;
-  const specSpacing = 50;
-
-  pdf.setTextColor(...colors.textLight);
-  pdf.setFontSize(9);
-  pdf.setFont('helvetica', 'normal');
+  const specSpacing = 60;
   
-  // Bedrooms
-  pdf.text('BEDROOMS', specStartX, specY);
-  pdf.setTextColor(...colors.text);
-  pdf.setFontSize(16);
-  pdf.setFont('helvetica', 'bold');
-  pdf.text(property.bedrooms.toString(), specStartX, specY + 8);
+  const features = getPropertyFeatures(property).slice(0, 3);
 
-  // Bathrooms
-  pdf.setTextColor(...colors.textLight);
-  pdf.setFontSize(9);
-  pdf.setFont('helvetica', 'normal');
-  pdf.text('BATHROOMS', specStartX + specSpacing, specY);
-  pdf.setTextColor(...colors.text);
-  pdf.setFontSize(16);
-  pdf.setFont('helvetica', 'bold');
-  pdf.text(property.bathrooms.toString(), specStartX + specSpacing, specY + 8);
-
-  // Area
-  pdf.setTextColor(...colors.textLight);
-  pdf.setFontSize(9);
-  pdf.setFont('helvetica', 'normal');
-  pdf.text('AREA (SQ FT)', specStartX + (specSpacing * 2), specY);
-  pdf.setTextColor(...colors.text);
-  pdf.setFontSize(16);
-  pdf.setFont('helvetica', 'bold');
-  pdf.text(property.area.toLocaleString(), specStartX + (specSpacing * 2), specY + 8);
+  features.forEach((feature, index) => {
+    const xPos = specStartX + (index * specSpacing);
+    
+    // Feature label
+    pdf.setTextColor(...colors.textLight);
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(feature.label.toUpperCase(), xPos, specY);
+    
+    // Feature value
+    pdf.setTextColor(...colors.text);
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(feature.value, xPos, specY + 8);
+  });
 
   // Property type and status badges
   const badgeY = yPos + 38;

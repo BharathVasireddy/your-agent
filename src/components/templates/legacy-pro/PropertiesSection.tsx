@@ -1,30 +1,18 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Bed, Bath, Home, MapPin, IndianRupee } from 'lucide-react';
+import { MapPin, IndianRupee, Download, Home } from 'lucide-react';
 import { generatePropertyBrochure } from '@/lib/pdfGenerator';
+import { getPropertyFeatures } from '@/lib/property-display-utils';
+import { type Property } from '@/types/dashboard';
 import Image from 'next/image';
 import { PerformanceSafeguards } from '@/lib/performance';
 
-interface Property {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  area: number;
-  bedrooms: number;
-  bathrooms: number;
-  location: string;
-  amenities: string[];
-  photos: string[];
-  status: string;
-  listingType: string;
-  propertyType: string;
-  slug: string | null;
-  brochureUrl: string | null;
-}
+
 
 interface Agent {
+  id: string;
+  slug: string;
   user: {
     name: string | null;
     email: string | null;
@@ -61,9 +49,7 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
     }
   };
 
-  const formatArea = (area: number) => {
-    return `${area.toLocaleString()} sq ft`;
-  };
+
 
   if (properties.length === 0) {
     return (
@@ -133,18 +119,15 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
 
                 {/* Property Features */}
                 <div className="flex items-center gap-4 text-sm text-zinc-600 mb-4">
-                  <div className="flex items-center">
-                    <Bed className="w-4 h-4 mr-1" />
-                    <span>{property.bedrooms}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Bath className="w-4 h-4 mr-1" />
-                    <span>{property.bathrooms}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Home className="w-4 h-4 mr-1" />
-                    <span>{formatArea(property.area)}</span>
-                  </div>
+                  {getPropertyFeatures(property).slice(0, 3).map((feature, index) => {
+                    const IconComponent = feature.icon;
+                    return (
+                      <div key={index} className="flex items-center">
+                        <IconComponent className="w-4 h-4 mr-1" />
+                        <span>{feature.value}</span>
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* Price */}
@@ -171,10 +154,11 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
                   
                   <Button 
                     variant="outline" 
-                    className="flex-1 border-zinc-200 text-zinc-700 hover:bg-zinc-50 text-sm font-medium h-10 rounded-full"
+                    className="px-3 border-zinc-200 text-zinc-700 hover:bg-zinc-50 text-sm font-medium h-10 rounded-full"
                     onClick={() => handleDownloadBrochure(property)}
+                    title="Download property brochure"
                   >
-                    Download property
+                    <Download className="w-4 h-4" />
                   </Button>
                 </div>
               </div>

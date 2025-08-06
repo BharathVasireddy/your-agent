@@ -4,7 +4,7 @@ import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import prisma from '@/lib/prisma';
-import EditPropertyForm from '@/components/EditPropertyForm';
+import PropertyEditWizard from '@/components/property/PropertyEditWizard';
 
 interface EditPropertyPageProps {
   params: Promise<{
@@ -69,6 +69,7 @@ export default async function EditPropertyPage({ params }: EditPropertyPageProps
     status: property.status,
     listingType: property.listingType,
     propertyType: property.propertyType,
+    propertyData: property.propertyData, // Include agricultural land data
     createdAt: property.createdAt,
     updatedAt: property.updatedAt
   };
@@ -91,7 +92,7 @@ export default async function EditPropertyPage({ params }: EditPropertyPageProps
       </div>
 
       {/* Edit Property Form */}
-      <EditPropertyForm property={propertyData} />
+      <PropertyEditWizard property={propertyData} />
     </div>
   );
 }

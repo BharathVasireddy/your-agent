@@ -4,33 +4,26 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Bed, Bath, Square, MapPin, IndianRupee, ExternalLink } from 'lucide-react';
+import { MapPin, IndianRupee, Download } from 'lucide-react';
 import { PerformanceSafeguards } from '@/lib/performance';
+import { getPropertyFeatures } from '@/lib/property-display-utils';
+import { generatePropertyBrochure } from '@/lib/pdfGenerator';
+import { type Property } from '@/types/dashboard';
 
-interface Property {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  area: number;
-  bedrooms: number;
-  bathrooms: number;
-  location: string;
-  amenities: string[];
-  photos: string[];
-  status: string;
-  listingType: string;
-  propertyType: string;
-  slug: string | null;
-  brochureUrl: string | null;
-}
+
 
 interface Agent {
   id: string;
   slug: string;
   user: {
     name: string | null;
+    email: string | null;
   };
+  phone: string | null;
+  city: string | null;
+  area: string | null;
+  experience: number | null;
+  bio: string | null;
 }
 
 interface PropertiesSectionProps {
@@ -52,13 +45,7 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
     }
   };
 
-  const formatArea = (area: number) => {
-    if (area >= 100000) {
-      return `${(area / 100000).toFixed(1)} acres`;
-    } else {
-      return `${area.toLocaleString()} sq ft`;
-    }
-  };
+
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -70,6 +57,15 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
         return 'bg-template-secondary text-white';
       default:
         return 'bg-template-background-accent text-template-text-secondary';
+    }
+  };
+
+  const handleDownloadBrochure = async (property: Property) => {
+    try {
+      await generatePropertyBrochure(property, agent);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Sorry, there was an error generating the brochure. Please try again.');
     }
   };
 
@@ -165,18 +161,15 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
 
                 {/* Property Features */}
                 <div className="flex items-center space-x-4 text-template-text-secondary">
-                  <div className="flex items-center space-x-1">
-                    <Bed className="h-4 w-4" />
-                    <span className="text-sm font-template-primary">{property.bedrooms}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Bath className="h-4 w-4" />
-                    <span className="text-sm font-template-primary">{property.bathrooms}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Square className="h-4 w-4" />
-                    <span className="text-sm font-template-primary">{formatArea(property.area)}</span>
-                  </div>
+                  {getPropertyFeatures(property).slice(0, 3).map((feature, index) => {
+                    const IconComponent = feature.icon;
+                    return (
+                      <div key={index} className="flex items-center space-x-1">
+                        <IconComponent className="h-4 w-4" />
+                        <span className="text-sm font-template-primary">{feature.value}</span>
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* Description */}
@@ -185,7 +178,7 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
                 </p>
 
                 {/* Action Buttons */}
-                <div className="flex space-x-3 pt-2">
+                <div className="flex gap-2 pt-2">
                   <Button 
                     className="flex-1 bg-template-primary hover:bg-template-primary-hover text-white rounded-template-button font-template-primary text-sm transition-all duration-200"
                     onClick={() => {
@@ -197,15 +190,14 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
                   >
                     Get Details
                   </Button>
-                  {property.brochureUrl && (
-                    <Button 
-                      variant="outline"
-                      className="border-template-border text-template-text-secondary hover:text-template-primary hover:border-template-primary rounded-template-button font-template-primary text-sm transition-all duration-200"
-                      onClick={() => window.open(property.brochureUrl!, '_blank')}
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
-                  )}
+                  <Button 
+                    variant="outline"
+                    className="px-3 border-template-border text-template-text-secondary hover:text-template-primary hover:border-template-primary rounded-template-button font-template-primary text-sm transition-all duration-200"
+                    onClick={() => handleDownloadBrochure(property)}
+                    title="Download property brochure"
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             </div>

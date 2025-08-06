@@ -3,6 +3,8 @@
  * Defines the structure and configuration for agent profile templates
  */
 
+import type { Prisma } from '@prisma/client';
+
 export interface TemplateColors {
   // Primary brand colors
   primary: string;
@@ -223,9 +225,9 @@ export interface PropertyData {
   title: string;
   description: string;
   price: number;
-  area: number;
-  bedrooms: number;
-  bathrooms: number;
+  area: number | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
   location: string;
   amenities: string[];
   photos: string[];
@@ -234,6 +236,10 @@ export interface PropertyData {
   propertyType: string;
   slug: string | null;
   brochureUrl: string | null;
+  propertyData?: Prisma.JsonValue;
+  agentId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface TestimonialData {

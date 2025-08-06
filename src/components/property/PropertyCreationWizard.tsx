@@ -32,14 +32,26 @@ export default function PropertyCreationWizard({}: PropertyCreationWizardProps) 
 
   const handleFormSubmit = async (data: BasePropertyFormData) => {
     try {
-      // TODO: Implement property creation API call
-      console.log('Property data to submit:', data);
-      
-      // For now, redirect back to properties list
+      const response = await fetch('/api/properties', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to create property');
+      }
+
+      // Success - redirect to properties list
       router.push('/agent/dashboard/properties');
     } catch (error) {
       console.error('Error creating property:', error);
       // TODO: Show error message to user
+      alert(`Error creating property: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
