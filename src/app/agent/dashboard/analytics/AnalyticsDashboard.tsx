@@ -269,7 +269,7 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
           
           {leadTypeData.length > 0 ? (
             <div className="space-y-3">
-              {leadTypeData.map((lead, index) => (
+              {leadTypeData.map((lead) => (
                 <div key={lead.name} className="flex items-center justify-between">
                   <div className="flex items-center">
                     {getLeadIcon(lead.name)}
@@ -356,7 +356,7 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
           
           {data.topLocations.length > 0 ? (
             <div className="space-y-3">
-              {data.topLocations.slice(0, 3).map((location, index) => (
+              {data.topLocations.slice(0, 3).map((location) => (
                 <div key={location.location} className="flex items-center justify-between">
                   <div className="flex items-center">
                     <MapPin className="w-4 h-4 text-zinc-400 mr-3" />

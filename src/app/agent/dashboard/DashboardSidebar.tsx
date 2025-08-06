@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, Building, User, LogOut, TrendingUp, Settings, HelpCircle, Copy } from 'lucide-react';
+import { Home, Building, User, LogOut, TrendingUp, Settings, HelpCircle, Copy, Palette, MessageSquare, ExternalLink, ChevronDown, ChevronRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import SignOutButton from './SignOutButton';
 import { useInstantNav } from '@/components/InstantNavProvider';
@@ -29,6 +29,7 @@ interface DashboardSidebarProps {
 
 export default function DashboardSidebar({ user, agent }: DashboardSidebarProps) {
   const [copied, setCopied] = useState(false);
+  const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
   const pathname = usePathname();
   const router = useRouter();
   const { pendingPath, navigateInstantly } = useInstantNav();
@@ -39,6 +40,9 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
       '/agent/dashboard',
       '/agent/dashboard/properties', 
       '/agent/dashboard/profile',
+      '/agent/dashboard/customise-website',
+      '/agent/dashboard/customise-website/testimonials',
+      '/agent/dashboard/customise-website/faqs',
       '/agent/dashboard/analytics',
       '/agent/dashboard/settings'
     ];
@@ -78,6 +82,23 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
       icon: User,
     },
     {
+      name: 'Customise Website',
+      href: '/agent/dashboard/customise-website',
+      icon: Palette,
+      subItems: [
+        {
+          name: 'Testimonials',
+          href: '/agent/dashboard/customise-website/testimonials',
+          icon: MessageSquare,
+        },
+        {
+          name: 'FAQs',
+          href: '/agent/dashboard/customise-website/faqs',
+          icon: HelpCircle,
+        },
+      ]
+    },
+    {
       name: 'Analytics',
       href: '/agent/dashboard/analytics',
       icon: TrendingUp,
@@ -103,6 +124,30 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
       return pathname === href;
     }
     return pathname.startsWith(href);
+  };
+
+  // Auto-expand menus when user is on a sub-page
+  useEffect(() => {
+    const newExpandedMenus: Record<string, boolean> = {};
+    
+    navigationItems.forEach((item) => {
+      if (item.subItems) {
+        // Check if current path matches any sub-item
+        const isSubItemActive = item.subItems.some(subItem => pathname.startsWith(subItem.href));
+        if (isSubItemActive) {
+          newExpandedMenus[item.name] = true;
+        }
+      }
+    });
+    
+    setExpandedMenus(prev => ({ ...prev, ...newExpandedMenus }));
+  }, [pathname, navigationItems]);
+
+  const toggleMenu = (menuName: string) => {
+    setExpandedMenus(prev => ({
+      ...prev,
+      [menuName]: !prev[menuName]
+    }));
   };
 
   return (
@@ -136,26 +181,83 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
         {navigationItems.map((item) => {
           const Icon = item.icon;
           const isActive = isActiveLink(item.href);
+          const hasSubItems = item.subItems && item.subItems.length > 0;
           
           return (
-            <button
-              key={item.name}
-              onClick={() => navigateInstantly(item.href)}
-              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
-                isActive
-                  ? 'bg-red-50 text-red-700 border border-red-200'
-                  : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
-              }`}
-            >
-              <Icon className={`w-5 h-5 ${isActive ? 'text-red-600' : 'text-zinc-500'}`} />
-              <span>{item.name}</span>
-            </button>
+            <div key={item.name}>
+              {/* Main Navigation Item */}
+              <div
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  isActive
+                    ? 'bg-red-50 text-red-700 border border-red-200'
+                    : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
+                }`}
+              >
+                <Icon className={`w-5 h-5 ${isActive ? 'text-red-600' : 'text-zinc-500'}`} />
+                <button
+                  onClick={() => navigateInstantly(item.href)}
+                  className="flex-1 text-left hover:underline"
+                >
+                  {item.name}
+                </button>
+                {hasSubItems && (
+                  <button
+                    onClick={() => toggleMenu(item.name)}
+                    className="ml-auto p-1 hover:bg-black/5 rounded transition-colors"
+                  >
+                    {expandedMenus[item.name] ? (
+                      <ChevronDown className={`w-4 h-4 ${isActive ? 'text-red-600' : 'text-zinc-500'}`} />
+                    ) : (
+                      <ChevronRight className={`w-4 h-4 ${isActive ? 'text-red-600' : 'text-zinc-500'}`} />
+                    )}
+                  </button>
+                )}
+              </div>
+              
+              {/* Sub Items */}
+              {hasSubItems && expandedMenus[item.name] && (
+                <div className="ml-4 mt-1 space-y-1 animate-in slide-in-from-top-1 duration-200">
+                  {item.subItems!.map((subItem) => {
+                    const SubIcon = subItem.icon;
+                    const isSubActive = isActiveLink(subItem.href);
+                    
+                    return (
+                      <button
+                        key={subItem.name}
+                        onClick={() => navigateInstantly(subItem.href)}
+                        className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-sm transition-all duration-200 ${
+                          isSubActive
+                            ? 'bg-red-50 text-red-700 border border-red-200'
+                            : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-700'
+                        }`}
+                      >
+                        <SubIcon className={`w-4 h-4 ${isSubActive ? 'text-red-600' : 'text-zinc-400'}`} />
+                        <span>{subItem.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           );
         })}
       </nav>
 
       {/* Bottom Section */}
       <div className="p-4 border-t border-zinc-200 space-y-1">
+        {/* Visit My Website Button */}
+        {agent?.slug && (
+          <Link
+            href={`/${agent.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors w-full"
+          >
+            <ExternalLink className="w-5 h-5 text-white" />
+            <span>Visit My Website</span>
+          </Link>
+        )}
+        
         {/* Copy Website Link Button */}
         {agent?.slug && (
           <button

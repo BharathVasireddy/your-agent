@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, Building, User, TrendingUp, Settings } from 'lucide-react';
+import { Home, Building, User, TrendingUp, Palette } from 'lucide-react';
 import { useInstantNav } from '@/components/InstantNavProvider';
 import { useEffect } from 'react';
 
@@ -16,6 +16,7 @@ export default function DashboardMobileNav() {
       '/agent/dashboard',
       '/agent/dashboard/properties', 
       '/agent/dashboard/profile',
+      '/agent/dashboard/customise-website',
       '/agent/dashboard/analytics',
       '/agent/dashboard/settings'
     ];
@@ -37,6 +38,11 @@ export default function DashboardMobileNav() {
       icon: Building,
     },
     {
+      name: 'Website',
+      href: '/agent/dashboard/customise-website',
+      icon: Palette,
+    },
+    {
       name: 'Analytics',
       href: '/agent/dashboard/analytics',
       icon: TrendingUp,
@@ -45,11 +51,6 @@ export default function DashboardMobileNav() {
       name: 'Profile',
       href: '/agent/dashboard/profile',
       icon: User,
-    },
-    {
-      name: 'Settings',
-      href: '/agent/dashboard/settings',
-      icon: Settings,
     },
   ];
 
