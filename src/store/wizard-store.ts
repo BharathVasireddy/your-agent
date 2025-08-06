@@ -6,9 +6,10 @@ interface AgentProfileState {
   phone: string;
   city: string;
   area: string;
-  theme: string;
+  template: string;
   profilePhotoUrl: string;
   slug: string;
+  dateOfBirth: string;
 }
 
 interface AgentProfileActions {
@@ -22,9 +23,10 @@ const initialState: AgentProfileState = {
   phone: '',
   city: '',
   area: '',
-  theme: 'professional-blue',
+  template: 'classic-professional',
   profilePhotoUrl: '',
   slug: '',
+  dateOfBirth: '',
 };
 
 export const useWizardStore = create<AgentProfileState & AgentProfileActions>((set) => ({

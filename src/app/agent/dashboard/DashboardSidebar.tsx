@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, Building, User, LogOut, TrendingUp, Settings, HelpCircle, Copy, Palette, MessageSquare, ExternalLink, ChevronDown, ChevronRight } from 'lucide-react';
+import { Home, Building, User, LogOut, TrendingUp, Settings, HelpCircle, Copy, Palette, MessageSquare, ExternalLink, ChevronDown, ChevronRight, CreditCard } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import SignOutButton from './SignOutButton';
 import { useInstantNav } from '@/components/InstantNavProvider';
@@ -44,6 +44,7 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
       '/agent/dashboard/customise-website/testimonials',
       '/agent/dashboard/customise-website/faqs',
       '/agent/dashboard/analytics',
+      '/agent/dashboard/subscription',
       '/agent/dashboard/settings'
     ];
     
@@ -102,6 +103,11 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
       name: 'Analytics',
       href: '/agent/dashboard/analytics',
       icon: TrendingUp,
+    },
+    {
+      name: 'Subscription',
+      href: '/agent/dashboard/subscription',
+      icon: CreditCard,
     },
     {
       name: 'Settings',

@@ -4,6 +4,7 @@ import DashboardMobileNav from './DashboardMobileNav';
 import { InstantNavProvider } from '@/components/InstantNavProvider';
 import ContentLoadingWrapper from './ContentLoadingWrapper';
 import { getCachedSession, getCachedAgent } from '@/lib/dashboard-data';
+import { getUserFlowStatus } from '@/lib/userFlow';
 
 export default async function DashboardLayout({
   children,
@@ -15,6 +16,14 @@ export default async function DashboardLayout({
   
   if (!session?.user) {
     redirect('/api/auth/signin');
+  }
+
+  // Check user flow status to ensure they should be on dashboard
+  const flowStatus = await getUserFlowStatus();
+  
+  // If user needs onboarding or subscription, redirect them
+  if (flowStatus.needsSubscription || flowStatus.needsOnboarding) {
+    redirect(flowStatus.redirectTo);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

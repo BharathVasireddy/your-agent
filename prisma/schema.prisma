@@ -16,6 +16,7 @@ model User {
   password      String?
   accounts      Account[]
   agentProfile  Agent?
+  payments      Payment[]
   sessions      Session[]
 }
 
@@ -27,24 +28,25 @@ model Agent {
   bio                String?
   phone              String?
   city               String?
-  area               String?
-  theme              String        @default("professional-blue")
+  dateOfBirth        DateTime?
   isSubscribed       Boolean       @default(false)
   subscriptionEndsAt DateTime?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
   profilePhotoUrl    String?
-  logoUrl            String?
+  area               String?
   heroImage          String?
-  heroTitle          String?
   heroSubtitle       String?
-
+  heroTitle          String?
+  logoUrl            String?
+  template           String        @default("classic-professional")
   user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  faqs               FAQ[]
+  leads              Lead[]
+  pageViews          PageView[]
+  payments           Payment[]
   properties         Property[]
   testimonials       Testimonial[]
-  faqs               FAQ[]
-  pageViews          PageView[]
-  leads              Lead[]
 
   @@index([city, area])
 }
@@ -71,6 +73,25 @@ model Property {
   agent        Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId, slug])
+}
+
+model Payment {
+  id                String   @id @default(cuid())
+  userId            String
+  agentId           String?
+  razorpayOrderId   String   @unique
+  razorpayPaymentId String   @unique
+  amount            Int
+  currency          String   @default("INR")
+  status            String   @default("completed")
+  type              String   @default("subscription")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  agent             Agent?   @relation(fields: [agentId], references: [id])
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([razorpayOrderId])
 }
 
 model Account {
@@ -108,49 +129,49 @@ model VerificationToken {
 }
 
 model Testimonial {
-  id      String @id @default(cuid())
+  id      String  @id @default(cuid())
   agentId String
-  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  text    String @db.Text
+  text    String
   author  String
-  role    String? // Role/title of the person giving the testimonial
-  rating  Int?   // Optional 1-5 star rating
+  role    String?
+  rating  Int?
+  agent   Agent   @relation(fields: [agentId], references: [id], onDelete: Cascade)
 }
 
 model FAQ {
   id       String @id @default(cuid())
   agentId  String
-  agent    Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
   question String
-  answer   String @db.Text
+  answer   String
+  agent    Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
 }
 
 model PageView {
-  id        String   @id @default(cuid())
-  agentId   String
-  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  timestamp DateTime @default(now())
-  source    String   // 'direct', 'social', 'search', 'referral'
-  device    String   // 'mobile', 'desktop', 'tablet'
-  location  String?  // City or region
-  page      String   // 'profile', 'property'
-  propertyId String? // If viewing a specific property
-  ipAddress String?  // For deduplication
-  userAgent String?  // For device detection
+  id         String   @id @default(cuid())
+  agentId    String
+  timestamp  DateTime @default(now())
+  source     String
+  device     String
+  location   String?
+  page       String
+  propertyId String?
+  ipAddress  String?
+  userAgent  String?
+  agent      Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId, timestamp])
   @@index([agentId, page])
 }
 
 model Lead {
-  id        String   @id @default(cuid())
-  agentId   String
-  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  timestamp DateTime @default(now())
-  type      String   // 'CALL', 'WHATSAPP', 'FORM', 'EMAIL'
-  source    String?  // Where the lead came from
-  propertyId String? // If lead was generated from a specific property
-  metadata  String?  // Additional JSON data
+  id         String   @id @default(cuid())
+  agentId    String
+  timestamp  DateTime @default(now())
+  type       String
+  source     String?
+  propertyId String?
+  metadata   String?
+  agent      Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId, timestamp])
   @@index([agentId, type])

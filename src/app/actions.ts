@@ -443,7 +443,7 @@ export async function grantSubscription() {
           slug,
           isSubscribed: true,
           subscriptionEndsAt,
-          theme: "professional-blue",
+          template: "classic-professional",
           bio: `Professional real estate agent with expertise in property sales and customer service.`,
           city: "Your City",
           area: "Central Area"
@@ -501,6 +501,102 @@ export async function subscribeAndRedirect() {
   }
 }
 
+// Razorpay payment integration
+export async function createRazorpayOrder() {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user) {
+      return { success: false, error: 'Authentication required' };
+    }
+
+    // Create Razorpay order
+    const { default: Razorpay } = await import('razorpay');
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID!,
+      key_secret: process.env.RAZORPAY_KEY_SECRET!,
+    });
+
+    const amount = 49900; // ₹499 in paise (smallest currency unit)
+    const currency = 'INR';
+
+    const order = await razorpay.orders.create({
+      amount,
+      currency,
+      receipt: `subscription_${Date.now()}`,
+      notes: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        userId: (session as any).user.id,
+        email: session.user.email,
+        type: 'monthly_subscription'
+      }
+    });
+
+    return { success: true, order };
+  } catch (error) {
+    console.error('Razorpay order creation error:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to create payment order' 
+    };
+  }
+}
+
+export async function verifyPayment(paymentData: {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}) {
+  try {
+    const crypto = await import('crypto');
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user) {
+      return { success: false, error: 'Authentication required' };
+    }
+
+    // Verify signature
+    const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!);
+    hmac.update(paymentData.razorpay_order_id + '|' + paymentData.razorpay_payment_id);
+    const generated_signature = hmac.digest('hex');
+
+    if (generated_signature !== paymentData.razorpay_signature) {
+      return { success: false, error: 'Payment verification failed' };
+    }
+
+    // Payment verified successfully, grant subscription
+    await grantSubscription();
+
+    // Store payment record
+    const userId = session.user?.id as string;
+    const agent = await prisma.agent.findUnique({
+      where: { userId },
+      select: { id: true }
+    });
+
+    await prisma.payment.create({
+      data: {
+        userId,
+        agentId: agent?.id || null,
+        razorpayOrderId: paymentData.razorpay_order_id,
+        razorpayPaymentId: paymentData.razorpay_payment_id,
+        amount: 49900,
+        currency: 'INR',
+        status: 'completed',
+        type: 'subscription'
+      }
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error('Payment verification error:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Payment verification failed' 
+    };
+  }
+}
+
 // Validation schema for agent profile data
 const agentProfileSchema = z.object({
   experience: z.number().min(0).max(50),
@@ -508,9 +604,10 @@ const agentProfileSchema = z.object({
   phone: z.string().min(1, "Phone number is required"),
   city: z.string().min(1, "City is required"),
   area: z.string().optional(),
-  theme: z.string().min(1, "Theme is required"),
+  template: z.string().min(1, "Template is required"),
   profilePhotoUrl: z.string().optional(),
   slug: z.string().min(3, "Profile URL must be at least 3 characters").max(50, "Profile URL must be less than 50 characters"),
+  dateOfBirth: z.string().min(1, "Date of birth is required"),
   logoUrl: z.string().optional(),
   heroImage: z.string().optional(),
   heroTitle: z.string().max(100, "Hero title must be 100 characters or less").optional(),
@@ -523,9 +620,10 @@ export async function updateAgentProfile(data: {
   phone: string;
   city: string;
   area: string;
-  theme: string;
+  template: string;
   profilePhotoUrl: string;
   slug: string;
+  dateOfBirth: string;
   logoUrl?: string;
   heroImage?: string;
   heroTitle?: string;
@@ -575,9 +673,10 @@ export async function updateAgentProfile(data: {
         phone: validatedData.phone,
         city: validatedData.city,
         area: validatedData.area || null,
-        theme: validatedData.theme,
+        template: validatedData.template,
         profilePhotoUrl: validatedData.profilePhotoUrl || null,
         slug: validatedData.slug,
+        dateOfBirth: validatedData.dateOfBirth ? new Date(validatedData.dateOfBirth) : null,
         logoUrl: validatedData.logoUrl || null,
         heroImage: validatedData.heroImage || null,
         heroTitle: validatedData.heroTitle || null,

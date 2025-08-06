@@ -2,9 +2,14 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { getUserFlowStatus } from '@/lib/userFlow';
-import SubscriptionPage from './SubscriptionPage';
+import TestPaymentPage from './TestPaymentPage';
 
-export default async function SubscribePage() {
+export default async function TestPaymentPageWrapper() {
+  // Only allow in development
+  if (process.env.NODE_ENV === 'production') {
+    redirect('/subscribe');
+  }
+
   // Check authentication
   const session = await getServerSession(authOptions);
   
@@ -15,7 +20,7 @@ export default async function SubscribePage() {
   // Check user flow status
   const flowStatus = await getUserFlowStatus();
   
-  // If user is already subscribed, redirect them based on onboarding status
+  // If user is already subscribed, redirect them
   if (!flowStatus.needsSubscription) {
     if (flowStatus.needsOnboarding) {
       redirect('/onboarding/wizard');
@@ -24,5 +29,5 @@ export default async function SubscribePage() {
     }
   }
 
-  return <SubscriptionPage session={session} flowStatus={flowStatus} />;
+  return <TestPaymentPage session={session} flowStatus={flowStatus} />;
 }

@@ -37,9 +37,8 @@ export default function SignInForm() {
       if (result?.error) {
         setError('Invalid email or password');
       } else if (result?.ok) {
-        // Redirect to welcome page to check user flow status
-        const callbackUrl = searchParams.get('callbackUrl') || '/onboarding/welcome';
-        router.push(callbackUrl);
+        // Always redirect to welcome page to check user flow status
+        router.push('/onboarding/welcome');
         router.refresh();
       }
     } catch (error) {

@@ -34,8 +34,9 @@ interface Agent {
   phone: string | null;
   city: string | null;
   area: string | null;
-  theme: string;
+  template: string;
   profilePhotoUrl: string | null;
+  dateOfBirth: Date | null;
   logoUrl: string | null;
   heroImage: string | null;
   heroTitle: string | null;
@@ -63,9 +64,10 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
     phone: agent.phone || '',
     city: agent.city || '',
     area: agent.area || '',
-    theme: agent.theme || 'professional-blue',
+    template: agent.template || 'classic-professional',
     profilePhotoUrl: agent.profilePhotoUrl || '',
     slug: agent.slug || '',
+    dateOfBirth: agent.dateOfBirth ? agent.dateOfBirth.toISOString().split('T')[0] : '',
     logoUrl: agent.logoUrl || '',
     heroImage: agent.heroImage || '',
     heroTitle: agent.heroTitle || '',
@@ -531,7 +533,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
     e.preventDefault();
     
     // Validate required fields
-    if (!formData.city || !formData.phone || !formData.experience) {
+    if (!formData.city || !formData.phone || !formData.experience || !formData.dateOfBirth) {
       toast.error('Please fill in all required fields.');
       return;
     }
@@ -741,6 +743,19 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
               />
             </div>
 
+            {/* Date of Birth */}
+            <div className="space-y-2">
+              <Label htmlFor="dateOfBirth" className="text-zinc-600">Date of Birth *</Label>
+              <Input
+                id="dateOfBirth"
+                type="date"
+                value={formData.dateOfBirth}
+                onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
+                max={new Date().toISOString().split('T')[0]}
+                required
+              />
+            </div>
+
             {/* Phone */}
             <div className="space-y-2">
               <Label htmlFor="phone" className="text-zinc-600">Phone Number *</Label>
@@ -896,32 +911,32 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
           </div>
         </div>
 
-        {/* Theme Selection */}
+        {/* Template Selection */}
         <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
-          <h3 className="text-lg font-semibold text-zinc-950 mb-4">Profile Theme</h3>
+          <h3 className="text-lg font-semibold text-zinc-950 mb-4">Profile Template</h3>
           
-          <RadioGroup value={formData.theme} onValueChange={(value) => handleInputChange('theme', value)}>
+          <RadioGroup value={formData.template} onValueChange={(value) => handleInputChange('template', value)}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
-                <RadioGroupItem value="professional-blue" id="professional-blue" />
+                <RadioGroupItem value="classic-professional" id="classic-professional" />
                 <div className="flex-1">
-                  <Label htmlFor="professional-blue" className="font-medium">Professional Blue</Label>
+                  <Label htmlFor="classic-professional" className="font-medium">Classic Professional</Label>
                   <div className="w-full h-4 bg-blue-500 rounded mt-2"></div>
                 </div>
               </div>
               
               <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
-                <RadioGroupItem value="elegant-dark" id="elegant-dark" />
+                <RadioGroupItem value="modern-minimal" id="modern-minimal" />
                 <div className="flex-1">
-                  <Label htmlFor="elegant-dark" className="font-medium">Elegant Dark</Label>
+                  <Label htmlFor="modern-minimal" className="font-medium">Modern Minimal</Label>
                   <div className="w-full h-4 bg-zinc-800 rounded mt-2"></div>
                 </div>
               </div>
               
               <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
-                <RadioGroupItem value="modern-red" id="modern-red" />
+                <RadioGroupItem value="bold-red" id="bold-red" />
                 <div className="flex-1">
-                  <Label htmlFor="modern-red" className="font-medium">Modern Red</Label>
+                  <Label htmlFor="bold-red" className="font-medium">Bold Red</Label>
                   <div className="w-full h-4 bg-red-600 rounded mt-2"></div>
                 </div>
               </div>

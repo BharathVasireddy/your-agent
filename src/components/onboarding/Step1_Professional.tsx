@@ -16,6 +16,7 @@ export default function Step1_Professional() {
     area,
     phone, 
     slug,
+    dateOfBirth,
     setData 
   } = useWizardStore();
 
@@ -304,6 +305,22 @@ export default function Step1_Professional() {
                   {phoneValidation.message}
                 </p>
               )}
+            </div>
+
+            {/* Date of Birth */}
+            <div className="space-y-2">
+              <Label htmlFor="dateOfBirth" className="text-sm font-medium text-zinc-700">Date of Birth *</Label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                <Input
+                  id="dateOfBirth"
+                  type="date"
+                  value={dateOfBirth}
+                  onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
+                  max={new Date().toISOString().split('T')[0]} // Prevent future dates
+                  className="pl-10 h-11"
+                />
+              </div>
             </div>
 
             {/* Experience */}

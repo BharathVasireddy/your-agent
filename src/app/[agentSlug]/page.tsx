@@ -17,17 +17,24 @@ import Footer from '@/components/sections/Footer';
 import { EditModeProvider } from '@/components/EditModeProvider';
 import EditToggleButton from '@/components/EditToggleButton';
 
-// Theme configuration
-function getThemeClass(theme: string): string {
-  switch (theme) {
+// Template configuration
+function getTemplateClass(template: string): string {
+  switch (template) {
+    case 'classic-professional':
+      return 'template-classic-professional';
+    case 'modern-minimal':
+      return 'template-modern-minimal';
+    case 'bold-red':
+      return 'template-bold-red';
+    // Legacy theme support
     case 'professional-blue':
-      return 'theme-professional-blue';
+      return 'template-classic-professional';
     case 'elegant-dark':
-      return 'theme-elegant-dark';
+      return 'template-modern-minimal';
     case 'modern-red':
-      return 'theme-modern-red';
+      return 'template-bold-red';
     default:
-      return 'theme-professional-blue';
+      return 'template-classic-professional';
   }
 }
 
@@ -161,12 +168,12 @@ export default async function AgentProfilePage({ params }: AgentProfilePageProps
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isOwner = session && (session as any).user && (session as any).user.id === agent.user.id;
 
-  // Get theme class for styling
-  const themeClass = getThemeClass(agent.theme);
+  // Get template class for styling
+  const templateClass = getTemplateClass(agent.template);
 
   return (
     <EditModeProvider isOwner={!!isOwner}>
-      <main className={themeClass}>
+      <main className={templateClass}>
         <Header agent={agent} />
         <HeroSection agent={agent} />
         <PropertiesSection properties={agent.properties} agent={agent} />

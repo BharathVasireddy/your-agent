@@ -4,13 +4,16 @@ import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import SignInForm from './SignInForm';
+import { getUserFlowStatus } from '@/lib/userFlow';
 
 export default async function SignInPage() {
   // Check if user is already signed in
   const session = await getServerSession(authOptions);
   
   if (session?.user) {
-    redirect('/agent/dashboard');
+    // Check their flow status to determine where to redirect
+    const flowStatus = await getUserFlowStatus();
+    redirect(flowStatus.redirectTo);
   }
 
   return (

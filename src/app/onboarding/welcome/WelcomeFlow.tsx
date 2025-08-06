@@ -20,25 +20,12 @@ export default function WelcomeFlow({ session, flowStatus }: WelcomeFlowProps) {
   const [subscriptionComplete, setSubscriptionComplete] = useState(!flowStatus.needsSubscription);
   const [error, setError] = useState<string | null>(null);
 
-  // Auto-subscribe Google users
+  // Redirect to subscription if needed
   useEffect(() => {
-    const autoSubscribe = async () => {
-      if (flowStatus.needsSubscription && !isSubscribing && !subscriptionComplete) {
-        try {
-          setIsSubscribing(true);
-          await grantSubscription();
-          setSubscriptionComplete(true);
-        } catch (error) {
-          console.error('Auto-subscription failed:', error);
-          setError(error instanceof Error ? error.message : 'Failed to activate your account');
-        } finally {
-          setIsSubscribing(false);
-        }
-      }
-    };
-
-    autoSubscribe();
-  }, [flowStatus.needsSubscription, isSubscribing, subscriptionComplete]);
+    if (flowStatus.needsSubscription) {
+      router.push('/subscribe');
+    }
+  }, [flowStatus.needsSubscription, router]);
 
   const handleStartOnboarding = () => {
     router.push('/onboarding/wizard');
