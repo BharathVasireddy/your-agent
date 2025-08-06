@@ -1,13 +1,16 @@
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import prisma from '@/lib/prisma';
 import DashboardContent from './DashboardContent';
 import type { Property } from '@/types/dashboard';
+import { 
+  getCachedSession, 
+  getCachedAgent, 
+  getCachedDashboardProperties,
+  getPropertyCounts 
+} from '@/lib/dashboard-data';
 
 export default async function DashboardPage() {
-  // Get the current user's session
-  const session = await getServerSession(authOptions);
+  // Use cached session
+  const session = await getCachedSession();
   
   if (!session?.user) {
     redirect('/api/auth/signin');
@@ -16,33 +19,23 @@ export default async function DashboardPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userId = (session as any).user.id as string;
 
-  // Fetch agent profile and properties
-  const [agent, properties] = await Promise.all([
-    prisma.agent.findUnique({
-      where: { userId },
-      include: { user: true }
-    }),
-    prisma.property.findMany({
-      where: { agent: { userId } },
-      orderBy: { createdAt: 'desc' },
-      take: 5 // Show only recent 5 properties
-    })
+  // Use cached data - these are now shared across layout and page
+  const [agent, properties, counts] = await Promise.all([
+    getCachedAgent(userId),
+    getCachedDashboardProperties(userId),
+    getPropertyCounts(userId)
   ]);
 
   // Filter properties with valid slugs
   const validProperties = properties.filter(p => p.slug !== null) as Property[];
-  
-  const saleProperties = validProperties.filter(p => p.listingType === 'Sale').length;
-  const rentProperties = validProperties.filter(p => p.listingType === 'Rent').length;
-  const availableProperties = validProperties.filter(p => p.status === 'Available').length;
 
   return (
     <DashboardContent 
       agent={agent}
       properties={validProperties}
-      saleProperties={saleProperties}
-      rentProperties={rentProperties}
-      availableProperties={availableProperties}
+      saleProperties={counts.saleProperties}
+      rentProperties={counts.rentProperties}
+      availableProperties={counts.availableProperties}
     />
   );
 }

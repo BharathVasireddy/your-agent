@@ -1,9 +1,7 @@
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Plus, Home } from 'lucide-react';
-import prisma from '@/lib/prisma';
+import { getCachedSession, getCachedAllProperties } from '@/lib/dashboard-data';
 import MobilePropertiesTabs from '@/components/MobilePropertiesTabs';
 import DesktopPropertiesGrid from '@/components/DesktopPropertiesGrid';
 
@@ -26,8 +24,8 @@ interface Property {
 }
 
 export default async function PropertiesPage() {
-  // Get the current user's session
-  const session = await getServerSession(authOptions);
+  // Use cached session
+  const session = await getCachedSession();
   
   if (!session?.user) {
     redirect('/api/auth/signin');
@@ -36,17 +34,8 @@ export default async function PropertiesPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userId = (session as any).user.id as string;
 
-  // Fetch all properties belonging to this agent
-  const properties = await prisma.property.findMany({
-    where: {
-      agent: {
-        userId: userId
-      }
-    },
-    orderBy: {
-      createdAt: 'desc'
-    }
-  });
+  // Use cached properties
+  const properties = await getCachedAllProperties(userId);
 
   // Filter properties with valid slugs and group by listing type
   const validProperties = properties.filter(p => p.slug !== null) as Property[];

@@ -1,12 +1,10 @@
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import prisma from '@/lib/prisma';
 import ProfileEditForm from './ProfileEditForm';
+import { getCachedSession, getCachedAgentProfile } from '@/lib/dashboard-data';
 
 export default async function ProfilePage() {
-  // Get the current user's session
-  const session = await getServerSession(authOptions);
+  // Use cached session
+  const session = await getCachedSession();
   
   if (!session?.user) {
     redirect('/api/auth/signin');
@@ -15,15 +13,8 @@ export default async function ProfilePage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userId = (session as any).user.id as string;
 
-  // Fetch agent profile with testimonials and FAQs
-  const agent = await prisma.agent.findUnique({
-    where: { userId },
-    include: { 
-      user: true,
-      testimonials: true,
-      faqs: true
-    }
-  });
+  // Use cached agent profile with relations
+  const agent = await getCachedAgentProfile(userId);
 
   if (!agent) {
     redirect('/subscribe');

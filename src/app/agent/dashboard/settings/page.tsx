@@ -1,11 +1,10 @@
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import prisma from '@/lib/prisma';
 import SettingsContent from './SettingsContent';
+import { getCachedSession, getCachedAgent } from '@/lib/dashboard-data';
 
 export default async function SettingsPage() {
-  const session = await getServerSession(authOptions);
+  // Use cached session
+  const session = await getCachedSession();
   
   if (!session?.user) {
     redirect('/api/auth/signin');
@@ -14,33 +13,15 @@ export default async function SettingsPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userId = (session as any).user.id as string;
 
-  // Fetch user and agent data
-  const [user, agent] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        image: true,
-      }
-    }),
-    prisma.agent.findUnique({
-      where: { userId },
-      select: {
-        id: true,
-        slug: true,
-        profilePhotoUrl: true,
-        bio: true,
-        experience: true,
-        city: true,
-        area: true,
-        phone: true,
-        isSubscribed: true,
-        createdAt: true,
-      }
-    })
-  ]);
+  // Use cached agent data - user data is already in session
+  const agent = await getCachedAgent(userId);
+
+  const user = {
+    id: userId,
+    name: session.user.name,
+    email: session.user.email,
+    image: session.user.image,
+  };
 
   if (!user) {
     redirect('/api/auth/signin');

@@ -1,15 +1,13 @@
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import { getAgentAnalytics } from '@/lib/analytics';
+import { getFastAnalytics } from '@/lib/analytics-fast';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import { Suspense } from 'react';
 import { PageLoader } from '@/components/PageLoader';
-
-import prisma from '@/lib/prisma';
+import { getCachedSession, getCachedAgent } from '@/lib/dashboard-data';
 
 export default async function AnalyticsPage() {
-  const session = await getServerSession(authOptions);
+  // Use cached session
+  const session = await getCachedSession();
   
   if (!session?.user) {
     redirect('/api/auth/signin');
@@ -18,18 +16,15 @@ export default async function AnalyticsPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userId = (session as any).user.id as string;
 
-  // Get agent profile to get agent ID for analytics
-  const agent = await prisma.agent.findUnique({
-    where: { userId },
-    select: { id: true }
-  });
+  // Use cached agent lookup
+  const agent = await getCachedAgent(userId);
 
   if (!agent) {
     redirect('/subscribe');
   }
 
-  // Get analytics data for the last 30 days
-  const analyticsData = await getAgentAnalytics(agent.id, 30);
+  // Get fast analytics data - much faster than complex queries
+  const analyticsData = await getFastAnalytics(agent.id, 30);
 
   return (
     <Suspense fallback={<PageLoader message="Loading analytics..." />}>

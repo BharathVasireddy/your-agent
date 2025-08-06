@@ -1,19 +1,17 @@
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import prisma from '@/lib/prisma';
 import DashboardSidebar from './DashboardSidebar';
 import DashboardMobileNav from './DashboardMobileNav';
 import { InstantNavProvider } from '@/components/InstantNavProvider';
 import ContentLoadingWrapper from './ContentLoadingWrapper';
+import { getCachedSession, getCachedAgent } from '@/lib/dashboard-data';
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Check authentication
-  const session = await getServerSession(authOptions);
+  // Use cached session check
+  const session = await getCachedSession();
   
   if (!session?.user) {
     redirect('/api/auth/signin');
@@ -22,11 +20,8 @@ export default async function DashboardLayout({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userId = (session as any).user.id as string;
 
-  // Fetch agent profile for sidebar
-  const agent = await prisma.agent.findUnique({
-    where: { userId },
-    include: { user: true }
-  });
+  // Use cached agent lookup - same cache as used in pages
+  const agent = await getCachedAgent(userId);
 
   return (
     <InstantNavProvider>

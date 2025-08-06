@@ -1177,26 +1177,24 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
       </form>
 
       {/* Sticky Save Button */}
-      <div className="sticky bottom-6 z-50 flex justify-end">
-        <div className="bg-white rounded-full shadow-lg border border-zinc-200 px-2 py-2">
-          <Button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-full shadow-lg"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="w-5 h-5 mr-2" />
-                Save Changes
-              </>
-            )}
-          </Button>
-        </div>
+      <div className="sticky bottom-20 md:bottom-6 z-50 flex justify-end pb-4">
+        <Button
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-full shadow-lg"
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="w-5 h-5 mr-2" />
+              Save Changes
+            </>
+          )}
+        </Button>
       </div>
 
     </div>
