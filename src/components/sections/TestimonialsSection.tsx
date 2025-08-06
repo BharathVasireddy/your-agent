@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { motion } from "motion/react";
+import { TestimonialsColumn } from "@/components/ui/testimonials-columns-1";
 
 interface Testimonial {
   id: string;
   text: string;
   author: string;
+  role?: string;
+  avatar?: string;
   rating: number | null;
 }
 
@@ -15,156 +16,123 @@ interface TestimonialsSectionProps {
   testimonials: Testimonial[];
 }
 
-export default function TestimonialsSection({ testimonials }: TestimonialsSectionProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const nextTestimonial = () => {
-    setCurrentIndex((prev) => (prev + 1) % testimonials.length);
-  };
-
-  const prevTestimonial = () => {
-    setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
-  };
-
-  if (testimonials.length === 0) {
-    return (
-      <section id="testimonials" className="w-full py-16 bg-zinc-50">
-        <div className="w-full px-4 md:px-8 lg:px-12 xl:px-16">
-          <div className="text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-zinc-950 mb-4">Client Testimonials</h2>
-            <p className="text-zinc-600 max-w-2xl mx-auto">
-              Client reviews and testimonials will appear here. Contact me to share your experience!
-            </p>
-          </div>
-        </div>
-      </section>
-    );
+const defaultTestimonials: Testimonial[] = [
+  {
+    id: "1",
+    text: "Buying my vacation home was surprisingly easy. Sophia really knew her stuff and made the whole process super smooth. I didn't have to worry about a thing.",
+    author: "Nathan Harper",
+    role: "Software Developer",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    rating: 5
+  },
+  {
+    id: "2", 
+    text: "Emily walked me through every step of my green home investment. She explained things clearly, gave great advice, and honestly just made it all feel doable.",
+    author: "Logan Price",
+    role: "Environmental Consultant", 
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+    rating: 5
+  },
+  {
+    id: "3",
+    text: "Isabella was amazing — super friendly and detail-oriented. I found the perfect rental without any of the usual stress. It actually felt fun.",
+    author: "Aria Sullivan",
+    role: "Digital Nomad",
+    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=150&h=150&fit=crop&crop=face", 
+    rating: 5
+  },
+  {
+    id: "4",
+    text: "I had no idea where to start with property investment, but Emily made it all make sense. She was patient, clear, and completely on my side the whole time.",
+    author: "Grace Powell",
+    role: "Financial Consultant",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face",
+    rating: 5
+  },
+  {
+    id: "5",
+    text: "I thought the rental process would be a nightmare, but Olivia made it simple. She's sharp, supportive, and gave me a lot of confidence.",
+    author: "Scarlett Mitchell", 
+    role: "Event Planner",
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+    rating: 5
+  },
+  {
+    id: "6",
+    text: "Charlotte totally got what I was looking for. Her design sense and guidance helped me find a home that fits me perfectly. Loved working with her.",
+    author: "Samuel Brooks",
+    role: "Interior Designer", 
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+    rating: 5
+  },
+  {
+    id: "7",
+    text: "The expertise and professionalism shown throughout the entire process was exceptional. Every detail was handled with care and precision.",
+    author: "Maya Chen",
+    role: "Marketing Director",
+    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
+    rating: 5
+  },
+  {
+    id: "8",
+    text: "Outstanding service from start to finish. The team went above and beyond to ensure everything was perfect for our family's needs.",
+    author: "David Rodriguez",
+    role: "Tech Entrepreneur",
+    avatar: "https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?w=150&h=150&fit=crop&crop=face",
+    rating: 5
+  },
+  {
+    id: "9",
+    text: "Professional, reliable, and incredibly knowledgeable. The entire experience exceeded our expectations in every way possible.",
+    author: "Sarah Johnson",
+    role: "Investment Advisor",
+    avatar: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face",
+    rating: 5
   }
+];
 
-  const currentTestimonial = testimonials[currentIndex];
+export default function TestimonialsSection({ testimonials = defaultTestimonials }: TestimonialsSectionProps) {
+  // Convert testimonials to the format expected by TestimonialsColumn
+  const convertedTestimonials = testimonials.map((testimonial, index) => ({
+    text: testimonial.text,
+    image: testimonial.avatar || defaultTestimonials[index % defaultTestimonials.length]?.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    name: testimonial.author,
+    role: testimonial.role || "Satisfied Client",
+  }));
+
+  // Split testimonials into three columns
+  const firstColumn = convertedTestimonials.slice(0, 3);
+  const secondColumn = convertedTestimonials.slice(3, 6);
+  const thirdColumn = convertedTestimonials.slice(6, 9);
 
   return (
-    <section id="testimonials" className="w-full py-16 bg-zinc-50">
+    <section id="testimonials" className="bg-background my-20 relative">
       <div className="w-full px-4 md:px-8 lg:px-12 xl:px-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-zinc-950 mb-4">Client Testimonials</h2>
-          <p className="text-zinc-600 max-w-2xl mx-auto">
-            Don&apos;t just take my word for it. Here&apos;s what my clients have to say about their experience working with me.
-          </p>
-        </div>
-
-        {/* Featured Testimonial */}
-        <div className="max-w-4xl mx-auto mb-12">
-          <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-8 md:p-12 relative">
-            {/* Quote Icon */}
-            <div className="absolute top-6 left-6 text-red-600/20">
-              <Quote className="w-12 h-12" />
-            </div>
-
-            <div className="text-center">
-              {/* Rating */}
-              {currentTestimonial.rating && (
-                <div className="flex justify-center mb-6">
-                  {Array.from({ length: currentTestimonial.rating }).map((_, i) => (
-                    <Star key={i} className="w-6 h-6 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-              )}
-
-              {/* Testimonial Text */}
-              <blockquote className="text-xl md:text-2xl text-zinc-700 leading-relaxed mb-8 italic">
-                &ldquo;{currentTestimonial.text}&rdquo;
-              </blockquote>
-
-              {/* Author */}
-              <div className="text-lg font-semibold text-zinc-950">
-                {currentTestimonial.author}
-              </div>
-            </div>
-
-            {/* Navigation Arrows */}
-            {testimonials.length > 1 && (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={prevTestimonial}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 p-0 rounded-full border-zinc-300 hover:border-red-600 hover:text-red-600"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={nextTestimonial}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 p-0 rounded-full border-zinc-300 hover:border-red-600 hover:text-red-600"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </Button>
-              </>
-            )}
-          </div>
-
-          {/* Dots Indicator */}
-          {testimonials.length > 1 && (
-            <div className="flex justify-center mt-6 space-x-2">
-              {testimonials.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  className={`w-3 h-3 rounded-full transition-colors ${
-                    index === currentIndex ? 'bg-red-600' : 'bg-zinc-300'
-                  }`}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* All Testimonials Grid (if more than 3) */}
-        {testimonials.length > 3 && (
-          <div className="max-w-6xl mx-auto">
-            <h3 className="text-2xl font-bold text-zinc-950 text-center mb-8">More Client Reviews</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {testimonials.slice(0, 6).map((testimonial) => (
-                <div key={testimonial.id} className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
-                  {/* Rating */}
-                  {testimonial.rating && (
-                    <div className="flex mb-4">
-                      {Array.from({ length: testimonial.rating }).map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Text */}
-                  <p className="text-zinc-700 mb-4 text-sm leading-relaxed">
-                    &ldquo;{testimonial.text}&rdquo;
-                  </p>
-
-                  {/* Author */}
-                  <div className="font-semibold text-zinc-950 text-sm">
-                    {testimonial.author}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* CTA */}
-        <div className="text-center mt-12">
-          <Button
-            onClick={() => {
-              const element = document.querySelector('#contact');
-              if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-              }
-            }}
-            className="bg-red-600 hover:bg-red-700 text-white px-8 py-3"
+        <div className="max-w-7xl mx-auto z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            viewport={{ once: true }}
+            className="flex flex-col items-center justify-center max-w-[540px] mx-auto"
           >
-            Share Your Experience
-          </Button>
+            <div className="flex justify-center">
+              <div className="border py-1 px-4 rounded-lg">Testimonials</div>
+            </div>
+
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tighter mt-5">
+              What our clients say
+            </h2>
+            <p className="text-center mt-5 opacity-75">
+              See what our customers have to say about us.
+            </p>
+          </motion.div>
+
+          <div className="flex justify-center gap-6 mt-10 [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)] max-h-[740px] overflow-hidden">
+            <TestimonialsColumn testimonials={firstColumn} duration={15} />
+            <TestimonialsColumn testimonials={secondColumn} className="hidden md:block" duration={19} />
+            <TestimonialsColumn testimonials={thirdColumn} className="hidden lg:block" duration={17} />
+          </div>
         </div>
       </div>
     </section>

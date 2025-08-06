@@ -83,14 +83,15 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
   return (
     <section id="properties" className="w-full py-16 bg-zinc-50">
       <div className="w-full px-4 md:px-8 lg:px-12 xl:px-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-zinc-950 mb-4">Featured Properties</h2>
-          <p className="text-zinc-600 max-w-2xl mx-auto">
-            Discover exceptional properties carefully selected for you. Each listing represents quality, value, and the perfect opportunity for your next home or investment.
-          </p>
-        </div>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-zinc-950 mb-4">Featured Properties</h2>
+            <p className="text-zinc-600 max-w-2xl mx-auto">
+              Discover exceptional properties carefully selected for you. Each listing represents quality, value, and the perfect opportunity for your next home or investment.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {properties.slice(0, 8).map((property) => (
             <div key={property.id} className="bg-white rounded-2xl overflow-hidden transition-all duration-300 group h-full flex flex-col">
               {/* Property Image */}
@@ -199,6 +200,7 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
             </Button>
           </div>
         )}
+        </div>
       </div>
     </section>
   );
