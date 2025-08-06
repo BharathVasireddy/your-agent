@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import EditableWrapper from '@/components/ClientOnlyEditableWrapper';
 import { updateAgentBio } from '@/app/actions';
 import { useParams } from 'next/navigation';
+import Image from 'next/image';
+import { PerformanceSafeguards } from '@/lib/performance';
 
 interface Agent {
   id: string;
@@ -74,11 +76,12 @@ export default function AboutSection({ agent }: AboutSectionProps) {
                 {agent.profilePhotoUrl ? (
                   <div className="w-full max-w-md mx-auto lg:mx-0">
                     <div className="aspect-[4/5] rounded-3xl overflow-hidden">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
+                      <Image
                         src={agent.profilePhotoUrl}
                         alt={agent.user.name || 'Agent photo'}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
+                        {...PerformanceSafeguards.getImageProps('profile')}
                       />
                     </div>
                   </div>

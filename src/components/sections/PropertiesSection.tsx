@@ -3,6 +3,8 @@
 import { Button } from '@/components/ui/button';
 import { Bed, Bath, Home, MapPin, IndianRupee } from 'lucide-react';
 import { generatePropertyBrochure } from '@/lib/pdfGenerator';
+import Image from 'next/image';
+import { PerformanceSafeguards } from '@/lib/performance';
 
 interface Property {
   id: string;
@@ -95,11 +97,12 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
               <div className="relative h-56 overflow-hidden rounded-3xl mx-5 mt-5">
                 {property.photos.length > 0 ? (
                   <>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={property.photos[0]}
                       alt={property.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      {...PerformanceSafeguards.getImageProps('property')}
                     />
                   </>
                 ) : (

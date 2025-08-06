@@ -104,7 +104,7 @@ export async function generatePropertyBrochure(property: Property, agent: Agent)
   yPos = 80;
 
   // Property Image Section
-  if (property.photos.length > 0) {
+  if (property.photos && property.photos.length > 0) {
     try {
       const imageData = await loadImageAsBase64(property.photos[0]);
       if (imageData) {
@@ -215,7 +215,7 @@ export async function generatePropertyBrochure(property: Property, agent: Agent)
   yPos += (descLines.length * 5) + 15;
 
   // Amenities Section
-  if (property.amenities.length > 0) {
+  if (property.amenities && property.amenities.length > 0) {
     pdf.setTextColor(...colors.textLight);
     pdf.setFontSize(11);
     pdf.setFont('helvetica', 'normal');
@@ -230,7 +230,7 @@ export async function generatePropertyBrochure(property: Property, agent: Agent)
     const amenitiesPerRow = 2;
     const colWidth = contentWidth / amenitiesPerRow;
 
-    property.amenities.slice(0, 10).forEach((amenity, index) => {
+    (property.amenities || []).slice(0, 10).forEach((amenity, index) => {
       const col = index % amenitiesPerRow;
       const row = Math.floor(index / amenitiesPerRow);
       const x = margin + (col * colWidth);
@@ -239,7 +239,7 @@ export async function generatePropertyBrochure(property: Property, agent: Agent)
       pdf.text(`• ${amenity}`, x, y);
     });
 
-    yPos += Math.ceil(Math.min(property.amenities.length, 10) / amenitiesPerRow) * 6 + 20;
+    yPos += Math.ceil(Math.min((property.amenities || []).length, 10) / amenitiesPerRow) * 6 + 20;
   }
 
   // Agent Information Section - Modern card design

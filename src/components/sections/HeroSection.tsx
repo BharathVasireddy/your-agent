@@ -5,6 +5,8 @@ import { ArrowRight } from 'lucide-react';
 import EditableWrapper from '@/components/ClientOnlyEditableWrapper';
 import { updateAgentHeroTitle, updateAgentHeroSubtitle } from '@/app/actions';
 import { useParams } from 'next/navigation';
+import Image from 'next/image';
+import { PerformanceSafeguards } from '@/lib/performance';
 
 interface Agent {
   id: string;
@@ -55,24 +57,38 @@ export default function HeroSection({ agent }: HeroSectionProps) {
   return (
     <section id="hero" className="relative h-screen flex flex-col">
       {/* Background Image */}
-      <div className="absolute inset-0 z-0 mx-4 md:mx-8 lg:mx-12 xl:mx-16 mt-6 rounded-3xl overflow-hidden">
+      <div className="absolute inset-0 z-0 mx-2 md:mx-4 mt-4 rounded-3xl overflow-hidden">
         {agent.heroImage ? (
-          <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={agent.heroImage}
-              alt="Hero background"
-              className="w-full h-full object-cover"
-            />
-          </>
-        ) : (
-          // Default background image - Hyderabad skyview building
-          <div 
-            className="w-full h-full bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url('https://upload.wikimedia.org/wikipedia/commons/6/60/Long_exposure_at_The_Skyview_building_in_Hyderabad.jpg')`
-            }}
+          <Image
+            src={agent.heroImage}
+            alt="Hero background"
+            fill
+            className="object-cover"
+            {...PerformanceSafeguards.getImageProps('hero')}
           />
+        ) : (
+          // Default background image - Modern luxury house
+          <>
+            <Image
+              src="/images/hero-background.jpg"
+              alt="Modern luxury house at twilight"
+              fill
+              className="object-cover"
+              {...PerformanceSafeguards.getImageProps('hero')}
+              priority={true}
+              onError={(e) => {
+                // Fallback to gradient background if image fails to load
+                const target = e.target as HTMLElement;
+                target.style.display = 'none';
+                const parent = target.parentElement;
+                if (parent) {
+                  parent.classList.add('bg-gradient-to-br', 'from-blue-900', 'via-blue-800', 'to-indigo-900');
+                }
+              }}
+            />
+            {/* Fallback gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 opacity-0 transition-opacity duration-300" />
+          </>
         )}
         {/* Dark overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
@@ -80,7 +96,7 @@ export default function HeroSection({ agent }: HeroSectionProps) {
 
       {/* Main Hero Content */}
       <div className="relative z-10 flex-1 flex items-center pt-20">
-        <div className="w-full px-8 md:px-12 lg:px-16 xl:px-20 mt-6">
+        <div className="w-full px-8 md:px-12 lg:px-16 mt-4">
           <div className="w-full">
             <div className="flex items-center h-full">
               
