@@ -6,7 +6,7 @@ import { CheckCircle, XCircle, AlertTriangle, Users } from "lucide-react";
 export default function BulkFixUsersPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [auditResults, setAuditResults] = useState<any>(null);
+  const [auditResults, setAuditResults] = useState<{orphanedAgents: Array<{id: string; slug: string; userId: string; isSubscribed: boolean}>} | null>(null);
 
   const handleAuditOrphanedAgents = async () => {
     setIsLoading(true);
@@ -102,7 +102,7 @@ export default function BulkFixUsersPage() {
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Step 1: Audit Orphaned Agents</h2>
             <p className="text-gray-600 mb-4">
-              Find all agent records that don't have corresponding User records.
+              Find all agent records that don&apos;t have corresponding User records.
             </p>
             <button
               onClick={handleAuditOrphanedAgents}
@@ -139,7 +139,7 @@ export default function BulkFixUsersPage() {
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {auditResults.orphanedAgents.map((agent: any) => (
+                        {auditResults.orphanedAgents.map((agent) => (
                           <tr key={agent.id}>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                               {agent.slug}
@@ -213,13 +213,13 @@ export default function BulkFixUsersPage() {
           <div className="bg-blue-50 border-l-4 border-blue-400 p-6">
             <h3 className="text-lg font-medium text-blue-800 mb-2">How This Fix Works</h3>
             <div className="text-sm text-blue-700 space-y-2">
-              <p><strong>1. Identification:</strong> Finds agents with userId that don't exist in User table</p>
+              <p><strong>1. Identification:</strong> Finds agents with userId that don&apos;t exist in User table</p>
               <p><strong>2. User Creation:</strong> Creates minimal User records with the missing userIds</p>
               <p><strong>3. Relationship Restoration:</strong> Fixes foreign key constraints</p>
               <p><strong>4. Access Restoration:</strong> Allows agents to access dashboard and manage profiles</p>
             </div>
             <div className="mt-4 text-sm text-blue-700">
-              <p><strong>Note:</strong> Created User records will have minimal data (just ID). 
+              <p><strong>Note:</strong> Created User records will have minimal data (just ID).
               Users may need to complete their profile information when they next sign in.</p>
             </div>
           </div>

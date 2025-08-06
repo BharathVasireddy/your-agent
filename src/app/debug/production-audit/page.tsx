@@ -84,7 +84,7 @@ export default async function ProductionAuditPage() {
   };
 
   const orphanedAgents = allAgents.filter(agent => !agent.user);
-  const orphanedSessions = allSessions.filter(session => !session.user);
+  // const orphanedSessions = allSessions.filter(session => !session.user);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">

@@ -2,6 +2,15 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
+interface ExtendedSession {
+  user: {
+    id: string;
+    email?: string | null;
+    name?: string | null;
+    image?: string | null;
+  };
+}
+
 export default async function UserMismatchDebugPage() {
   // Get session
   const session = await getServerSession(authOptions);
@@ -44,8 +53,7 @@ export default async function UserMismatchDebugPage() {
   let sessionUserRecord = null;
   
   if (session?.user) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sessionUserId = (session as any).user.id as string;
+    const sessionUserId = (session as unknown as ExtendedSession).user.id;
     
     sessionUserRecord = await prisma.user.findUnique({
       where: { id: sessionUserId },
@@ -69,7 +77,7 @@ export default async function UserMismatchDebugPage() {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Current Session</h2>
             {session?.user ? (
               <div className="space-y-2">
-                <p><strong>Session User ID:</strong> {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */ (session as any).user.id}</p>
+                <p><strong>Session User ID:</strong> {(session as unknown as ExtendedSession).user.id}</p>
                 <p><strong>Email:</strong> {session.user.email}</p>
                 <p><strong>Name:</strong> {session.user.name}</p>
                 <p><strong>User Exists in DB:</strong> 
@@ -140,7 +148,7 @@ export default async function UserMismatchDebugPage() {
               <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
                 <h3 className="font-semibold text-yellow-800">Foreign Key Constraint Issue</h3>
                 <p className="text-yellow-700">
-                  The error occurs because the session user ID doesn't exist in the User table. 
+                  The error occurs because the session user ID doesn&apos;t exist in the User table. 
                   This prevents creating an Agent record due to the foreign key constraint.
                 </p>
               </div>
@@ -149,7 +157,7 @@ export default async function UserMismatchDebugPage() {
                 <div className="bg-red-50 border-l-4 border-red-400 p-4">
                   <h3 className="font-semibold text-red-800">Critical Issue Found</h3>
                   <p className="text-red-700">
-                    Your session user ID <code>{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */ (session as any).user.id}</code> does not exist in the User table.
+                    Your session user ID <code>{(session as unknown as ExtendedSession).user.id}</code> does not exist in the User table.
                     This is why you&apos;re being redirected to /subscribe and why the grantSubscription fails.
                   </p>
                 </div>
@@ -159,7 +167,7 @@ export default async function UserMismatchDebugPage() {
                 <div className="bg-orange-50 border-l-4 border-orange-400 p-4">
                   <h3 className="font-semibold text-orange-800">Orphaned Agents Found</h3>
                   <p className="text-orange-700">
-                    Some agents exist without corresponding users. This can happen when User records are deleted 
+                    Some agents exist without corresponding users. This can happen when User records are deleted
                     but Agent records remain.
                   </p>
                 </div>
