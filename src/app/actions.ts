@@ -673,7 +673,7 @@ Do not include any special formatting, just plain text.`;
 }
 
 // Testimonial Management Actions
-export async function addTestimonial(data: { text: string; author: string; rating?: number | null }) {
+export async function addTestimonial(data: { text: string; author: string; role?: string | null; rating?: number | null }) {
   try {
     const session = await getServerSession(authOptions);
     
@@ -700,6 +700,7 @@ export async function addTestimonial(data: { text: string; author: string; ratin
         agentId: agent.id,
         text: data.text.trim(),
         author: data.author.trim(),
+        role: data.role?.trim() || null,
         rating: data.rating || null
       }
     });
@@ -713,7 +714,7 @@ export async function addTestimonial(data: { text: string; author: string; ratin
   }
 }
 
-export async function updateTestimonial(id: string, data: { text: string; author: string; rating?: number | null }) {
+export async function updateTestimonial(id: string, data: { text: string; author: string; role?: string | null; rating?: number | null }) {
   try {
     const session = await getServerSession(authOptions);
     
@@ -749,6 +750,7 @@ export async function updateTestimonial(id: string, data: { text: string; author
       data: {
         text: data.text.trim(),
         author: data.author.trim(),
+        role: data.role?.trim() || null,
         rating: data.rating || null
       }
     });

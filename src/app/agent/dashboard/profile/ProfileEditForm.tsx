@@ -16,6 +16,7 @@ interface Testimonial {
   id: string;
   text: string;
   author: string;
+  role?: string | null;
   rating: number | null;
 }
 
@@ -88,6 +89,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
   const [testimonialForm, setTestimonialForm] = useState({
     text: '',
     author: '',
+    role: '',
     rating: null as number | null,
     editingId: null as string | null
   });
@@ -388,6 +390,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
       const data = {
         text: testimonialForm.text,
         author: testimonialForm.author,
+        role: testimonialForm.role.trim() || null,
         rating: testimonialForm.rating
       };
 
@@ -413,6 +416,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
       setTestimonialForm({
         text: '',
         author: '',
+        role: '',
         rating: null,
         editingId: null
       });
@@ -429,6 +433,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
     setTestimonialForm({
       text: testimonial.text,
       author: testimonial.author,
+      role: testimonial.role || '',
       rating: testimonial.rating,
       editingId: testimonial.id
     });
@@ -947,7 +952,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
                 />
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="testimonial-author" className="text-zinc-600 mb-2 block">Client Name *</Label>
                   <Input
@@ -956,6 +961,16 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
                     onChange={(e) => setTestimonialForm(prev => ({ ...prev, author: e.target.value }))}
                     placeholder="Client's full name"
                     required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="testimonial-role" className="text-zinc-600 mb-2 block">Client Role/Title</Label>
+                  <Input
+                    id="testimonial-role"
+                    value={testimonialForm.role}
+                    onChange={(e) => setTestimonialForm(prev => ({ ...prev, role: e.target.value }))}
+                    placeholder="e.g., Software Developer"
                   />
                 </div>
                 
@@ -1010,6 +1025,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
                     onClick={() => setTestimonialForm({
                       text: '',
                       author: '',
+                      role: '',
                       rating: null,
                       editingId: null
                     })}
@@ -1040,6 +1056,9 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
                           </div>
                         )}
                       </div>
+                      {testimonial.role && (
+                        <p className="text-zinc-500 text-sm mb-2">{testimonial.role}</p>
+                      )}
                       <p className="text-zinc-700 text-sm">{testimonial.text}</p>
                     </div>
                     <div className="flex space-x-1 ml-4">

@@ -113,6 +113,7 @@ model Testimonial {
   agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
   text    String @db.Text
   author  String
+  role    String? // Role/title of the person giving the testimonial
   rating  Int?   // Optional 1-5 star rating
 }
 

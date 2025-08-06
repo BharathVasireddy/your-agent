@@ -1,13 +1,12 @@
 'use client';
 
-import { motion } from "motion/react";
 import { TestimonialsColumn } from "@/components/ui/testimonials-columns-1";
 
 interface Testimonial {
   id: string;
   text: string;
   author: string;
-  role?: string;
+  role?: string | null;
   avatar?: string;
   rating: number | null;
 }
@@ -93,45 +92,47 @@ const defaultTestimonials: Testimonial[] = [
 
 export default function TestimonialsSection({ testimonials = defaultTestimonials }: TestimonialsSectionProps) {
   // Convert testimonials to the format expected by TestimonialsColumn
-  const convertedTestimonials = testimonials.map((testimonial, index) => ({
+  const convertedTestimonials = testimonials.map((testimonial) => ({
     text: testimonial.text,
-    image: testimonial.avatar || defaultTestimonials[index % defaultTestimonials.length]?.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
     name: testimonial.author,
     role: testimonial.role || "Satisfied Client",
   }));
 
-  // Split testimonials into three columns
-  const firstColumn = convertedTestimonials.slice(0, 3);
-  const secondColumn = convertedTestimonials.slice(3, 6);
-  const thirdColumn = convertedTestimonials.slice(6, 9);
+  // Split testimonials for two columns
+  const firstColumn = convertedTestimonials.slice(0, Math.ceil(convertedTestimonials.length / 2));
+  const secondColumn = convertedTestimonials.slice(Math.ceil(convertedTestimonials.length / 2));
 
   return (
-    <section id="testimonials" className="bg-background my-20 relative">
+    <section id="testimonials" className="w-full py-12 md:py-16 lg:py-20 bg-gray-50">
       <div className="w-full px-4 md:px-8 lg:px-12 xl:px-16">
-        <div className="max-w-7xl mx-auto z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            viewport={{ once: true }}
-            className="flex flex-col items-center justify-center max-w-[540px] mx-auto"
-          >
-            <div className="flex justify-center">
-              <div className="border py-1 px-4 rounded-lg">Testimonials</div>
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-3 gap-8 md:gap-12 lg:gap-16">
+            {/* Left Column - Sticky */}
+            <div className="lg:sticky lg:top-8 lg:self-start">
+              {/* Tag */}
+              <div className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-white rounded-full border border-gray-200 text-xs md:text-sm text-gray-600 mb-6 md:mb-8">
+                What Our Clients Say
+              </div>
+              
+              {/* Heading */}
+              <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-4 md:mb-6">
+                TRUSTED BY MANY,<br />
+                LOVED BY ALL
+              </h2>
+              
+              {/* Description */}
+              <p className="text-gray-600 text-base md:text-lg leading-relaxed">
+                Our clients&apos; success stories reflect our commitment to excellence. See how we&apos;ve helped them find their dream homes, sustainable investments, and perfect getaways.
+              </p>
             </div>
 
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tighter mt-5">
-              What our clients say
-            </h2>
-            <p className="text-center mt-5 opacity-75">
-              See what our customers have to say about us.
-            </p>
-          </motion.div>
-
-          <div className="flex justify-center gap-6 mt-10 [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)] max-h-[740px] overflow-hidden">
-            <TestimonialsColumn testimonials={firstColumn} duration={15} />
-            <TestimonialsColumn testimonials={secondColumn} className="hidden md:block" duration={19} />
-            <TestimonialsColumn testimonials={thirdColumn} className="hidden lg:block" duration={17} />
+            {/* Right Column - Animated Testimonials */}
+            <div className="lg:col-span-2">
+              <div className="flex justify-center gap-6 [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)] max-h-[740px] overflow-hidden">
+                <TestimonialsColumn testimonials={firstColumn} duration={15} />
+                <TestimonialsColumn testimonials={secondColumn} className="hidden md:block" duration={19} />
+              </div>
+            </div>
           </div>
         </div>
       </div>
