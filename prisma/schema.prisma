@@ -43,6 +43,8 @@ model Agent {
   properties         Property[]
   testimonials       Testimonial[]
   faqs               FAQ[]
+  pageViews          PageView[]
+  leads              Lead[]
 
   @@index([city, area])
 }
@@ -120,4 +122,35 @@ model FAQ {
   agent    Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
   question String
   answer   String @db.Text
+}
+
+model PageView {
+  id        String   @id @default(cuid())
+  agentId   String
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  timestamp DateTime @default(now())
+  source    String   // 'direct', 'social', 'search', 'referral'
+  device    String   // 'mobile', 'desktop', 'tablet'
+  location  String?  // City or region
+  page      String   // 'profile', 'property'
+  propertyId String? // If viewing a specific property
+  ipAddress String?  // For deduplication
+  userAgent String?  // For device detection
+
+  @@index([agentId, timestamp])
+  @@index([agentId, page])
+}
+
+model Lead {
+  id        String   @id @default(cuid())
+  agentId   String
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  timestamp DateTime @default(now())
+  type      String   // 'CALL', 'WHATSAPP', 'FORM', 'EMAIL'
+  source    String?  // Where the lead came from
+  propertyId String? // If lead was generated from a specific property
+  metadata  String?  // Additional JSON data
+
+  @@index([agentId, timestamp])
+  @@index([agentId, type])
 }
