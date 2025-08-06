@@ -55,7 +55,7 @@ export default function HeroSection({ agent }: HeroSectionProps) {
   return (
     <section id="hero" className="relative h-screen flex flex-col">
       {/* Background Image */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 mx-4 md:mx-8 lg:mx-12 xl:mx-16 mt-6 rounded-3xl overflow-hidden">
         {agent.heroImage ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -66,11 +66,11 @@ export default function HeroSection({ agent }: HeroSectionProps) {
             />
           </>
         ) : (
-          // Default background image - modern luxury home with evening lighting
+          // Default background image - Hyderabad skyview building
           <div 
             className="w-full h-full bg-cover bg-center bg-no-repeat"
             style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2075&q=80')`
+              backgroundImage: `url('https://upload.wikimedia.org/wikipedia/commons/6/60/Long_exposure_at_The_Skyview_building_in_Hyderabad.jpg')`
             }}
           />
         )}
@@ -80,13 +80,13 @@ export default function HeroSection({ agent }: HeroSectionProps) {
 
       {/* Main Hero Content */}
       <div className="relative z-10 flex-1 flex items-center pt-20">
-        <div className="container mx-auto pl-4 pr-4 md:pl-8 lg:pl-12 xl:pl-16">
+        <div className="w-full px-8 md:px-12 lg:px-16 xl:px-20 mt-6">
           <div className="w-full">
             <div className="flex items-center h-full">
               
-              {/* Main Content */}
-              <div className="text-white w-full">
-                <div className="max-w-4xl">
+              {/* Main Content - Moved to left */}
+              <div className="text-white w-full md:w-3/4 lg:w-2/3">
+                <div className="max-w-3xl">
                   {/* Main Headline */}
                   <EditableWrapper
                     value={agent.heroTitle || 'Trusted Real Estate Advisor'}

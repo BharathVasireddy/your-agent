@@ -65,8 +65,8 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
 
   if (properties.length === 0) {
     return (
-      <section id="properties" className="py-16 bg-zinc-50">
-        <div className="container mx-auto px-4">
+      <section id="properties" className="w-full py-16 bg-zinc-50">
+        <div className="w-full px-4 md:px-8 lg:px-12 xl:px-16">
           <div className="text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-zinc-950 mb-4">Featured Properties</h2>
             <p className="text-zinc-600 max-w-2xl mx-auto">
@@ -79,8 +79,8 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
   }
 
   return (
-    <section id="properties" className="py-16 bg-zinc-50">
-      <div className="container mx-auto px-4">
+    <section id="properties" className="w-full py-16 bg-zinc-50">
+      <div className="w-full px-4 md:px-8 lg:px-12 xl:px-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-zinc-950 mb-4">Featured Properties</h2>
           <p className="text-zinc-600 max-w-2xl mx-auto">
@@ -90,9 +90,9 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {properties.slice(0, 8).map((property) => (
-            <div key={property.id} className="bg-white rounded-2xl overflow-hidden transition-all duration-300 group">
+            <div key={property.id} className="bg-white rounded-2xl overflow-hidden transition-all duration-300 group h-full flex flex-col">
               {/* Property Image */}
-              <div className="relative h-56 overflow-hidden">
+              <div className="relative h-56 overflow-hidden rounded-3xl mx-5 mt-5">
                 {property.photos.length > 0 ? (
                   <>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -117,10 +117,10 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
               </div>
 
               {/* Property Details */}
-              <div className="p-5">
+              <div className="p-5 flex-1 flex flex-col">
                 {/* Location */}
-                <div className="flex items-center text-zinc-500 text-sm mb-2">
-                  <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+                <div className="flex items-center text-zinc-500 text-xs mb-2">
+                  <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
                   <span className="line-clamp-1">{property.location}</span>
                 </div>
 
@@ -152,9 +152,9 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-col gap-2">
+                <div className="flex gap-2 mt-auto">
                   <Button 
-                    className="w-full bg-zinc-950 hover:bg-zinc-800 text-white text-sm font-medium h-10 rounded-full"
+                    className="flex-1 bg-zinc-950 hover:bg-zinc-800 text-white text-sm font-medium h-10 rounded-full"
                     onClick={() => {
                       const element = document.querySelector('#contact');
                       if (element) {
@@ -167,10 +167,10 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
                   
                   <Button 
                     variant="outline" 
-                    className="w-full border-zinc-200 text-zinc-700 hover:bg-zinc-50 text-sm font-medium h-10 rounded-full"
+                    className="flex-1 border-zinc-200 text-zinc-700 hover:bg-zinc-50 text-sm font-medium h-10 rounded-full"
                     onClick={() => handleDownloadBrochure(property)}
                   >
-                    Download brochure
+                    Download property
                   </Button>
                 </div>
               </div>

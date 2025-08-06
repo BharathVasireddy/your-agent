@@ -97,8 +97,8 @@ export default function ContactSection({ agent }: ContactSectionProps) {
   ];
 
   return (
-    <section id="contact" className="py-16 bg-zinc-50">
-      <div className="container mx-auto px-4">
+    <section id="contact" className="w-full py-16 bg-zinc-50">
+      <div className="w-full px-4 md:px-8 lg:px-12 xl:px-16">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-zinc-950 mb-4">Get In Touch</h2>

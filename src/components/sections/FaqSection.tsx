@@ -50,8 +50,8 @@ export default function FaqSection({ faqs }: FaqSectionProps) {
   const displayFaqs = faqs.length > 0 ? faqs : defaultFaqs;
 
   return (
-    <section id="faq" className="py-16 bg-white">
-      <div className="container mx-auto px-4">
+    <section id="faq" className="w-full py-16 bg-white">
+      <div className="w-full px-4 md:px-8 lg:px-12 xl:px-16">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-zinc-950 mb-4">Frequently Asked Questions</h2>
