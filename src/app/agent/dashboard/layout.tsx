@@ -44,7 +44,7 @@ export default async function DashboardLayout({
       {/* Mobile Layout */}
       <div className="md:hidden pb-20">
         {/* Mobile Main Content */}
-        <main>
+        <main className="p-4">
           {children}
         </main>
 
