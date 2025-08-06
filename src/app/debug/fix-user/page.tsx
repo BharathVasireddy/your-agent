@@ -22,6 +22,7 @@ export default function FixUserPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           id: (session as any).user.id,
           email: session.user.email,
           name: session.user.name,
@@ -102,7 +103,7 @@ export default function FixUserPage() {
             <div className="ml-3">
               <h3 className="text-sm font-medium text-yellow-800">Current Session Info</h3>
               <div className="mt-2 text-sm text-yellow-700">
-                <p><strong>User ID:</strong> {(session as any).user.id}</p>
+                <p><strong>User ID:</strong> {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */ (session as any).user.id}</p>
                 <p><strong>Email:</strong> {session.user.email}</p>
                 <p><strong>Name:</strong> {session.user.name}</p>
               </div>

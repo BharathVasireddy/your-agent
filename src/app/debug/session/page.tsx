@@ -142,10 +142,10 @@ DATABASE_URL prefix: ${process.env.DATABASE_URL?.substring(0, 20)}...`}
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">User ID Analysis</h2>
               <div className="space-y-2 text-sm">
-                <p><strong>Session User ID:</strong> {(session as any).user.id}</p>
+                <p><strong>Session User ID:</strong> {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */ (session as any).user.id}</p>
                 <p><strong>Agent Found:</strong> {agentData ? 'Yes' : 'No'}</p>
                 <p><strong>Agent User ID:</strong> {agentData?.userId}</p>
-                <p><strong>IDs Match:</strong> {(session as any).user.id === agentData?.userId ? 'Yes' : 'No'}</p>
+                <p><strong>IDs Match:</strong> {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */ (session as any).user.id === agentData?.userId ? 'Yes' : 'No'}</p>
                 <p><strong>Agent is Subscribed:</strong> {agentData?.isSubscribed ? 'Yes' : 'No'}</p>
                 <p><strong>Subscription Ends:</strong> {agentData?.subscriptionEndsAt ? new Date(agentData.subscriptionEndsAt).toISOString() : 'N/A'}</p>
               </div>

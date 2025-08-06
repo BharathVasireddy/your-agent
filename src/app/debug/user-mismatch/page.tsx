@@ -69,7 +69,7 @@ export default async function UserMismatchDebugPage() {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Current Session</h2>
             {session?.user ? (
               <div className="space-y-2">
-                <p><strong>Session User ID:</strong> {(session as any).user.id}</p>
+                <p><strong>Session User ID:</strong> {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */ (session as any).user.id}</p>
                 <p><strong>Email:</strong> {session.user.email}</p>
                 <p><strong>Name:</strong> {session.user.name}</p>
                 <p><strong>User Exists in DB:</strong> 
@@ -149,8 +149,8 @@ export default async function UserMismatchDebugPage() {
                 <div className="bg-red-50 border-l-4 border-red-400 p-4">
                   <h3 className="font-semibold text-red-800">Critical Issue Found</h3>
                   <p className="text-red-700">
-                    Your session user ID <code>{(session as any).user.id}</code> does not exist in the User table.
-                    This is why you're being redirected to /subscribe and why the grantSubscription fails.
+                    Your session user ID <code>{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */ (session as any).user.id}</code> does not exist in the User table.
+                    This is why you&apos;re being redirected to /subscribe and why the grantSubscription fails.
                   </p>
                 </div>
               )}
@@ -170,7 +170,7 @@ export default async function UserMismatchDebugPage() {
                 <ul className="list-disc list-inside text-blue-700 space-y-1">
                   <li>Re-authenticate to create a proper User record</li>
                   <li>Manually create a User record with your session ID</li>
-                  <li>Check if you're using the correct database in production</li>
+                  <li>Check if you&apos;re using the correct database in production</li>
                   <li>Verify NextAuth is creating User records properly</li>
                 </ul>
               </div>
