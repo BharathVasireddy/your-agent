@@ -32,6 +32,10 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
     };
   }
 
+  // Development bypass: skip subscription requirements if enabled
+  const bypassSubscription = process.env.NODE_ENV === 'development' || 
+    process.env.BYPASS_SUBSCRIPTION === 'true';
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userId = (session as any).user.id as string;
 
@@ -56,15 +60,15 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
   if (!agent) {
     return {
       isAuthenticated: true,
-      needsSubscription: true,
+      needsSubscription: !bypassSubscription,
       needsOnboarding: true,
-      redirectTo: '/onboarding/welcome',
+      redirectTo: bypassSubscription ? '/onboarding/welcome' : '/onboarding/welcome',
       agent: null
     };
   }
 
-  // Has agent but not subscribed - needs subscription
-  if (!agent.isSubscribed) {
+  // Has agent but not subscribed - needs subscription (unless bypassed)
+  if (!agent.isSubscribed && !bypassSubscription) {
     return {
       isAuthenticated: true,
       needsSubscription: true,
@@ -87,7 +91,7 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
     agent.slug
   );
 
-  // Subscribed but needs onboarding
+  // Subscribed (or bypassed) but needs onboarding
   if (!hasCompletedOnboarding) {
     return {
       isAuthenticated: true,
@@ -97,7 +101,7 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
       agent: {
         id: agent.id,
         slug: agent.slug,
-        isSubscribed: agent.isSubscribed,
+        isSubscribed: agent.isSubscribed || bypassSubscription,
         hasCompletedOnboarding: false
       }
     };
@@ -112,7 +116,7 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
     agent: {
       id: agent.id,
       slug: agent.slug,
-      isSubscribed: agent.isSubscribed,
+      isSubscribed: agent.isSubscribed || bypassSubscription,
       hasCompletedOnboarding: true
     }
   };
