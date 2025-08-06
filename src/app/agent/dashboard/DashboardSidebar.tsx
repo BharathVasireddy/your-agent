@@ -65,7 +65,7 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
     }
   };
 
-  const navigationItems = [
+  const navigationItems = useMemo(() => [
     {
       name: 'Dashboard',
       href: '/agent/dashboard',
@@ -108,7 +108,7 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
       href: '/agent/dashboard/settings',
       icon: Settings,
     },
-  ];
+  ], []);
 
   const isActiveLink = (href: string) => {
     // Check if this is the pending navigation target (instant active state)
