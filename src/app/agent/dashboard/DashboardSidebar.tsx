@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { Home, Building, User, LogOut, TrendingUp, Settings, HelpCircle, Copy, Palette, MessageSquare, ExternalLink, ChevronDown, ChevronRight } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import SignOutButton from './SignOutButton';
 import { useInstantNav } from '@/components/InstantNavProvider';
 
