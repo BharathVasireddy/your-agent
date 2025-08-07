@@ -9,7 +9,7 @@ export default async function SubscribePage() {
   const session = await getServerSession(authOptions);
   
   if (!session?.user) {
-    redirect('/auth/signin');
+    redirect('/login');
   }
 
   // Check user flow status

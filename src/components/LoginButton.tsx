@@ -1,15 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { LogIn, User, LayoutDashboard } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import AuthModal from "./AuthModal";
 
 export default function LoginButton() {
   const { data: session, status } = useSession();
-  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Loading state - pulsing gray placeholder
   if (status === "loading") {
@@ -37,7 +34,7 @@ export default function LoginButton() {
         )}
         <Link
           href="/agent/dashboard"
-          className="flex items-center gap-2 h-10 px-6 text-white rounded-md transition-all duration-200 font-medium btn-primary"
+          className="flex items-center gap-2 text-white transition-all duration-200 font-medium btn-primary btn-lg"
           style={{ backgroundColor: "var(--primary-red)" }}
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--primary-red-hover)"}
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--primary-red)"}
@@ -52,21 +49,16 @@ export default function LoginButton() {
   // Not authenticated state - show sign in button
   return (
     <>
-      <button
-        onClick={() => setShowAuthModal(true)}
-        className="flex items-center gap-2 h-10 px-6 text-white rounded-md transition-all duration-200 font-medium btn-primary"
+      <Link
+        href="/login"
+        className="flex items-center gap-2 text-white transition-all duration-200 font-medium btn-primary btn-lg"
         style={{ backgroundColor: "var(--primary-red)" }}
         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--primary-red-hover)"}
         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--primary-red)"}
       >
         <LogIn size={16} />
         Get Started
-      </button>
-      
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
-      />
+      </Link>
     </>
   );
 }

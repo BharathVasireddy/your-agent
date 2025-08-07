@@ -8,7 +8,7 @@ import prisma from "./prisma";
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
   pages: {
-    signIn: '/auth/signin',
+    signIn: '/login',
   },
   callbacks: {
     async signIn() {
@@ -16,9 +16,19 @@ export const authOptions = {
       return true;
     },
     async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
-      // If it's a callback from OAuth, redirect to our flow controller
-      if (url.includes('/api/auth/callback')) {
-        return `${baseUrl}/onboarding/welcome`;
+      // Handle sign-out - redirect to home page
+      if (url.includes('/api/auth/signout')) {
+        return `${baseUrl}/`;
+      }
+      
+      // Handle explicit home page redirects
+      if (url === baseUrl || url === `${baseUrl}/`) {
+        return `${baseUrl}/`;
+      }
+      
+      // Allow smart redirect endpoint specifically
+      if (url === '/api/auth/post-signin-redirect') {
+        return `${baseUrl}/api/auth/post-signin-redirect`;
       }
       
       // If user is trying to access a specific page, allow it
@@ -68,6 +78,7 @@ export const authOptions = {
           const hasGoogle = user.accounts.some(acc => acc.provider === "google");
           if (hasGoogle) {
             console.log(`User ${credentials.email} tried password login but only has Google auth`);
+            throw new Error("GOOGLE_ONLY_ACCOUNT");
           }
           return null;
         }

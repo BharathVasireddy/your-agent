@@ -8,7 +8,7 @@ export default async function OnboardingWizardPage() {
 
   // If user is not authenticated, redirect to sign in
   if (!flowStatus.isAuthenticated) {
-    redirect('/auth/signin');
+    redirect('/login');
   }
 
   // If user needs subscription, redirect to subscribe page

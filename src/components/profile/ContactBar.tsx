@@ -13,7 +13,7 @@ interface ContactBarProps {
 
 export default function ContactBar({ agent }: ContactBarProps) {
   return (
-    <div className="sticky bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t shadow-lg z-50 sm:relative sm:bg-card sm:backdrop-blur-none sm:border sm:rounded-lg sm:shadow-sm">
+    <div className="sticky bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t shadow-lg sm:relative sm:bg-card sm:backdrop-blur-none sm:border sm:rounded-lg sm:shadow-sm" style={{ zIndex: 'var(--z-sticky)' }}>
       <div className="container mx-auto px-4 py-3 sm:py-4">
         <div className="flex gap-3 justify-center">
           {/* Call Now Button */}

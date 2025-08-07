@@ -1,7 +1,8 @@
 'use client';
 
 import { signOut } from 'next-auth/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, X } from 'lucide-react';
 
@@ -14,9 +15,25 @@ export default function SignOutButton({ className, children }: SignOutButtonProp
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (showConfirmation) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showConfirmation]);
+
   const handleSignOutClick = () => {
     console.log('Sign out clicked, showing confirmation modal');
     setShowConfirmation(true);
+    // Add debug logging
+    console.log('showConfirmation state set to:', true);
   };
 
   const handleConfirmSignOut = async () => {
@@ -49,14 +66,23 @@ export default function SignOutButton({ className, children }: SignOutButtonProp
         {children || 'Sign Out'}
       </button>
 
-      {/* Confirmation Modal */}
-      {showConfirmation && (
+      {/* Confirmation Modal - Rendered as Portal */}
+      {showConfirmation && typeof document !== 'undefined' && createPortal(
         <div 
-          className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-75 flex items-center justify-center z-[100] p-4"
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-[99999]"
           onClick={handleCancelSignOut}
+          style={{ 
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 99999,
+            backgroundColor: 'rgba(0, 0, 0, 0.75)'
+          }}
         >
           <div 
-            className="bg-white rounded-lg shadow-2xl max-w-md w-full p-6 relative z-[101]"
+            className="bg-white rounded-lg shadow-2xl max-w-md w-full p-6 relative z-[100000]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
@@ -103,7 +129,8 @@ export default function SignOutButton({ className, children }: SignOutButtonProp
               </Button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

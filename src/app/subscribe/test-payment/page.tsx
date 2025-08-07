@@ -14,7 +14,7 @@ export default async function TestPaymentPageWrapper() {
   const session = await getServerSession(authOptions);
   
   if (!session?.user) {
-    redirect('/auth/signin');
+    redirect('/login');
   }
 
   // Check user flow status

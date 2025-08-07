@@ -27,7 +27,7 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
       isAuthenticated: false,
       needsSubscription: false,
       needsOnboarding: false,
-      redirectTo: '/auth/signin',
+      redirectTo: '/login',
       agent: null
     };
   }
@@ -52,7 +52,7 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
       isAuthenticated: false,
       needsSubscription: false,
       needsOnboarding: false,
-      redirectTo: '/auth/signin?error=session_expired',
+      redirectTo: '/login?error=session_expired',
       agent: null
     };
   }
