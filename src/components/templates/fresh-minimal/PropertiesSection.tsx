@@ -41,7 +41,7 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
     } else if (price >= 100000) {
       return `₹${(price / 100000).toFixed(1)}L`;
     } else {
-      return `₹${price.toLocaleString()}`;
+      return `₹${price.toLocaleString('en-IN')}`;
     }
   };
 

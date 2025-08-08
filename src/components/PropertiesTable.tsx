@@ -13,7 +13,15 @@ interface Row {
   createdAt: string;
 }
 
-export default function PropertiesTable({ rows, total, page, pages }: { rows: Row[]; total: number; page: number; pages: number; }) {
+export default function PropertiesTable({ rows, total, page, pages, basePath, query }: { rows: Row[]; total: number; page: number; pages: number; basePath: string; query: Record<string, string | undefined>; }) {
+  const buildHref = (targetPage: number) => {
+    const sp = new URLSearchParams();
+    Object.entries(query).forEach(([k, v]) => {
+      if (v && v.length) sp.set(k, v);
+    });
+    sp.set('page', String(targetPage));
+    return `${basePath}?${sp.toString()}`;
+  };
   return (
     <div className="bg-white border border-zinc-200 rounded-lg overflow-hidden">
       <div className="overflow-x-auto">
@@ -33,7 +41,7 @@ export default function PropertiesTable({ rows, total, page, pages }: { rows: Ro
             {rows.map((p) => (
               <tr key={p.id} className="border-t border-zinc-200">
                 <td className="px-3 py-2 font-medium text-zinc-900 truncate max-w-[260px]">{p.title}</td>
-                <td className="px-3 py-2 text-right">₹{p.price.toLocaleString()}</td>
+                <td className="px-3 py-2 text-right">₹{p.price.toLocaleString('en-IN')}</td>
                 <td className="px-3 py-2">{p.listingType}</td>
                 <td className="px-3 py-2">{p.propertyType}</td>
                 <td className="px-3 py-2">{p.status}</td>
@@ -54,21 +62,19 @@ export default function PropertiesTable({ rows, total, page, pages }: { rows: Ro
       <div className="flex items-center justify-between px-3 py-2 border-t border-zinc-200 text-sm text-zinc-600">
         <span>Total: {total}</span>
         <div className="space-x-2">
-          <PaginationButton page={page - 1} disabled={page <= 1}>Prev</PaginationButton>
+          <PaginationButton href={buildHref(page - 1)} disabled={page <= 1}>Prev</PaginationButton>
           <span>{page} / {pages}</span>
-          <PaginationButton page={page + 1} disabled={page >= pages}>Next</PaginationButton>
+          <PaginationButton href={buildHref(page + 1)} disabled={page >= pages}>Next</PaginationButton>
         </div>
       </div>
     </div>
   );
 }
 
-function PaginationButton({ page, disabled, children }: { page: number; disabled?: boolean; children: React.ReactNode }) {
-  const url = new URL(typeof window !== 'undefined' ? window.location.href : 'http://localhost');
-  url.searchParams.set('page', String(page));
+function PaginationButton({ href, disabled, children }: { href: string; disabled?: boolean; children: React.ReactNode }) {
   return (
     <Link
-      href={url.pathname + '?' + url.searchParams.toString()}
+      href={href}
       className={`px-2 py-1 rounded border ${disabled ? 'text-zinc-400 border-zinc-200 cursor-not-allowed' : 'text-zinc-700 border-zinc-300 hover:bg-zinc-50'}`}
       aria-disabled={disabled}
       onClick={(e) => { if (disabled) e.preventDefault(); }}

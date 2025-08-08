@@ -239,7 +239,7 @@ export default function DashboardContent({
                   <div>
                     <p className="font-medium text-zinc-950 text-sm">{property.title}</p>
                     <p className="text-xs text-zinc-600">
-                      ₹{property.price.toLocaleString()} • {property.propertyType}
+                      ₹{property.price.toLocaleString('en-IN')} • {property.propertyType}
                     </p>
                   </div>
                   <span className={`px-2 py-1 text-xs rounded-full ${
@@ -291,7 +291,7 @@ export default function DashboardContent({
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-zinc-950 text-sm truncate">{property.title}</p>
                   <p className="text-xs text-zinc-600">
-                    ₹{property.price.toLocaleString()} • {property.propertyType}
+                    ₹{property.price.toLocaleString('en-IN')} • {property.propertyType}
                   </p>
                 </div>
                 <span className={`px-2 py-1 text-xs rounded-full ml-2 ${

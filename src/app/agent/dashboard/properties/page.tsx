@@ -40,7 +40,10 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
   const params = await searchParams;
   const listingType = params.listingType || undefined;
   const propertyType = params.propertyType || undefined;
+  // status filter removed from UI; keep reading for backward compatibility but unused in query build
   const status = params.status || undefined;
+  const q = params.q || undefined;
+  const area = params.area || undefined;
   const view = (params.view as 'cards' | 'table') || 'cards';
   const page = params.page ? parseInt(params.page) || 1 : 1;
 
@@ -48,8 +51,10 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
     listingType,
     propertyType,
     status,
+    area,
     page,
     take: 12,
+    q,
   });
 
   const saleProperties = items.filter(p => p.listingType === 'Sale') as unknown as Property[];
@@ -124,6 +129,14 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
             total={total}
             page={page}
             pages={pages}
+            basePath={"/agent/dashboard/properties"}
+            query={{
+              view,
+              listingType: listingType || undefined,
+              propertyType: propertyType || undefined,
+              area: area || undefined,
+              q: q || undefined,
+            }}
           />
         ) : (
           <DesktopPropertiesGrid 

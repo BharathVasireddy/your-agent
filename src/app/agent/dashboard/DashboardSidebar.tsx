@@ -39,6 +39,24 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
     try { router.prefetch(route); } catch {}
   };
 
+  // Prefetch core dashboard routes on mount for faster first navigation
+  useEffect(() => {
+    const routes = [
+      '/agent/dashboard',
+      '/agent/dashboard/properties',
+      '/agent/dashboard/profile',
+      '/agent/dashboard/customise-website',
+      '/agent/dashboard/customise-website/testimonials',
+      '/agent/dashboard/customise-website/faqs',
+      '/agent/dashboard/analytics',
+      '/agent/dashboard/subscription',
+      '/agent/dashboard/settings',
+    ];
+    routes.forEach((r) => {
+      try { router.prefetch(r); } catch {}
+    });
+  }, [router]);
+
   const copyWebsiteLink = async () => {
     if (!agent?.slug) return;
     
@@ -189,7 +207,7 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
                 <button
                   onMouseEnter={() => prefetchOnHover(item.href)}
                   onClick={() => navigateInstantly(item.href)}
-                  className="flex-1 text-left hover:underline"
+                  className="flex-1 text-left no-underline"
                 >
                   {item.name}
                 </button>

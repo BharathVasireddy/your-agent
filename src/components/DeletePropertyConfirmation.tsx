@@ -115,7 +115,7 @@ export default function DeletePropertyConfirmation({ property }: DeletePropertyC
                     {property.location}
                   </p>
                   <div className="flex items-center gap-4 text-sm text-zinc-500">
-                    <span>₹{property.price.toLocaleString()}</span>
+                    <span>₹{property.price.toLocaleString('en-IN')}</span>
                     <span>{property.area} sq ft</span>
                     <span className="px-2 py-1 bg-zinc-200 rounded-full text-xs">
                       {property.propertyType}

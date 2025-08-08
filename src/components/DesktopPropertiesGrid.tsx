@@ -72,7 +72,7 @@ function PropertyCard({ property }: { property: Property }) {
           {property.title}
         </h3>
         <p className="text-2xl font-bold text-red-600 mb-4">
-          ₹{property.price.toLocaleString()}
+          ₹{property.price.toLocaleString('en-IN')}
           <span className="text-sm font-normal text-zinc-500 ml-1">
             / {property.listingType === 'Rent' ? 'month' : 'total'}
           </span>

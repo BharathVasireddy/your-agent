@@ -95,6 +95,8 @@ export const getFilteredAgentProperties = cache(async (
     listingType?: string;
     propertyType?: string;
     status?: string;
+    area?: string;
+    q?: string;
     page?: number;
     take?: number;
   }
@@ -108,6 +110,16 @@ export const getFilteredAgentProperties = cache(async (
     ...(opts.listingType ? { listingType: opts.listingType } : {}),
     ...(opts.propertyType ? { propertyType: opts.propertyType } : {}),
     ...(opts.status ? { status: opts.status } : {}),
+    ...(opts.area ? { location: { contains: opts.area, mode: 'insensitive' as const } } : {}),
+    ...(opts.q
+      ? {
+          OR: [
+            { title: { contains: opts.q, mode: 'insensitive' as const } },
+            { description: { contains: opts.q, mode: 'insensitive' as const } },
+            { location: { contains: opts.q, mode: 'insensitive' as const } },
+          ],
+        }
+      : {}),
     slug: { not: null as unknown as undefined },
   } as const;
 
