@@ -21,6 +21,7 @@ async function getData(agentSlug: string, propertySlug: string) {
     include: {
       user: { select: { id: true, name: true, email: true, image: true } },
       testimonials: { take: 6, orderBy: { id: 'desc' } },
+      faqs: { take: 10, orderBy: { id: 'desc' } },
     },
   });
 

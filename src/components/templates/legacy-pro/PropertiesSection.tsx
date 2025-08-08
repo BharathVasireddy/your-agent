@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { MapPin, IndianRupee, Download, Home } from 'lucide-react';
 import { generatePropertyBrochure } from '@/lib/pdfGenerator';
 import { getPropertyFeatures } from '@/lib/property-display-utils';
@@ -140,17 +141,26 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
 
                 {/* Action Buttons */}
                 <div className="flex gap-2 mt-auto">
-                  <Button 
-                    className="flex-1 bg-zinc-950 hover:bg-zinc-800 text-white text-sm font-medium h-10 rounded-full"
-                    onClick={() => {
-                      const element = document.querySelector('#contact');
-                      if (element) {
-                        element.scrollIntoView({ behavior: 'smooth' });
-                      }
-                    }}
-                  >
-                    View property
-                  </Button>
+                  {property.slug ? (
+                    <Link 
+                      href={`/${agent.slug}/properties/${property.slug}`}
+                      className="flex-1 inline-flex items-center justify-center bg-zinc-950 hover:bg-zinc-800 text-white text-sm font-medium h-10 rounded-full"
+                    >
+                      View property
+                    </Link>
+                  ) : (
+                    <Button 
+                      className="flex-1 bg-zinc-950 hover:bg-zinc-800 text-white text-sm font-medium h-10 rounded-full"
+                      onClick={() => {
+                        const element = document.querySelector('#contact');
+                        if (element) {
+                          element.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }}
+                    >
+                      View property
+                    </Button>
+                  )}
                   
                   <Button 
                     variant="outline" 

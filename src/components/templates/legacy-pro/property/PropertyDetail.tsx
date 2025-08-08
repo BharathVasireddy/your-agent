@@ -6,6 +6,11 @@ import { MapPin, IndianRupee, Download } from 'lucide-react';
 import { PerformanceSafeguards } from '@/lib/performance';
 import { formatArea, formatPrice, getPropertyFeatures } from '@/lib/property-display-utils';
 import ContactSection from '../ContactSection';
+import Header from '../Header';
+import Footer from '../Footer';
+import PropertiesSection from '../PropertiesSection';
+import TestimonialsSection from '../TestimonialsSection';
+import FaqSection from '../FaqSection';
 
 interface Agent {
   id: string;
@@ -33,6 +38,8 @@ interface Property {
   propertyType: string;
   brochureUrl: string | null;
 }
+interface Testimonial { id: string; text: string; author: string; role?: string | null; rating: number | null }
+interface FAQ { id: string; question: string; answer: string }
 
 export default function LegacyPropertyDetail({ agent, property, similar }: { agent: Agent; property: Property; similar: Property[]; isOwner?: boolean; }) {
   // getPropertyFeatures expects dashboard Property shape which closely matches here
@@ -43,6 +50,8 @@ export default function LegacyPropertyDetail({ agent, property, similar }: { age
 
   return (
     <main className="w-full">
+      {/* Header */}
+      <Header agent={agent as unknown as { id: string; slug: string; phone: string | null; logoUrl: string | null; logoFont?: string | null; logoMaxHeight?: number | null; logoMaxWidth?: number | null; user: { id: string; name: string | null; email: string | null } }} />
       {/* Hero Gallery */}
       <section className="w-full px-4 md:px-8 lg:px-12 xl:px-16 pt-6">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -157,42 +166,35 @@ export default function LegacyPropertyDetail({ agent, property, similar }: { age
         </div>
       </section>
 
-      {/* Similar properties */}
+      {/* Similar properties (reuse template grid) */}
       {similar.length > 0 && (
-        <section className="w-full px-4 md:px-8 lg:px-12 xl:px-16 mt-10">
-          <div className="max-w-7xl mx-auto">
-            <h3 className="text-xl font-semibold text-zinc-950 mb-4">Similar properties</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {similar.map((p) => (
-                <article key={p.id} className="border border-zinc-200 rounded-xl overflow-hidden bg-white">
-                  <Link href={`/${agent.slug}/properties/${p.slug}`} className="block relative aspect-[4/3]">
-                    <Image
-                      src={p.photos?.[0] || '/images/hero-background.jpg'}
-                      alt={p.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      {...PerformanceSafeguards.getImageProps('property')}
-                    />
-                  </Link>
-                  <div className="p-4">
-                    <Link href={`/${agent.slug}/properties/${p.slug}`} className="font-semibold text-zinc-950 line-clamp-1 hover:underline">
-                      {p.title}
-                    </Link>
-                    <div className="mt-1 text-zinc-700 text-sm">{p.location}</div>
-                    <div className="mt-2 text-zinc-900 font-semibold">₹ {formatPrice(p.price)}</div>
-                  </div>
-                </article>
-              ))}
+        <section className="mt-12">
+          <div className="w-full px-4 md:px-8 lg:px-12 xl:px-16">
+            <div className="max-w-7xl mx-auto">
+              <h3 className="text-2xl font-bold text-zinc-950 mb-6">Similar properties</h3>
             </div>
           </div>
+          <PropertiesSection
+            // Casting to existing props to satisfy template component without widening to any globally
+            properties={similar as unknown as unknown as import('@/types/dashboard').Property[]}
+            agent={agent as unknown as { id: string; slug: string; user: { name: string | null; email: string | null }; phone: string | null; city: string | null; area: string | null; experience: number | null; bio: string | null }}
+          />
         </section>
       )}
 
-      {/* Testimonials and contact reuse */}
+      {/* Testimonials */}
+      <TestimonialsSection testimonials={(agent as unknown as { testimonials?: Testimonial[] }).testimonials || []} />
+
+      {/* FAQs */}
+      <FaqSection faqs={(agent as unknown as { faqs?: FAQ[] }).faqs || []} />
+
+      {/* Contact reuse */}
       <section className="mt-12">
         <ContactSection agent={agent as unknown as { id: string; phone: string | null; city: string | null; area: string | null; user: { name: string | null; email: string | null } }} />
       </section>
+
+      {/* Footer */}
+      <Footer />
     </main>
   );
 }

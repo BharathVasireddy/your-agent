@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 type Property = {
   id: string;
@@ -38,6 +39,11 @@ export default function PropertiesSection({ properties }: { properties: Property
                   {p.bathrooms !== null && <span>{p.bathrooms} Bath</span>}
                 </div>
               </div>
+              {p.slug && (
+                <div className="mt-3">
+                  <Link href={`/${/* agent slug not available here */''}`} className="hidden" />
+                </div>
+              )}
             </div>
           </article>
         ))}

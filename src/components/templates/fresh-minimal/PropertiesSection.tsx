@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, IndianRupee, Download } from 'lucide-react';
 import { PerformanceSafeguards } from '@/lib/performance';
@@ -179,17 +180,26 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
 
                 {/* Action Buttons */}
                 <div className="flex gap-2 pt-2">
-                  <Button 
-                    className="flex-1 bg-template-primary hover:bg-template-primary-hover text-white rounded-template-button font-template-primary text-sm transition-all duration-200"
-                    onClick={() => {
-                      const element = document.querySelector('#contact');
-                      if (element) {
-                        element.scrollIntoView({ behavior: 'smooth' });
-                      }
-                    }}
-                  >
-                    Get Details
-                  </Button>
+                  {property.slug ? (
+                    <Link
+                      href={`/${agent.slug}/properties/${property.slug}`}
+                      className="flex-1 inline-flex items-center justify-center bg-template-primary hover:bg-template-primary-hover text-white rounded-template-button font-template-primary text-sm transition-all duration-200"
+                    >
+                      View property
+                    </Link>
+                  ) : (
+                    <Button 
+                      className="flex-1 bg-template-primary hover:bg-template-primary-hover text-white rounded-template-button font-template-primary text-sm transition-all duration-200"
+                      onClick={() => {
+                        const element = document.querySelector('#contact');
+                        if (element) {
+                          element.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }}
+                    >
+                      Get Details
+                    </Button>
+                  )}
                   <Button 
                     variant="outline"
                     className="px-3 border-template-border text-template-text-secondary hover:text-template-primary hover:border-template-primary rounded-template-button font-template-primary text-sm transition-all duration-200"
