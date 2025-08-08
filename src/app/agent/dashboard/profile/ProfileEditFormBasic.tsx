@@ -45,7 +45,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
     phone: agent.phone || '',
     city: agent.city || '',
     area: agent.area || '',
-    template: agent.template === 'fresh-minimal' ? 'fresh-minimal' : 'legacy-pro',
+    template: agent.template || 'legacy-pro',
     profilePhotoUrl: agent.profilePhotoUrl || '',
     logoFont: (agent as unknown as { logoFont?: string }).logoFont || 'sans',
     logoMaxHeight: (agent as unknown as { logoMaxHeight?: number }).logoMaxHeight || 48,
@@ -795,6 +795,8 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
                   <div className="w-full h-4 bg-zinc-700 rounded mt-3"></div>
                 </div>
               </label>
+
+
             </div>
           </RadioGroup>
         </div>

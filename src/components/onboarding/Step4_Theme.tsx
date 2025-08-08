@@ -43,7 +43,8 @@ export default function Step4_Theme() {
       textColor: 'text-zinc-900',
       bgColor: 'bg-zinc-50',
       borderColor: 'border-zinc-200'
-    }
+    },
+
   ];
 
   const handleTemplateChange = (value: string) => {

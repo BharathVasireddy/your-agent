@@ -64,7 +64,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
     phone: agent.phone || '',
     city: agent.city || '',
     area: agent.area || '',
-    template: agent.template || 'classic-professional',
+    template: agent.template || 'legacy-pro',
     profilePhotoUrl: agent.profilePhotoUrl || '',
     slug: agent.slug || '',
     dateOfBirth: agent.dateOfBirth ? agent.dateOfBirth.toISOString().split('T')[0] : '',
@@ -916,38 +916,40 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
           <h3 className="text-lg font-semibold text-zinc-950 mb-4">Profile Template</h3>
           
           <RadioGroup value={formData.template} onValueChange={(value) => handleInputChange('template', value)}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
-                <RadioGroupItem value="classic-professional" id="classic-professional" />
+                <RadioGroupItem value="legacy-pro" id="legacy-pro" />
                 <div className="flex-1">
-                  <Label htmlFor="classic-professional" className="font-medium">Classic Professional</Label>
-                  <div className="w-full h-4 bg-blue-500 rounded mt-2"></div>
+                  <Label htmlFor="legacy-pro" className="font-medium">Legacy Pro</Label>
+                  <div className="w-full h-4 bg-zinc-900 rounded mt-2"></div>
                 </div>
               </div>
               
               <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
-                <RadioGroupItem value="modern-minimal" id="modern-minimal" />
+                <RadioGroupItem value="fresh-minimal" id="fresh-minimal" />
                 <div className="flex-1">
-                  <Label htmlFor="modern-minimal" className="font-medium">Modern Minimal</Label>
+                  <Label htmlFor="fresh-minimal" className="font-medium">Fresh Minimal</Label>
+                  <div className="w-full h-4 bg-green-600 rounded mt-2"></div>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
+                <RadioGroupItem value="mono-modern" id="mono-modern" />
+                <div className="flex-1">
+                  <Label htmlFor="mono-modern" className="font-medium">Mono Modern</Label>
                   <div className="w-full h-4 bg-zinc-800 rounded mt-2"></div>
                 </div>
               </div>
               
               <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
-                <RadioGroupItem value="bold-red" id="bold-red" />
+                <RadioGroupItem value="mono-elite" id="mono-elite" />
                 <div className="flex-1">
-                  <Label htmlFor="bold-red" className="font-medium">Bold Red</Label>
-                  <div className="w-full h-4 bg-red-600 rounded mt-2"></div>
+                  <Label htmlFor="mono-elite" className="font-medium">Mono Elite</Label>
+                  <div className="w-full h-4 bg-zinc-700 rounded mt-2"></div>
                 </div>
               </div>
-              
-              <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
-                <RadioGroupItem value="black-white" id="black-white" />
-                <div className="flex-1">
-                  <Label htmlFor="black-white" className="font-medium">Black & White</Label>
-                  <div className="w-full h-4 bg-black rounded mt-2"></div>
-                </div>
-              </div>
+
+
             </div>
           </RadioGroup>
         </div>
