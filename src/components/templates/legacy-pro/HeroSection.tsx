@@ -70,14 +70,12 @@ export default async function HeroSection({ agent }: HeroSectionProps) {
             <div className="flex items-center h-full">
               <div className="text-white w-full md:w-3/4 lg:w-2/3">
                 <div className="max-w-3xl">
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 leading-tight">
+                  <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold mb-5 leading-tight">
                     {agent.heroTitle || 'Trusted Real Estate Advisor'}
-                    <br />
-                    <span className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl">in {agent.city || 'Hyderabad'}</span>
                   </h1>
-                  <p className="text-lg md:text-xl lg:text-2xl mb-8 text-white/90 font-light max-w-2xl">
+                  <p className="text-base md:text-lg lg:text-xl mb-8 text-white max-w-2xl font-medium">
                     {agent.heroSubtitle ||
-                      `Luxury Homes & Premium Properties${agent.area ? ` in ${agent.area}` : ' in Beverly Hills'}`}
+                      `Luxury Homes & Premium Properties${agent.area ? ` in ${agent.area}` : ''}`}
                   </p>
                   {/* CTA Buttons */}
                   <div className="flex flex-wrap gap-3 mb-10">

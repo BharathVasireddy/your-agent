@@ -13,12 +13,12 @@ export default function HeroSection({ agent }: { agent: { heroTitle: string | nu
         <div className="grid md:grid-cols-12 gap-10 items-center">
           <div className="md:col-span-6">
             <BlurFade inView>
-              <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-zinc-950 leading-tight">
+              <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-zinc-950 leading-tight">
                 {agent.heroTitle || 'Modern Real Estate Portfolio'}
               </h1>
             </BlurFade>
             <BlurFade delay={0.1} inView>
-              <p className="mt-4 text-zinc-700 text-lg md:text-xl max-w-prose">
+              <p className="mt-3 text-zinc-800 text-base md:text-lg max-w-prose">
                 {agent.heroSubtitle || 'A refined, fast, and distraction-free showcase of listings and expertise.'}
               </p>
             </BlurFade>

@@ -44,10 +44,10 @@ export default function HeroSection({ agent }: HeroSectionProps) {
           {/* Left Content */}
           <div className="space-y-template-element">
             <div className="space-y-6">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-template-primary font-bold text-template-text-primary leading-tight">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-template-primary font-semibold text-template-text-primary leading-tight">
                 {agent.heroTitle || `Professional Real Estate Services in ${agent.city || 'Your Area'}`}
               </h1>
-              <p className="text-lg md:text-xl text-template-text-secondary font-template-primary leading-relaxed max-w-xl">
+              <p className="text-base md:text-lg text-template-text-primary font-template-primary leading-relaxed max-w-xl">
                 {agent.heroSubtitle || `Your trusted partner for buying, selling, and investing in real estate. ${agent.experience ? `With ${agent.experience} years of experience` : 'Expert guidance'} to help you make the right decisions.`}
               </p>
             </div>

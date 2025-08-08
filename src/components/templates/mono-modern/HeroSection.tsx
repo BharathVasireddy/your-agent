@@ -6,10 +6,10 @@ export default function HeroSection({ agent }: { agent: { heroTitle: string | nu
     <section className="relative border-b border-zinc-200">
       <div className="mx-auto max-w-6xl px-4 py-16 grid md:grid-cols-12 gap-8 items-center">
         <div className="md:col-span-6">
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-zinc-950 leading-tight">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-zinc-950 leading-tight">
             {agent.heroTitle || 'Properties, Perfectly Presented'}
           </h1>
-          <p className="mt-4 text-zinc-700 text-base md:text-lg">
+          <p className="mt-3 text-zinc-800 text-sm md:text-base">
             {agent.heroSubtitle || 'A clean, modern showcase of listings and expertise. No distractions.'}
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
