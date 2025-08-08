@@ -77,13 +77,58 @@ export async function POST(request: NextRequest) {
       propertyData.bedrooms = null;
       propertyData.bathrooms = null;
       propertyData.propertyData = data.agriculturalLandData;
-    } else {
-      // For other property types, use default values (these will be required when we implement other property types)
-      propertyData.area = 0; // TODO: Get this from property-specific form data
+    } else if (data.propertyType === 'Plot' && data.plotData) {
+      // For plots, convert square yards to square feet (1 sq yd = 9 sq ft)
+      const totalSqFt = Math.round(data.plotData.extentSqYds * 9);
+
+      propertyData.area = totalSqFt;
       propertyData.bedrooms = null;
       propertyData.bathrooms = null;
+      propertyData.propertyData = data.plotData;
+    } else if (data.propertyType === 'Flat/Apartment' && data.flatApartmentData) {
+      // For flats, area is provided directly in square feet
+      propertyData.area = data.flatApartmentData.flatAreaSqFt || 0;
       
-      // TODO: Add handling for other property types when implemented
+      // Extract BHK number from string like "2BHK"
+      const bhkMatch = (data.flatApartmentData.bhk || '').match(/(\d+)/);
+      const bhkNumber = bhkMatch ? parseInt(bhkMatch[1]) : null;
+      propertyData.bedrooms = bhkNumber;
+      
+      // Bathrooms not specified in fields; keep null
+      propertyData.bathrooms = null;
+      propertyData.propertyData = data.flatApartmentData;
+    } else if (data.propertyType === 'Villa/Independent House' && data.villaIndependentHouseData) {
+      // For villas, area is provided directly in square feet
+      propertyData.area = data.villaIndependentHouseData.villaAreaSqFt || 0;
+
+      // Extract BHK number from string like "3BHK"
+      const bhkMatch = (data.villaIndependentHouseData.bhk || '').match(/(\d+)/);
+      const bhkNumber = bhkMatch ? parseInt(bhkMatch[1]) : null;
+      propertyData.bedrooms = bhkNumber;
+
+      // Bathrooms not specified separately; keep null
+      propertyData.bathrooms = null;
+      propertyData.propertyData = data.villaIndependentHouseData;
+    } else if (data.propertyType === 'IT Commercial Space' && data.itCommercialSpaceData) {
+      // For IT commercial space, set area to per-unit area for consistency
+      propertyData.area = data.itCommercialSpaceData.perUnitAreaSqFt || 0;
+      propertyData.bedrooms = null;
+      propertyData.bathrooms = null;
+      propertyData.propertyData = data.itCommercialSpaceData;
+    } else if (data.propertyType === 'Farm House' && data.farmHouseData) {
+      // For farm houses, area is the overall area in sq.ft
+      propertyData.area = data.farmHouseData.overallAreaSqFt || 0;
+      // Derive bedrooms from BHK
+      const bhkMatch = (data.farmHouseData.bhk || '').match(/(\d+)/);
+      const bhkNumber = bhkMatch ? parseInt(bhkMatch[1]) : null;
+      propertyData.bedrooms = bhkNumber;
+      propertyData.bathrooms = null;
+      propertyData.propertyData = data.farmHouseData;
+    } else {
+      // For other property types, use default values until implemented
+      propertyData.area = 0;
+      propertyData.bedrooms = null;
+      propertyData.bathrooms = null;
     }
 
     // Create the property

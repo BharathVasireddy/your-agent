@@ -44,7 +44,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
     phone: agent.phone || '',
     city: agent.city || '',
     area: agent.area || '',
-    template: agent.template || 'classic-professional',
+    template: agent.template === 'fresh-minimal' ? 'fresh-minimal' : 'legacy-pro',
     profilePhotoUrl: agent.profilePhotoUrl || '',
     slug: agent.slug || '',
     dateOfBirth: agent.dateOfBirth ? agent.dateOfBirth.toISOString().split('T')[0] : '',
@@ -634,40 +634,85 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
         {/* Template Selection */}
         <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
           <h3 className="text-lg font-semibold text-zinc-950 mb-4">Profile Template</h3>
-          
           <RadioGroup value={formData.template} onValueChange={(value) => handleInputChange('template', value)}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
-                <RadioGroupItem value="classic-professional" id="classic-professional" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Legacy Pro */}
+              <label
+                htmlFor="legacy-pro"
+                className={`flex items-center space-x-4 p-4 rounded-lg border-2 transition-all cursor-pointer ${formData.template === 'legacy-pro' ? 'border-red-200 bg-red-50' : 'border-zinc-200 hover:bg-zinc-50'}`}
+              >
+                <RadioGroupItem value="legacy-pro" id="legacy-pro" />
                 <div className="flex-1">
-                  <Label htmlFor="classic-professional" className="font-medium">Classic Professional</Label>
-                  <div className="w-full h-4 bg-blue-500 rounded mt-2"></div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-zinc-950">Legacy Pro</p>
+                      <p className="text-sm text-zinc-600">Solid, professional layout with proven UX</p>
+                    </div>
+                    <a
+                      href="/preview?template=legacy-pro"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="px-3 py-1 rounded text-xs font-medium bg-zinc-50 text-zinc-900 border border-zinc-200 hover:opacity-90"
+                    >
+                      Preview
+                    </a>
+                  </div>
+                  <div className="w-full h-4 bg-zinc-900 rounded mt-3"></div>
                 </div>
-              </div>
-              
-              <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
-                <RadioGroupItem value="modern-minimal" id="modern-minimal" />
+              </label>
+
+              {/* Fresh Minimal */}
+              <label
+                htmlFor="fresh-minimal"
+                className={`flex items-center space-x-4 p-4 rounded-lg border-2 transition-all cursor-pointer ${formData.template === 'fresh-minimal' ? 'border-red-200 bg-red-50' : 'border-zinc-200 hover:bg-zinc-50'}`}
+              >
+                <RadioGroupItem value="fresh-minimal" id="fresh-minimal" />
                 <div className="flex-1">
-                  <Label htmlFor="modern-minimal" className="font-medium">Modern Minimal</Label>
-                  <div className="w-full h-4 bg-zinc-800 rounded mt-2"></div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-zinc-950">Fresh Minimal</p>
+                      <p className="text-sm text-zinc-600">Light, airy design with minimal aesthetic</p>
+                    </div>
+                    <a
+                      href="/preview?template=fresh-minimal"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="px-3 py-1 rounded text-xs font-medium bg-green-50 text-green-700 border border-green-200 hover:opacity-90"
+                    >
+                      Preview
+                    </a>
+                  </div>
+                  <div className="w-full h-4 bg-green-600 rounded mt-3"></div>
                 </div>
-              </div>
-              
-              <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
-                <RadioGroupItem value="bold-red" id="bold-red" />
+              </label>
+
+              {/* Mono Modern */}
+              <label
+                htmlFor="mono-modern"
+                className={`flex items-center space-x-4 p-4 rounded-lg border-2 transition-all cursor-pointer ${formData.template === 'mono-modern' ? 'border-red-200 bg-red-50' : 'border-zinc-200 hover:bg-zinc-50'}`}
+              >
+                <RadioGroupItem value="mono-modern" id="mono-modern" />
                 <div className="flex-1">
-                  <Label htmlFor="bold-red" className="font-medium">Bold Red</Label>
-                  <div className="w-full h-4 bg-red-600 rounded mt-2"></div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-zinc-950">Mono Modern</p>
+                      <p className="text-sm text-zinc-600">Monochrome, editorial layout with strong typography</p>
+                    </div>
+                    <a
+                      href="/preview?template=mono-modern"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="px-3 py-1 rounded text-xs font-medium bg-zinc-50 text-zinc-900 border border-zinc-200 hover:opacity-90"
+                    >
+                      Preview
+                    </a>
+                  </div>
+                  <div className="w-full h-4 bg-zinc-800 rounded mt-3"></div>
                 </div>
-              </div>
-              
-              <div className="flex items-center space-x-2 p-4 border border-zinc-200 rounded-lg">
-                <RadioGroupItem value="black-white" id="black-white" />
-                <div className="flex-1">
-                  <Label htmlFor="black-white" className="font-medium">Black & White</Label>
-                  <div className="w-full h-4 bg-black rounded mt-2"></div>
-                </div>
-              </div>
+              </label>
             </div>
           </RadioGroup>
         </div>

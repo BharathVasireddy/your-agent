@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { NextResponse } from 'next/server';
+import { PerformanceUtils } from '@/lib/performance';
 import { 
   getCachedAgent, 
   getCachedDashboardProperties,
@@ -28,11 +29,15 @@ export async function GET() {
     // Filter properties with valid slugs
     const validProperties = properties.filter(p => p.slug !== null);
 
-    return NextResponse.json({
+    const res = NextResponse.json({
       agent,
       properties: validProperties,
       counts
     });
+    if (PerformanceUtils.isOptimizationEnabled('caching')) {
+      res.headers.set('Cache-Control', `public, s-maxage=${PerformanceUtils.getRevalidateTime() || 60}, stale-while-revalidate=300`);
+    }
+    return res;
 
   } catch (error) {
     console.error('Dashboard data API error:', error);

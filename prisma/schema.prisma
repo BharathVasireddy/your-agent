@@ -39,7 +39,7 @@ model Agent {
   heroSubtitle       String?
   heroTitle          String?
   logoUrl            String?
-  template           String        @default("classic-professional")
+  template           String        @default("fresh-minimal")
   user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   faqs               FAQ[]
   leads              Lead[]

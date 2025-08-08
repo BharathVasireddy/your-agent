@@ -9,13 +9,13 @@ export default function Step4_Theme() {
 
   const templates = [
     {
-      value: 'classic-professional',
-      name: 'Classic Professional',
-      description: 'Traditional and trustworthy with blue accents',
-      preview: 'bg-blue-500',
-      textColor: 'text-blue-700',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200'
+      value: 'legacy-pro',
+      name: 'Legacy Pro',
+      description: 'Solid, professional layout with proven UX',
+      preview: 'bg-zinc-900',
+      textColor: 'text-zinc-900',
+      bgColor: 'bg-zinc-50',
+      borderColor: 'border-zinc-200'
     },
     {
       value: 'fresh-minimal',
@@ -27,31 +27,13 @@ export default function Step4_Theme() {
       borderColor: 'border-green-200'
     },
     {
-      value: 'modern-minimal',
-      name: 'Modern Minimal',
-      description: 'Clean and contemporary with emphasis on whitespace',
+      value: 'mono-modern',
+      name: 'Mono Modern',
+      description: 'Monochrome, editorial layout with strong typography',
       preview: 'bg-zinc-800',
-      textColor: 'text-zinc-800',
+      textColor: 'text-zinc-900',
       bgColor: 'bg-zinc-50',
       borderColor: 'border-zinc-200'
-    },
-    {
-      value: 'bold-red',
-      name: 'Bold Red',
-      description: 'Energetic and attention-grabbing with red accents',
-      preview: 'bg-red-600',
-      textColor: 'text-red-700',
-      bgColor: 'bg-red-50',
-      borderColor: 'border-red-200'
-    },
-    {
-      value: 'black-white',
-      name: 'Black & White',
-      description: 'Clean monochrome with full-width header and rounded buttons',
-      preview: 'bg-black',
-      textColor: 'text-black',
-      bgColor: 'bg-gray-50',
-      borderColor: 'border-gray-200'
     }
   ];
 
@@ -102,10 +84,16 @@ export default function Step4_Theme() {
                     <p className="text-sm text-zinc-600 mt-1">{templateOption.description}</p>
                   </div>
                   
-                  {/* Preview Badge */}
-                  <div className={`px-3 py-1 rounded text-xs font-medium ${templateOption.bgColor} ${templateOption.textColor} ${templateOption.borderColor} border`}>
+                  {/* Live Preview Link */}
+                  <a
+                    href={`/preview?template=${templateOption.value}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`px-3 py-1 rounded text-xs font-medium ${templateOption.bgColor} ${templateOption.textColor} ${templateOption.borderColor} border hover:opacity-90 transition`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     Preview
-                  </div>
+                  </a>
                 </label>
               </div>
             </div>

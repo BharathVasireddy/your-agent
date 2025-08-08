@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Sparkles, Upload, X, HelpCircle } from 'lucide-react';
-import { type BasePropertyFormData, type ListingType, type PropertyType, type AgriculturalLandData, FACING_DIRECTIONS, AGRICULTURAL_PURPOSES } from '@/types/property';
+import { type BasePropertyFormData, type ListingType, type PropertyType, type AgriculturalLandData, type PlotData, type FlatApartmentData, type ITCommercialSpaceData, type VillaIndependentHouseData, type FarmHouseData, FACING_DIRECTIONS, AGRICULTURAL_PURPOSES, PLOT_APPROVALS, BHK_OPTIONS, COMMUNITY_STATUS, TRANSACTION_TYPES, FLAT_CONSTRUCTION_STATUS, FURNISHING_STATUS } from '@/types/property';
 import { type Property } from '@/types/dashboard';
 
 interface PropertyEditWizardProps {
@@ -31,11 +31,15 @@ export default function PropertyEditWizard({ property }: PropertyEditWizardProps
     status: property.status,
     listingType: property.listingType as ListingType,
     propertyType: property.propertyType as PropertyType,
-    agriculturalLandData: (property.propertyData as unknown as AgriculturalLandData) || undefined
+    agriculturalLandData: property.propertyType === 'Agricultural Land' ? (property.propertyData as unknown as AgriculturalLandData) : undefined,
+    plotData: property.propertyType === 'Plot' ? (property.propertyData as unknown as PlotData) : undefined,
+    villaIndependentHouseData: property.propertyType === 'Villa/Independent House' ? (property.propertyData as unknown as VillaIndependentHouseData) : undefined
   });
 
   // Initialize agricultural land data if it exists
-  const propertyDataObj = property.propertyData as unknown as AgriculturalLandData | null;
+  const propertyDataObj = property.propertyType === 'Agricultural Land'
+    ? (property.propertyData as unknown as AgriculturalLandData | null)
+    : null;
   const [agriculturalData, setAgriculturalData] = useState<AgriculturalLandData>({
     village: propertyDataObj?.village || '',
     city: propertyDataObj?.city || '',
@@ -47,6 +51,99 @@ export default function PropertyEditWizard({ property }: PropertyEditWizardProps
     boundaryWall: propertyDataObj?.boundaryWall || false,
     openSides: propertyDataObj?.openSides || 0,
     purpose: propertyDataObj?.purpose || 'Farming'
+  });
+
+  // Initialize plot data if property is Plot
+  const propertyPlotDataObj = property.propertyType === 'Plot'
+    ? (property.propertyData as unknown as PlotData | null)
+    : null;
+  const [plotData, setPlotData] = useState<PlotData>({
+    village: propertyPlotDataObj?.village || '',
+    city: propertyPlotDataObj?.city || '',
+    district: propertyPlotDataObj?.district || '',
+    extentSqYds: propertyPlotDataObj?.extentSqYds || 0,
+    facing: propertyPlotDataObj?.facing || 'East',
+    roadWidth: propertyPlotDataObj?.roadWidth || 0,
+    openSides: propertyPlotDataObj?.openSides || 0,
+    approval: propertyPlotDataObj?.approval || 'HMDA',
+    layoutName: propertyPlotDataObj?.layoutName || ''
+  });
+
+  // Initialize villa data if property is Villa/Independent House
+  const propertyVillaDataObj = property.propertyType === 'Villa/Independent House'
+    ? (property.propertyData as unknown as VillaIndependentHouseData | null)
+    : null;
+  const [villaData, setVillaData] = useState<VillaIndependentHouseData>({
+    city: propertyVillaDataObj?.city || '',
+    projectName: propertyVillaDataObj?.projectName || '',
+    projectArea: propertyVillaDataObj?.projectArea || '',
+    numUnits: propertyVillaDataObj?.numUnits || 0,
+    villaAreaSqFt: propertyVillaDataObj?.villaAreaSqFt || 0,
+    bhk: propertyVillaDataObj?.bhk || '2BHK',
+    communityStatus: propertyVillaDataObj?.communityStatus || 'Standalone',
+    constructionStatus: propertyVillaDataObj?.constructionStatus || 'Ready to move',
+    handoverInMonths: propertyVillaDataObj?.handoverInMonths,
+    numFloors: propertyVillaDataObj?.numFloors || 0,
+    parkingCount: propertyVillaDataObj?.parkingCount || 0,
+    transactionType: propertyVillaDataObj?.transactionType || 'Resale',
+    facing: propertyVillaDataObj?.facing || 'East',
+    furnishingStatus: propertyVillaDataObj?.furnishingStatus || 'Unfurnished',
+  });
+
+  // Initialize flat/apartment data if property is Flat/Apartment
+  const propertyFlatDataObj = property.propertyType === 'Flat/Apartment'
+    ? (property.propertyData as unknown as FlatApartmentData | null)
+    : null;
+  const [flatData, setFlatData] = useState<FlatApartmentData>({
+    city: propertyFlatDataObj?.city || '',
+    projectName: propertyFlatDataObj?.projectName || '',
+    projectArea: propertyFlatDataObj?.projectArea || '',
+    numUnits: propertyFlatDataObj?.numUnits || 0,
+    flatAreaSqFt: propertyFlatDataObj?.flatAreaSqFt || 0,
+    bhk: propertyFlatDataObj?.bhk || '2BHK',
+    communityStatus: propertyFlatDataObj?.communityStatus || 'Standalone',
+    constructionStatus: propertyFlatDataObj?.constructionStatus || 'Ready to move',
+    handoverInMonths: propertyFlatDataObj?.handoverInMonths,
+    floor: propertyFlatDataObj?.floor || 0,
+    parkingCount: propertyFlatDataObj?.parkingCount || 0,
+    transactionType: propertyFlatDataObj?.transactionType || 'Resale',
+    facing: propertyFlatDataObj?.facing || 'East'
+  });
+
+  // Initialize IT Commercial Space data if property type matches
+  const propertyItDataObj = property.propertyType === 'IT Commercial Space'
+    ? (property.propertyData as unknown as ITCommercialSpaceData | null)
+    : null;
+  const [itData, setItData] = useState<ITCommercialSpaceData>({
+    city: propertyItDataObj?.city || '',
+    projectName: propertyItDataObj?.projectName || '',
+    projectAreaSqFt: propertyItDataObj?.projectAreaSqFt || 0,
+    numUnits: propertyItDataObj?.numUnits || 0,
+    perUnitAreaSqFt: propertyItDataObj?.perUnitAreaSqFt || 0,
+    constructionStatus: propertyItDataObj?.constructionStatus || 'Ready to move',
+    handoverInMonths: propertyItDataObj?.handoverInMonths,
+    floorInfo: propertyItDataObj?.floorInfo || '',
+    facing: propertyItDataObj?.facing || 'East',
+    carParkingCount: propertyItDataObj?.carParkingCount || 0,
+    bikeParkingCount: propertyItDataObj?.bikeParkingCount || 0,
+    transactionType: propertyItDataObj?.transactionType || 'Resale',
+    furnishingStatus: propertyItDataObj?.furnishingStatus || 'Unfurnished',
+    airConditioned: propertyItDataObj?.airConditioned || false
+  });
+  
+  // Initialize Farm House data if property type matches
+  const propertyFarmDataObj = property.propertyType === 'Farm House'
+    ? (property.propertyData as unknown as FarmHouseData | null)
+    : null;
+  const [farmData, setFarmData] = useState<FarmHouseData>({
+    city: propertyFarmDataObj?.city || '',
+    overallAreaSqFt: propertyFarmDataObj?.overallAreaSqFt || 0,
+    builtUpAreaSqFt: propertyFarmDataObj?.builtUpAreaSqFt || 0,
+    numFloors: propertyFarmDataObj?.numFloors || 0,
+    bhk: propertyFarmDataObj?.bhk || '2BHK',
+    swimmingPool: propertyFarmDataObj?.swimmingPool || false,
+    ageYears: propertyFarmDataObj?.ageYears || 0,
+    furnishingStatus: propertyFarmDataObj?.furnishingStatus || 'Unfurnished'
   });
 
   const updateFormData = (updates: Partial<BasePropertyFormData>) => {
@@ -102,7 +199,12 @@ export default function PropertyEditWizard({ property }: PropertyEditWizardProps
     try {
       const completeData: BasePropertyFormData = {
         ...formData,
-        agriculturalLandData: property.propertyType === 'Agricultural Land' ? agriculturalData : undefined
+        agriculturalLandData: property.propertyType === 'Agricultural Land' ? agriculturalData : undefined,
+        plotData: property.propertyType === 'Plot' ? plotData : undefined,
+        flatApartmentData: property.propertyType === 'Flat/Apartment' ? flatData : undefined,
+        itCommercialSpaceData: property.propertyType === 'IT Commercial Space' ? itData : undefined,
+        villaIndependentHouseData: property.propertyType === 'Villa/Independent House' ? villaData : undefined,
+        farmHouseData: property.propertyType === 'Farm House' ? farmData : undefined
       };
 
       const response = await fetch(`/api/properties/${property.slug}`, {
@@ -208,6 +310,20 @@ export default function PropertyEditWizard({ property }: PropertyEditWizardProps
     if (property.propertyType === 'Agricultural Land') {
       const title = await generatePurposeAwareTitle();
       updateFormData({ title });
+    } else if (property.propertyType === 'Flat/Apartment') {
+      const parts: string[] = [];
+      if (flatData.projectName) parts.push(flatData.projectName);
+      parts.push(flatData.bhk);
+      if (flatData.flatAreaSqFt > 0) parts.push(`${flatData.flatAreaSqFt} Sq.ft`);
+      if (flatData.city) parts.push(flatData.city);
+      updateFormData({ title: parts.join(' - ') });
+    } else if (property.propertyType === 'Plot') {
+      const parts: string[] = [];
+      if (plotData.layoutName) parts.push(plotData.layoutName);
+      parts.push('Plot');
+      if (plotData.extentSqYds > 0) parts.push(`${plotData.extentSqYds} Sq. Yds`);
+      if (plotData.city) parts.push(plotData.city);
+      updateFormData({ title: parts.join(' - ') });
     } else {
       const titleTemplates = [
         `Updated ${property.propertyType} for ${property.listingType}`,
@@ -222,6 +338,20 @@ export default function PropertyEditWizard({ property }: PropertyEditWizardProps
   const generatePropertyDescription = async () => {
     if (property.propertyType === 'Agricultural Land') {
       const description = await generatePurposeAwareDescription();
+      updateFormData({ description });
+    } else if (property.propertyType === 'Flat/Apartment') {
+      const statusText = flatData.constructionStatus === 'Ready to move'
+        ? 'Ready to move'
+        : `Handover in ${flatData.handoverInMonths || 0} months`;
+      const description = `${flatData.bhk} apartment in ${flatData.projectName}, ${flatData.city}. ${flatData.flatAreaSqFt} Sq.ft, ${flatData.communityStatus} community, ${statusText}. ${flatData.parkingCount} car parking(s). ${flatData.transactionType}. ${flatData.facing} facing.`;
+      updateFormData({ description });
+    } else if (property.propertyType === 'Plot') {
+      const facingText = plotData.facing ? `${plotData.facing} facing` : '';
+      const roadText = plotData.roadWidth ? `, ${plotData.roadWidth} ft road` : '';
+      const approvalText = plotData.approval ? `, ${plotData.approval} approved` : '';
+      const locationText = [plotData.village, plotData.city, plotData.district].filter(Boolean).join(', ');
+      const layoutText = plotData.layoutName ? ` in ${plotData.layoutName}` : '';
+      const description = `Premium residential/commercial plot${layoutText} measuring ${plotData.extentSqYds} Sq. Yds, ${facingText}${roadText}${approvalText}. Located at ${locationText}. Ideal for immediate construction and great investment potential.`;
       updateFormData({ description });
     } else {
       const descriptions = [
@@ -576,6 +706,835 @@ export default function PropertyEditWizard({ property }: PropertyEditWizardProps
                   required
                   className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Flat/Apartment Specific Fields */}
+      {property.propertyType === 'Flat/Apartment' && (
+        <>
+          {/* Project & Location */}
+          <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+            <h3 className="text-lg font-semibold text-zinc-900 mb-4">Project & Location</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  value={flatData.city}
+                  onChange={(e) => setFlatData(prev => ({ ...prev, city: e.target.value }))}
+                  placeholder="e.g., Hyderabad"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="projectName">Project Name</Label>
+                <Input
+                  id="projectName"
+                  value={flatData.projectName}
+                  onChange={(e) => setFlatData(prev => ({ ...prev, projectName: e.target.value }))}
+                  placeholder="e.g., Sunshine Towers"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="projectArea">Project Area</Label>
+                <Input
+                  id="projectArea"
+                  value={flatData.projectArea}
+                  onChange={(e) => setFlatData(prev => ({ ...prev, projectArea: e.target.value }))}
+                  placeholder="e.g., 5 Acres"
+                  className="mt-2"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <div>
+                <Label htmlFor="numUnits">No. of Units</Label>
+                <Input
+                  id="numUnits"
+                  type="number"
+                  value={flatData.numUnits === 0 ? '' : flatData.numUnits.toString()}
+                  onChange={(e) => setFlatData(prev => ({ ...prev, numUnits: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 120"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <div>
+                <Label htmlFor="flatArea">Flat Area (Sq.ft)</Label>
+                <Input
+                  id="flatArea"
+                  type="number"
+                  value={flatData.flatAreaSqFt === 0 ? '' : flatData.flatAreaSqFt.toString()}
+                  onChange={(e) => setFlatData(prev => ({ ...prev, flatAreaSqFt: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 1450"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <div>
+                <Label>Facing</Label>
+                <Select value={flatData.facing} onValueChange={(value) => setFlatData(prev => ({ ...prev, facing: value as FlatApartmentData['facing'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select facing" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(FACING_DIRECTIONS).map((dir) => (
+                      <SelectItem key={dir} value={dir}>{dir}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          {/* Configuration & Status */}
+          <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+            <h3 className="text-lg font-semibold text-zinc-900 mb-4">Configuration & Status</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <Label>BHK</Label>
+                <Select value={flatData.bhk} onValueChange={(value) => setFlatData(prev => ({ ...prev, bhk: value as FlatApartmentData['bhk'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select BHK" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(BHK_OPTIONS).map((b) => (
+                      <SelectItem key={b} value={b}>{b}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Community Status</Label>
+                <Select value={flatData.communityStatus} onValueChange={(value) => setFlatData(prev => ({ ...prev, communityStatus: value as FlatApartmentData['communityStatus'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select community type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(COMMUNITY_STATUS).map((c) => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Construction Status</Label>
+                <Select value={flatData.constructionStatus} onValueChange={(value) => setFlatData(prev => ({ ...prev, constructionStatus: value as FlatApartmentData['constructionStatus'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select construction status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(FLAT_CONSTRUCTION_STATUS).map((s) => (
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {flatData.constructionStatus === 'Handover in' && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                <div>
+                  <Label htmlFor="handoverIn">Handover In (months)</Label>
+                  <Input
+                    id="handoverIn"
+                    type="number"
+                    value={flatData.handoverInMonths?.toString() || ''}
+                    onChange={(e) => setFlatData(prev => ({ ...prev, handoverInMonths: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 }))}
+                    placeholder="e.g., 6"
+                    className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Other Details */}
+          <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+            <h3 className="text-lg font-semibold text-zinc-900 mb-4">Other Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <Label htmlFor="floor">Floor</Label>
+                <Input
+                  id="floor"
+                  type="number"
+                  value={flatData.floor === 0 ? '' : flatData.floor.toString()}
+                  onChange={(e) => setFlatData(prev => ({ ...prev, floor: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 5"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <div>
+                <Label htmlFor="parkingCount">Parking (No. of Car Parkings)</Label>
+                <Input
+                  id="parkingCount"
+                  type="number"
+                  value={flatData.parkingCount === 0 ? '' : flatData.parkingCount.toString()}
+                  onChange={(e) => setFlatData(prev => ({ ...prev, parkingCount: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 2"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <div>
+                <Label>Transaction</Label>
+                <Select value={flatData.transactionType} onValueChange={(value) => setFlatData(prev => ({ ...prev, transactionType: value as FlatApartmentData['transactionType'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select transaction type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(TRANSACTION_TYPES).map((t) => (
+                      <SelectItem key={t} value={t}>{t}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* IT Commercial Space Specific Fields */}
+      {property.propertyType === 'IT Commercial Space' && (
+        <>
+          {/* Project & Location */}
+          <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+            <h3 className="text-lg font-semibold text-zinc-900 mb-4">Project & Location</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  value={itData.city}
+                  onChange={(e) => setItData(prev => ({ ...prev, city: e.target.value }))}
+                  placeholder="e.g., Hyderabad"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="projectName">Project Name</Label>
+                <Input
+                  id="projectName"
+                  value={itData.projectName}
+                  onChange={(e) => setItData(prev => ({ ...prev, projectName: e.target.value }))}
+                  placeholder="e.g., Cyber Heights"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="projectAreaSqFt">Project Area (Sq.ft)</Label>
+                <Input
+                  id="projectAreaSqFt"
+                  type="number"
+                  value={itData.projectAreaSqFt === 0 ? '' : itData.projectAreaSqFt.toString()}
+                  onChange={(e) => setItData(prev => ({ ...prev, projectAreaSqFt: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 100000"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <div>
+                <Label htmlFor="numUnits">No. of Units</Label>
+                <Input
+                  id="numUnits"
+                  type="number"
+                  value={itData.numUnits === 0 ? '' : itData.numUnits.toString()}
+                  onChange={(e) => setItData(prev => ({ ...prev, numUnits: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 20"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <div>
+                <Label htmlFor="perUnitAreaSqFt">Area (per unit in Sq.ft)</Label>
+                <Input
+                  id="perUnitAreaSqFt"
+                  type="number"
+                  value={itData.perUnitAreaSqFt === 0 ? '' : itData.perUnitAreaSqFt.toString()}
+                  onChange={(e) => setItData(prev => ({ ...prev, perUnitAreaSqFt: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 5000"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <div>
+                <Label htmlFor="floorInfo">Floor (e.g., 3/10)</Label>
+                <Input
+                  id="floorInfo"
+                  value={itData.floorInfo}
+                  onChange={(e) => setItData(prev => ({ ...prev, floorInfo: e.target.value }))}
+                  placeholder="e.g., 3/10"
+                  className="mt-2"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Status & Specs */}
+          <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+            <h3 className="text-lg font-semibold text-zinc-900 mb-4">Status & Specifications</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <Label>Construction Status</Label>
+                <Select value={itData.constructionStatus} onValueChange={(value) => setItData(prev => ({ ...prev, constructionStatus: value as ITCommercialSpaceData['constructionStatus'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(FLAT_CONSTRUCTION_STATUS).map((s) => (
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {itData.constructionStatus === 'Handover in' && (
+                <div>
+                  <Label htmlFor="handoverIn">Handover In (months)</Label>
+                  <Input
+                    id="handoverIn"
+                    type="number"
+                    value={itData.handoverInMonths?.toString() || ''}
+                    onChange={(e) => setItData(prev => ({ ...prev, handoverInMonths: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 }))}
+                    placeholder="e.g., 6"
+                    className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+              )}
+              <div>
+                <Label>Facing</Label>
+                <Select value={itData.facing} onValueChange={(value) => setItData(prev => ({ ...prev, facing: value as ITCommercialSpaceData['facing'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select facing" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(FACING_DIRECTIONS).map((dir) => (
+                      <SelectItem key={dir} value={dir}>{dir}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <div>
+                <Label htmlFor="carParkingCount">Car Parking</Label>
+                <Input
+                  id="carParkingCount"
+                  type="number"
+                  value={itData.carParkingCount === 0 ? '' : itData.carParkingCount.toString()}
+                  onChange={(e) => setItData(prev => ({ ...prev, carParkingCount: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 4"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <div>
+                <Label htmlFor="bikeParkingCount">Bike Parking</Label>
+                <Input
+                  id="bikeParkingCount"
+                  type="number"
+                  value={itData.bikeParkingCount === 0 ? '' : itData.bikeParkingCount.toString()}
+                  onChange={(e) => setItData(prev => ({ ...prev, bikeParkingCount: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 10"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <div>
+                <Label>Transaction Type</Label>
+                <Select value={itData.transactionType} onValueChange={(value) => setItData(prev => ({ ...prev, transactionType: value as ITCommercialSpaceData['transactionType'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select transaction type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(TRANSACTION_TYPES).map((t) => (
+                      <SelectItem key={t} value={t}>{t}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <div>
+                <Label>Furnishing Status</Label>
+                <Select value={itData.furnishingStatus} onValueChange={(value) => setItData(prev => ({ ...prev, furnishingStatus: value as ITCommercialSpaceData['furnishingStatus'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select furnishing status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(FURNISHING_STATUS).map((f) => (
+                      <SelectItem key={f} value={f}>{f}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="flex items-center">Air Conditioned</Label>
+                <RadioGroup
+                  value={itData.airConditioned.toString()}
+                  onValueChange={(value) => setItData(prev => ({ ...prev, airConditioned: value === 'true' }))}
+                  className="mt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="true" id="ac-yes" />
+                    <Label htmlFor="ac-yes">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="false" id="ac-no" />
+                    <Label htmlFor="ac-no">No</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Plot Specific Fields */}
+      {property.propertyType === 'Plot' && (
+        <>
+          {/* Location Details */}
+          <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+            <h3 className="text-lg font-semibold text-zinc-900 mb-4">Location Details</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <Label htmlFor="village">Village</Label>
+                <Input
+                  id="village"
+                  value={plotData.village}
+                  onChange={(e) => setPlotData(prev => ({ ...prev, village: e.target.value }))}
+                  placeholder="e.g., Narsingi"
+                  className="mt-2"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  value={plotData.city}
+                  onChange={(e) => setPlotData(prev => ({ ...prev, city: e.target.value }))}
+                  placeholder="e.g., Hyderabad"
+                  className="mt-2"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="district">District</Label>
+                <Input
+                  id="district"
+                  value={plotData.district}
+                  onChange={(e) => setPlotData(prev => ({ ...prev, district: e.target.value }))}
+                  placeholder="e.g., Ranga Reddy"
+                  className="mt-2"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Plot Specifications */}
+          <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+            <h3 className="text-lg font-semibold text-zinc-900 mb-4">Plot Specifications</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <Label htmlFor="extent">Extent (Sq. Yds)</Label>
+                <Input
+                  id="extent"
+                  type="number"
+                  value={plotData.extentSqYds === 0 ? '' : plotData.extentSqYds.toString()}
+                  onChange={(e) => setPlotData(prev => ({ ...prev, extentSqYds: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 200"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+
+              <div>
+                <Label>Facing</Label>
+                <Select value={plotData.facing} onValueChange={(value) => setPlotData(prev => ({ ...prev, facing: value as PlotData['facing'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select facing" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(FACING_DIRECTIONS).map((dir) => (
+                      <SelectItem key={dir} value={dir}>
+                        {dir}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="roadWidth">Width of road facing (ft)</Label>
+                <Input
+                  id="roadWidth"
+                  type="number"
+                  value={plotData.roadWidth === 0 ? '' : plotData.roadWidth.toString()}
+                  onChange={(e) => setPlotData(prev => ({ ...prev, roadWidth: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 30"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <div>
+                <Label htmlFor="openSides">Open sides</Label>
+                <Input
+                  id="openSides"
+                  type="number"
+                  value={plotData.openSides === 0 ? '' : plotData.openSides.toString()}
+                  onChange={(e) => setPlotData(prev => ({ ...prev, openSides: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 2"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+
+              <div>
+                <Label>Approval</Label>
+                <Select value={plotData.approval} onValueChange={(value) => setPlotData(prev => ({ ...prev, approval: value as PlotData['approval'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select approval" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(PLOT_APPROVALS).map((appr) => (
+                      <SelectItem key={appr} value={appr}>
+                        {appr}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="layoutName">Layout Name</Label>
+                <Input
+                  id="layoutName"
+                  value={plotData.layoutName}
+                  onChange={(e) => setPlotData(prev => ({ ...prev, layoutName: e.target.value }))}
+                  placeholder="e.g., Green Meadows"
+                  className="mt-2"
+                />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Villa/Independent House Specific Fields */}
+      {property.propertyType === 'Villa/Independent House' && (
+        <>
+          {/* Project & Location */}
+          <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+            <h3 className="text-lg font-semibold text-zinc-900 mb-4">Project & Location</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <Label htmlFor="location-hint">Location</Label>
+                <Input id="location-hint" placeholder="e.g., Jubilee Hills" className="mt-2" disabled />
+              </div>
+              <div>
+                <Label htmlFor="villa-city">City</Label>
+                <Input
+                  id="villa-city"
+                  value={villaData.city}
+                  onChange={(e) => setVillaData(prev => ({ ...prev, city: e.target.value }))}
+                  placeholder="e.g., Hyderabad"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="villa-projectName">Project Name</Label>
+                <Input
+                  id="villa-projectName"
+                  value={villaData.projectName}
+                  onChange={(e) => setVillaData(prev => ({ ...prev, projectName: e.target.value }))}
+                  placeholder="e.g., Elite Enclave"
+                  className="mt-2"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <div>
+                <Label htmlFor="villa-projectArea">Project Area</Label>
+                <Input
+                  id="villa-projectArea"
+                  value={villaData.projectArea}
+                  onChange={(e) => setVillaData(prev => ({ ...prev, projectArea: e.target.value }))}
+                  placeholder="e.g., 5 Acres"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="villa-numUnits">No. of Units</Label>
+                <Input
+                  id="villa-numUnits"
+                  type="number"
+                  value={villaData.numUnits === 0 ? '' : villaData.numUnits.toString()}
+                  onChange={(e) => setVillaData(prev => ({ ...prev, numUnits: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 50"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <div>
+                <Label htmlFor="villa-areaSqFt">Villa Area (Sq.ft)</Label>
+                <Input
+                  id="villa-areaSqFt"
+                  type="number"
+                  value={villaData.villaAreaSqFt === 0 ? '' : villaData.villaAreaSqFt.toString()}
+                  onChange={(e) => setVillaData(prev => ({ ...prev, villaAreaSqFt: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 2400"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Configuration & Status */}
+          <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+            <h3 className="text-lg font-semibold text-zinc-900 mb-4">Configuration & Status</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <Label>BHK</Label>
+                <Select value={villaData.bhk} onValueChange={(value) => setVillaData(prev => ({ ...prev, bhk: value as VillaIndependentHouseData['bhk'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select BHK" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(BHK_OPTIONS).map((b) => (
+                      <SelectItem key={b} value={b}>{b}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Community Status</Label>
+                <Select value={villaData.communityStatus} onValueChange={(value) => setVillaData(prev => ({ ...prev, communityStatus: value as VillaIndependentHouseData['communityStatus'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select community type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(COMMUNITY_STATUS).map((c) => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Construction Status</Label>
+                <Select value={villaData.constructionStatus} onValueChange={(value) => setVillaData(prev => ({ ...prev, constructionStatus: value as VillaIndependentHouseData['constructionStatus'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select construction status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(FLAT_CONSTRUCTION_STATUS).map((s) => (
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {villaData.constructionStatus === 'Handover in' && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                <div>
+                  <Label htmlFor="villa-handoverIn">Handover In (months)</Label>
+                  <Input
+                    id="villa-handoverIn"
+                    type="number"
+                    value={villaData.handoverInMonths?.toString() || ''}
+                    onChange={(e) => setVillaData(prev => ({ ...prev, handoverInMonths: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 }))}
+                    placeholder="e.g., 6"
+                    className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Other Details */}
+          <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+            <h3 className="text-lg font-semibold text-zinc-900 mb-4">Other Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <Label htmlFor="villa-numFloors">Number of Floors</Label>
+                <Input
+                  id="villa-numFloors"
+                  type="number"
+                  value={villaData.numFloors === 0 ? '' : villaData.numFloors.toString()}
+                  onChange={(e) => setVillaData(prev => ({ ...prev, numFloors: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 2"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <div>
+                <Label htmlFor="villa-parkingCount">Parking (No. of Car Parkings)</Label>
+                <Input
+                  id="villa-parkingCount"
+                  type="number"
+                  value={villaData.parkingCount === 0 ? '' : villaData.parkingCount.toString()}
+                  onChange={(e) => setVillaData(prev => ({ ...prev, parkingCount: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 2"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <div>
+                <Label>Transaction</Label>
+                <Select value={villaData.transactionType} onValueChange={(value) => setVillaData(prev => ({ ...prev, transactionType: value as VillaIndependentHouseData['transactionType'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select transaction type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(TRANSACTION_TYPES).map((t) => (
+                      <SelectItem key={t} value={t}>{t}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <div>
+                <Label>Facing</Label>
+                <Select value={villaData.facing} onValueChange={(value) => setVillaData(prev => ({ ...prev, facing: value as VillaIndependentHouseData['facing'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select facing" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(FACING_DIRECTIONS).map((dir) => (
+                      <SelectItem key={dir} value={dir}>{dir}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Furnishing Status</Label>
+                <Select value={villaData.furnishingStatus} onValueChange={(value) => setVillaData(prev => ({ ...prev, furnishingStatus: value as VillaIndependentHouseData['furnishingStatus'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select furnishing status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(FURNISHING_STATUS).map((f) => (
+                      <SelectItem key={f} value={f}>{f}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Farm House Specific Fields */}
+      {property.propertyType === 'Farm House' && (
+        <>
+          <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+            <h3 className="text-lg font-semibold text-zinc-900 mb-4">Farm House Details</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <Label htmlFor="farm-city">City</Label>
+                <Input
+                  id="farm-city"
+                  value={farmData.city}
+                  onChange={(e) => setFarmData(prev => ({ ...prev, city: e.target.value }))}
+                  placeholder="e.g., Hyderabad"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="farm-overallArea">Overall Area (Sq.ft)</Label>
+                <Input
+                  id="farm-overallArea"
+                  type="number"
+                  value={farmData.overallAreaSqFt === 0 ? '' : farmData.overallAreaSqFt.toString()}
+                  onChange={(e) => setFarmData(prev => ({ ...prev, overallAreaSqFt: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 10000"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <div>
+                <Label htmlFor="farm-builtUpArea">Built Up Area (Sq.ft)</Label>
+                <Input
+                  id="farm-builtUpArea"
+                  type="number"
+                  value={farmData.builtUpAreaSqFt === 0 ? '' : farmData.builtUpAreaSqFt.toString()}
+                  onChange={(e) => setFarmData(prev => ({ ...prev, builtUpAreaSqFt: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 3500"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <div>
+                <Label htmlFor="farm-numFloors">Number of Floors</Label>
+                <Input
+                  id="farm-numFloors"
+                  type="number"
+                  value={farmData.numFloors === 0 ? '' : farmData.numFloors.toString()}
+                  onChange={(e) => setFarmData(prev => ({ ...prev, numFloors: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 2"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <div>
+                <Label>BHK</Label>
+                <Select value={farmData.bhk} onValueChange={(value) => setFarmData(prev => ({ ...prev, bhk: value as FarmHouseData['bhk'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select BHK" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(BHK_OPTIONS).map((b) => (
+                      <SelectItem key={b} value={b}>{b}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="flex items-center">Swimming Pool</Label>
+                <RadioGroup
+                  value={farmData.swimmingPool.toString()}
+                  onValueChange={(value) => setFarmData(prev => ({ ...prev, swimmingPool: value === 'true' }))}
+                  className="mt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="true" id="farm-pool-yes" />
+                    <Label htmlFor="farm-pool-yes">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="false" id="farm-pool-no" />
+                    <Label htmlFor="farm-pool-no">No</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <div>
+                <Label htmlFor="farm-ageYears">Age of the Property (years)</Label>
+                <Input
+                  id="farm-ageYears"
+                  type="number"
+                  value={farmData.ageYears === 0 ? '' : farmData.ageYears.toString()}
+                  onChange={(e) => setFarmData(prev => ({ ...prev, ageYears: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
+                  placeholder="e.g., 3"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <div>
+                <Label>Furnishing Status</Label>
+                <Select value={farmData.furnishingStatus} onValueChange={(value) => setFarmData(prev => ({ ...prev, furnishingStatus: value as FarmHouseData['furnishingStatus'] }))}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select furnishing status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(FURNISHING_STATUS).map((f) => (
+                      <SelectItem key={f} value={f}>{f}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>

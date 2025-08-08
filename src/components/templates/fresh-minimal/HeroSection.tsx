@@ -1,10 +1,7 @@
-'use client';
+// server component (public view)
 
-import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
-import EditableWrapper from '@/components/ClientOnlyEditableWrapper';
-import { updateAgentHeroTitle, updateAgentHeroSubtitle } from '@/app/actions';
-import { useParams } from 'next/navigation';
+import dynamic from 'next/dynamic';
+import ClientEditOnly from '@/components/ClientEditOnly';
 import Image from 'next/image';
 import { PerformanceSafeguards } from '@/lib/performance';
 
@@ -28,23 +25,9 @@ interface HeroSectionProps {
   agent: Agent;
 }
 
+const HeroSectionEditable = dynamic(() => import('./HeroSectionEditable'));
+
 export default function HeroSection({ agent }: HeroSectionProps) {
-  const params = useParams();
-  const agentSlug = params.agentSlug as string;
-
-  const scrollToContact = () => {
-    const element = document.querySelector('#contact');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const scrollToProperties = () => {
-    const element = document.querySelector('#properties');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   // Default stats that can be customized later
   const stats = [
@@ -56,53 +39,21 @@ export default function HeroSection({ agent }: HeroSectionProps) {
 
   return (
     <section id="hero" className="bg-template-background py-template-section">
-      <div className="max-w-7xl mx-auto px-template-container">
+      <div id="hero-public" className="max-w-7xl mx-auto px-template-container">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
           <div className="space-y-template-element">
             <div className="space-y-6">
-              <EditableWrapper
-                value={agent.heroTitle || `Professional Real Estate Services in ${agent.city || 'Your Area'}`}
-                onSave={async (value) => {
-                  await updateAgentHeroTitle(agentSlug, value);
-                }}
-                className="group"
-              >
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-template-primary font-bold text-template-text-primary leading-tight">
-                  {agent.heroTitle || `Professional Real Estate Services in ${agent.city || 'Your Area'}`}
-                </h1>
-              </EditableWrapper>
-
-              <EditableWrapper
-                value={agent.heroSubtitle || `Your trusted partner for buying, selling, and investing in real estate. ${agent.experience ? `With ${agent.experience} years of experience` : 'Expert guidance'} to help you make the right decisions.`}
-                onSave={async (value) => {
-                  await updateAgentHeroSubtitle(agentSlug, value);
-                }}
-                className="group"
-              >
-                <p className="text-lg md:text-xl text-template-text-secondary font-template-primary leading-relaxed max-w-xl">
-                  {agent.heroSubtitle || `Your trusted partner for buying, selling, and investing in real estate. ${agent.experience ? `With ${agent.experience} years of experience` : 'Expert guidance'} to help you make the right decisions.`}
-                </p>
-              </EditableWrapper>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-template-primary font-bold text-template-text-primary leading-tight">
+                {agent.heroTitle || `Professional Real Estate Services in ${agent.city || 'Your Area'}`}
+              </h1>
+              <p className="text-lg md:text-xl text-template-text-secondary font-template-primary leading-relaxed max-w-xl">
+                {agent.heroSubtitle || `Your trusted partner for buying, selling, and investing in real estate. ${agent.experience ? `With ${agent.experience} years of experience` : 'Expert guidance'} to help you make the right decisions.`}
+              </p>
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                onClick={scrollToProperties}
-                className="bg-template-primary hover:bg-template-primary-hover text-white px-8 py-3 rounded-template-button font-template-primary font-semibold text-base shadow-template-md hover:shadow-template-lg transition-all duration-300 group"
-              >
-                View Properties
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button
-                variant="outline"
-                onClick={scrollToContact}
-                className="border-2 border-template-primary text-template-primary hover:bg-template-primary hover:text-white px-8 py-3 rounded-template-button font-template-primary font-semibold text-base transition-all duration-300"
-              >
-                Get Consultation
-              </Button>
-            </div>
+            <div className="h-2" />
 
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8">
@@ -173,6 +124,9 @@ export default function HeroSection({ agent }: HeroSectionProps) {
           </div>
         </div>
       </div>
+      <ClientEditOnly selectorToHide="#hero-public">
+        <HeroSectionEditable agent={agent} />
+      </ClientEditOnly>
     </section>
   );
 }

@@ -6,20 +6,12 @@
 import { Template, TemplatePreview } from '@/types/template';
 
 // Import template definitions
-import { modernMinimalTemplate } from './definitions/modern-minimal';
-import { classicProfessionalTemplate } from './definitions/classic-professional';
-import { boldRedTemplate } from './definitions/bold-red';
-import { blackWhiteTemplate } from './definitions/black-white';
 import { freshMinimalTemplate } from './definitions/fresh-minimal';
 
 /**
  * Registry of all available templates
  */
 export const TEMPLATE_REGISTRY: Record<string, Template> = {
-  'modern-minimal': modernMinimalTemplate,
-  'classic-professional': classicProfessionalTemplate,
-  'bold-red': boldRedTemplate,
-  'black-white': blackWhiteTemplate,
   'fresh-minimal': freshMinimalTemplate,
 };
 
@@ -49,7 +41,7 @@ export function getTemplate(templateId: string): Template | null {
  */
 export function getDefaultTemplate(): Template {
   const defaultTemplate = Object.values(TEMPLATE_REGISTRY).find(t => t.isDefault);
-  return defaultTemplate || TEMPLATE_REGISTRY['classic-professional'];
+  return defaultTemplate || TEMPLATE_REGISTRY['fresh-minimal'];
 }
 
 /**

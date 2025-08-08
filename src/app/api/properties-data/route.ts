@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { NextResponse } from 'next/server';
+import { PerformanceUtils } from '@/lib/performance';
 import { getCachedAllProperties } from '@/lib/dashboard-data';
 
 export async function GET() {
@@ -22,10 +23,14 @@ export async function GET() {
     const saleProperties = validProperties.filter(p => p.listingType === 'Sale');
     const rentProperties = validProperties.filter(p => p.listingType === 'Rent');
 
-    return NextResponse.json({
+    const res = NextResponse.json({
       saleProperties,
       rentProperties
     });
+    if (PerformanceUtils.isOptimizationEnabled('caching')) {
+      res.headers.set('Cache-Control', `public, s-maxage=${PerformanceUtils.getRevalidateTime() || 60}, stale-while-revalidate=300`);
+    }
+    return res;
 
   } catch (error) {
     console.error('Properties data API error:', error);

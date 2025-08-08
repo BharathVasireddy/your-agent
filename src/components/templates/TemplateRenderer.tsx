@@ -4,8 +4,7 @@
  */
 
 import React from 'react';
-import * as LegacyPro from './legacy-pro';
-import * as FreshMinimal from './fresh-minimal';
+// Dynamically import only the selected template's components
 import type { Prisma } from '@prisma/client';
 
 interface Agent {
@@ -69,21 +68,24 @@ interface TemplateRendererProps {
   agentData: Agent;
 }
 
-/**
- * Template Registry
- * Maps template names to their component sets
- */
-const templates = {
-  'legacy-pro': LegacyPro,
-  'fresh-minimal': FreshMinimal,
-};
+async function loadTemplateComponents(templateName: string) {
+  switch (templateName) {
+    case 'mono-modern':
+      return await import('./mono-modern');
+    case 'fresh-minimal':
+      return await import('./fresh-minimal');
+    case 'legacy-pro':
+    default:
+      return await import('./legacy-pro');
+  }
+}
 
 /**
  * Main Template Renderer Component
  * The brains of the operation - dynamically imports and renders correct template components
  */
-export default function TemplateRenderer({ templateName, agentData }: TemplateRendererProps) {
-  const Components = templates[templateName as keyof typeof templates] || templates['legacy-pro']; // Default to legacy-pro
+export default async function TemplateRenderer({ templateName, agentData }: TemplateRendererProps) {
+  const Components = await loadTemplateComponents(templateName);
 
   return (
     <main className={`template-${templateName}`}>

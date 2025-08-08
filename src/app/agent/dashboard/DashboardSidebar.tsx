@@ -34,24 +34,10 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
   const router = useRouter();
   const { pendingPath, navigateInstantly } = useInstantNav();
 
-  // Prefetch all dashboard routes for instant navigation
-  useEffect(() => {
-    const routes = [
-      '/agent/dashboard',
-      '/agent/dashboard/properties', 
-      '/agent/dashboard/profile',
-      '/agent/dashboard/customise-website',
-      '/agent/dashboard/customise-website/testimonials',
-      '/agent/dashboard/customise-website/faqs',
-      '/agent/dashboard/analytics',
-      '/agent/dashboard/subscription',
-      '/agent/dashboard/settings'
-    ];
-    
-    routes.forEach(route => {
-      router.prefetch(route);
-    });
-  }, [router]);
+  // Prefetch routes on intent (hover) to reduce initial cost
+  const prefetchOnHover = (route: string) => {
+    try { router.prefetch(route); } catch {}
+  };
 
   const copyWebsiteLink = async () => {
     if (!agent?.slug) return;
@@ -201,6 +187,7 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
               >
                 <Icon className={`w-5 h-5 ${isActive ? 'text-red-600' : 'text-zinc-500'}`} />
                 <button
+                  onMouseEnter={() => prefetchOnHover(item.href)}
                   onClick={() => navigateInstantly(item.href)}
                   className="flex-1 text-left hover:underline"
                 >

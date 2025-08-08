@@ -31,8 +31,12 @@ export function EditModeProvider({ children, isOwner }: EditModeProviderProps) {
 
 export function useEditMode() {
   const context = useContext(EditModeContext);
-  if (context === undefined) {
-    throw new Error('useEditMode must be used within an EditModeProvider');
-  }
-  return context;
+  // Gracefully handle absence of provider (public pages)
+  return (
+    context || {
+      isEditMode: false,
+      isOwner: false,
+      toggleEditMode: () => {},
+    }
+  );
 }

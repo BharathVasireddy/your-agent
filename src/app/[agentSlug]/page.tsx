@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
+import { cookies } from 'next/headers';
+import { PerformanceUtils } from '@/lib/performance';
 import prisma from '@/lib/prisma';
 
 
@@ -10,24 +12,11 @@ import TemplateRenderer from '@/components/templates/TemplateRenderer';
 import { EditModeProvider } from '@/components/EditModeProvider';
 import EditToggleButton from '@/components/EditToggleButton';
 
-// Template name mapping
+// Template name mapping - only support two stable templates
 function getTemplateName(template: string): string {
-  switch (template) {
-    case 'classic-professional':
-    case 'modern-minimal':
-    case 'bold-red':
-    case 'black-white':
-      return 'legacy-pro';
-    case 'fresh-minimal':
-      return 'fresh-minimal';
-    // Legacy theme support
-    case 'professional-blue':
-    case 'elegant-dark':
-    case 'modern-red':
-      return 'legacy-pro';
-    default:
-      return 'legacy-pro';
-  }
+  if (template === 'fresh-minimal') return 'fresh-minimal';
+  if (template === 'mono-modern') return 'mono-modern';
+  return 'legacy-pro';
 }
 
 interface AgentProfilePageProps {
@@ -121,7 +110,8 @@ export async function generateMetadata({ params }: AgentProfilePageProps): Promi
 
 // Dynamic revalidation based on performance config
 // Dynamic revalidation based on performance config
-export const revalidate = 300; // 5 minutes default, can be overridden by ISR
+// Next.js requires a primitive here; avoid TS-only expressions
+export const revalidate = 300;
 
 // Generate static paths for popular agents (optional)
 export async function generateStaticParams() {
@@ -156,9 +146,11 @@ export default async function AgentProfilePage({ params }: AgentProfilePageProps
     notFound();
   }
 
-  // Only check session if needed for edit functionality
-  // This can be lazy-loaded on the client side for better performance
-  const session = await getServerSession(authOptions);
+  // Only check session if user has an auth cookie to avoid extra work for anonymous users
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get('next-auth.session-token')
+    || cookieStore.get('__Secure-next-auth.session-token');
+  const session = sessionToken ? await getServerSession(authOptions) : null;
   
   // Check if current user owns this profile
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

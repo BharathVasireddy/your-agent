@@ -70,14 +70,52 @@ export async function PUT(
       propertyData.bedrooms = null;
       propertyData.bathrooms = null;
       propertyData.propertyData = data.agriculturalLandData;
+    } else if (data.propertyType === 'Plot' && data.plotData) {
+      // For plots, convert square yards to square feet (1 sq yd = 9 sq ft)
+      const totalSqFt = Math.round(data.plotData.extentSqYds * 9);
+      
+      propertyData.area = totalSqFt;
+      propertyData.bedrooms = null;
+      propertyData.bathrooms = null;
+      propertyData.propertyData = data.plotData;
+    } else if (data.propertyType === 'Flat/Apartment' && data.flatApartmentData) {
+      // For flats, use flat area (sq ft) and derive bedrooms from BHK
+      propertyData.area = data.flatApartmentData.flatAreaSqFt || 0;
+      const bhkMatch = (data.flatApartmentData.bhk || '').match(/(\d+)/);
+      const bhkNumber = bhkMatch ? parseInt(bhkMatch[1]) : null;
+      propertyData.bedrooms = bhkNumber;
+      propertyData.bathrooms = existingProperty.bathrooms; // keep as-is (not part of form)
+      propertyData.propertyData = data.flatApartmentData;
+    } else if (data.propertyType === 'Villa/Independent House' && data.villaIndependentHouseData) {
+      // For villas, use villa area (sq ft) and derive bedrooms from BHK
+      propertyData.area = data.villaIndependentHouseData.villaAreaSqFt || 0;
+      const bhkMatch = (data.villaIndependentHouseData.bhk || '').match(/(\d+)/);
+      const bhkNumber = bhkMatch ? parseInt(bhkMatch[1]) : null;
+      propertyData.bedrooms = bhkNumber;
+      propertyData.bathrooms = existingProperty.bathrooms; // unchanged
+      propertyData.propertyData = data.villaIndependentHouseData;
+    } else if (data.propertyType === 'IT Commercial Space' && data.itCommercialSpaceData) {
+      // For IT commercial space, set area to per-unit area
+      propertyData.area = data.itCommercialSpaceData.perUnitAreaSqFt || 0;
+      propertyData.bedrooms = existingProperty.bedrooms; // unchanged
+      propertyData.bathrooms = existingProperty.bathrooms; // unchanged
+      propertyData.propertyData = data.itCommercialSpaceData;
+    } else if (data.propertyType === 'Farm House' && data.farmHouseData) {
+      // For farm house, set area to overall area and derive bedrooms from BHK
+      propertyData.area = data.farmHouseData.overallAreaSqFt || 0;
+      const bhkMatch = (data.farmHouseData.bhk || '').match(/(\d+)/);
+      const bhkNumber = bhkMatch ? parseInt(bhkMatch[1]) : null;
+      propertyData.bedrooms = bhkNumber;
+      propertyData.bathrooms = existingProperty.bathrooms; // unchanged
+      propertyData.propertyData = data.farmHouseData;
     } else {
       // For other property types, preserve existing values
       propertyData.area = existingProperty.area;
       propertyData.bedrooms = existingProperty.bedrooms;
       propertyData.bathrooms = existingProperty.bathrooms;
-      
-      // TODO: Add handling for other property types when implemented
-      // For now, maintain existing structure
+      // Preserve existing propertyData blob
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (propertyData as any).propertyData = existingProperty.propertyData as any;
     }
 
     // Update the property

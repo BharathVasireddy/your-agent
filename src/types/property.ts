@@ -108,6 +108,56 @@ export const AGRICULTURAL_PURPOSES = {
 
 export type AgriculturalPurpose = typeof AGRICULTURAL_PURPOSES[keyof typeof AGRICULTURAL_PURPOSES];
 
+// Plot approvals
+export const PLOT_APPROVALS = {
+  HMDA: 'HMDA',
+  DTCP: 'DTCP',
+  GP: 'GP'
+} as const;
+
+export type PlotApproval = typeof PLOT_APPROVALS[keyof typeof PLOT_APPROVALS];
+
+// Flat/Apartment constants
+export const BHK_OPTIONS = {
+  ONE: '1BHK',
+  TWO: '2BHK',
+  THREE: '3BHK',
+  FOUR: '4BHK',
+  FIVE: '5BHK'
+} as const;
+
+export type BhkOption = typeof BHK_OPTIONS[keyof typeof BHK_OPTIONS];
+
+export const COMMUNITY_STATUS = {
+  STANDALONE: 'Standalone',
+  GATED: 'Gated'
+} as const;
+
+export type CommunityStatus = typeof COMMUNITY_STATUS[keyof typeof COMMUNITY_STATUS];
+
+export const TRANSACTION_TYPES = {
+  RESALE: 'Resale',
+  BRAND_NEW: 'Brand New'
+} as const;
+
+export type TransactionType = typeof TRANSACTION_TYPES[keyof typeof TRANSACTION_TYPES];
+
+export const FLAT_CONSTRUCTION_STATUS = {
+  READY_TO_MOVE: 'Ready to move',
+  HANDOVER_IN: 'Handover in'
+} as const;
+
+export type FlatConstructionStatus = typeof FLAT_CONSTRUCTION_STATUS[keyof typeof FLAT_CONSTRUCTION_STATUS];
+
+// Furnishing status (common for residential)
+export const FURNISHING_STATUS = {
+  UNFURNISHED: 'Unfurnished',
+  SEMI_FURNISHED: 'Semi furnished',
+  FULLY_FURNISHED: 'Fully furnished'
+} as const;
+
+export type FurnishingStatus = typeof FURNISHING_STATUS[keyof typeof FURNISHING_STATUS];
+
 // Agricultural Land specific fields
 export interface AgriculturalLandData {
   village: string;
@@ -120,6 +170,72 @@ export interface AgriculturalLandData {
   boundaryWall: boolean;
   openSides: number;
   purpose: AgriculturalPurpose;
+}
+
+// Plot specific fields
+export interface PlotData {
+  village: string;
+  city: string;
+  district: string;
+  extentSqYds: number; // in square yards
+  facing: FacingDirection;
+  roadWidth: number; // in feet
+  openSides: number;
+  approval: PlotApproval; // HMDA, DTCP, GP
+  layoutName: string;
+}
+
+// Flat/Apartment specific fields
+export interface FlatApartmentData {
+  city: string;
+  projectName: string;
+  projectArea: string; // free-form e.g., "5 Acres"
+  numUnits: number;
+  flatAreaSqFt: number;
+  bhk: BhkOption; // 1BHK to 5BHK
+  communityStatus: CommunityStatus; // Standalone, Gated
+  constructionStatus: FlatConstructionStatus; // Ready to move, Handover in
+  handoverInMonths?: number; // applicable when constructionStatus is Handover in
+  floor: number;
+  parkingCount: number; // number of car parkings
+  transactionType: TransactionType; // Resale, Brand New
+  facing: FacingDirection;
+}
+
+// Villa/Independent House specific fields
+export interface VillaIndependentHouseData {
+  city: string;
+  projectName: string;
+  projectArea: string; // e.g., "5 Acres"
+  numUnits: number;
+  villaAreaSqFt: number;
+  bhk: BhkOption;
+  communityStatus: CommunityStatus;
+  constructionStatus: FlatConstructionStatus; // reuse same options
+  handoverInMonths?: number; // when constructionStatus is Handover in
+  numFloors: number;
+  parkingCount: number; // number of car parkings
+  transactionType: TransactionType;
+  facing: FacingDirection;
+  furnishingStatus: FurnishingStatus;
+}
+
+// IT Commercial Space specific fields
+export interface ITCommercialSpaceData {
+  city: string;
+  projectName: string;
+  projectAreaSqFt: number; // total project area in sq.ft
+  numUnits: number;
+  perUnitAreaSqFt: number; // area per unit in sq.ft
+  constructionStatus: FlatConstructionStatus; // Ready to move, Handover in
+  handoverInMonths?: number; // when constructionStatus is Handover in
+  floorInfo: string; // e.g., "3/10"
+  facing: FacingDirection;
+  carParkingCount: number;
+  bikeParkingCount: number;
+  transactionType: TransactionType; // Resale, Brand New
+  furnishingStatus: FurnishingStatus; // Unfurnished, Semi furnished, Fully furnished
+  airConditioned: boolean; // yes/no
 }
 
 // Base property form interface
@@ -137,4 +253,21 @@ export interface BasePropertyFormData {
   brochureUrl?: string;
   // Property type specific data
   agriculturalLandData?: AgriculturalLandData;
+  plotData?: PlotData;
+  flatApartmentData?: FlatApartmentData;
+  villaIndependentHouseData?: VillaIndependentHouseData;
+  itCommercialSpaceData?: ITCommercialSpaceData;
+  farmHouseData?: FarmHouseData;
+}
+
+// Farm House specific fields
+export interface FarmHouseData {
+  city: string;
+  overallAreaSqFt: number;
+  builtUpAreaSqFt: number;
+  numFloors: number;
+  bhk: BhkOption;
+  swimmingPool: boolean;
+  ageYears: number;
+  furnishingStatus: FurnishingStatus;
 }
