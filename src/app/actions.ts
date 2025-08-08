@@ -596,6 +596,9 @@ const agentProfileSchema = z.object({
   slug: z.string().min(3, "Profile URL must be at least 3 characters").max(50, "Profile URL must be less than 50 characters"),
   dateOfBirth: z.string().min(1, "Date of birth is required"),
   logoUrl: z.string().optional(),
+  logoFont: z.string().optional(),
+  logoMaxHeight: z.number().optional(),
+  logoMaxWidth: z.number().optional(),
   heroImage: z.string().optional(),
   heroTitle: z.string().max(100, "Hero title must be 100 characters or less").optional(),
   heroSubtitle: z.string().max(150, "Hero subtitle must be 150 characters or less").optional(),
@@ -612,6 +615,9 @@ export async function updateAgentProfile(data: {
   slug: string;
   dateOfBirth: string;
   logoUrl?: string;
+  logoFont?: string;
+  logoMaxHeight?: number;
+  logoMaxWidth?: number;
   heroImage?: string;
   heroTitle?: string;
   heroSubtitle?: string;
@@ -665,6 +671,9 @@ export async function updateAgentProfile(data: {
         slug: validatedData.slug,
         dateOfBirth: validatedData.dateOfBirth ? new Date(validatedData.dateOfBirth) : null,
         logoUrl: validatedData.logoUrl || null,
+        logoFont: validatedData.logoFont || null,
+        logoMaxHeight: validatedData.logoMaxHeight ?? null,
+        logoMaxWidth: validatedData.logoMaxWidth ?? null,
         heroImage: validatedData.heroImage || null,
         heroTitle: validatedData.heroTitle || null,
         heroSubtitle: validatedData.heroSubtitle || null,

@@ -39,6 +39,9 @@ model Agent {
   heroSubtitle       String?
   heroTitle          String?
   logoUrl            String?
+  logoFont           String?
+  logoMaxHeight      Int?
+  logoMaxWidth       Int?
   template           String        @default("fresh-minimal")
   user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   faqs               FAQ[]

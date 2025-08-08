@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { Menu, X, Phone, Mail, Home } from 'lucide-react';
-import DashboardButton from '@/components/DashboardButton';
+import { logoFontClassNameByKey } from '@/lib/logo-fonts';
 
 
 // WhatsApp Icon Component
@@ -22,6 +24,9 @@ interface Agent {
   slug: string;
   phone: string | null;
   logoUrl: string | null;
+  logoFont?: string | null;
+  logoMaxHeight?: number | null;
+  logoMaxWidth?: number | null;
   user: {
     id: string;
     name: string | null;
@@ -35,13 +40,16 @@ interface HeaderProps {
 
 export default function Header({ agent }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { data: session } = useSession();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isOwner = session && (session as any).user && (session as any).user.id === agent.user.id;
 
   const navItems = [
     { label: 'Home', href: '#hero' },
-    { label: 'Properties', href: '#properties' },
     { label: 'About', href: '#about' },
-    { label: 'Reviews', href: '#testimonials' },
-    { label: 'Blog', href: '#faq' },
+    { label: 'Properties', href: '#properties' },
+    { label: 'Testimonials', href: '#testimonials' },
+    { label: 'Blog', href: '#blog' },
     { label: 'Contact', href: '#contact' },
   ];
 
@@ -54,81 +62,78 @@ export default function Header({ agent }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-sm">
-      <div className="header-container container mx-auto px-4">
-        <div className="flex items-center h-20">
+    <header className="sticky top-0 z-50 bg-white">
+      <div className="header-container w-full px-4 md:px-6">
+        <div className="flex items-center h-16">
           {/* Left - Logo/Brand/Name */}
-          <div className="flex items-center space-x-3 flex-1">
+          <div className="flex items-center gap-3 flex-1">
             {agent.logoUrl ? (
-              <div className="h-12 w-12 rounded-lg overflow-hidden">
+              <div
+                className="overflow-hidden"
+                style={{
+                  maxHeight: `${agent.logoMaxHeight ?? 48}px`,
+                  maxWidth: `${agent.logoMaxWidth ?? 160}px`,
+                }}
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={agent.logoUrl}
                   alt={`${agent.user.name} Logo`}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain"
                 />
               </div>
             ) : (
-              <div className="bg-red-600 p-2 rounded-lg">
-                <Home className="w-6 h-6 text-white" />
+              <div className="flex items-center">
+                <div className="sr-only">Logo</div>
+                <h1
+                  className={`text-lg font-semibold text-zinc-950 tracking-tight ${logoFontClassNameByKey[agent.logoFont || 'sans']}`}
+                >
+                  {agent.user.name || 'REALTOR'}
+                </h1>
               </div>
             )}
-            <div>
-              <h1 className="text-xl font-bold text-zinc-950 uppercase tracking-wide">
-                {agent.user.name || 'REALTOR'}
-              </h1>
-            </div>
           </div>
 
           {/* Center - Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8 flex-1 justify-center">
+          <nav className="hidden lg:flex items-center gap-8 flex-1 justify-center">
             {navItems.map((item) => (
               <button
                 key={item.href}
                 onClick={() => scrollToSection(item.href)}
-                className="text-zinc-700 hover:text-red-600 transition-colors text-sm font-medium capitalize"
+                className="text-zinc-700 hover:text-zinc-950 transition-colors text-sm font-medium capitalize"
               >
                 {item.label}
               </button>
             ))}
+            {isOwner && (
+              <Link href="/agent/dashboard" className="text-zinc-700 hover:text-zinc-950 transition-colors text-sm font-medium capitalize">
+                Dashboard
+              </Link>
+            )}
           </nav>
 
           {/* Right - Dashboard Button & Contact Icons */}
-          <div className="flex items-center space-x-4 flex-1 justify-end">
-            {/* Dashboard Button (visible when user owns the profile) */}
-            <DashboardButton agentUserId={agent.user.id} />
-
+          <div className="flex items-center gap-4 flex-1 justify-end">
             {/* Contact Icons (Desktop) */}
-            <div className="hidden lg:flex items-center space-x-4">
+            <div className="hidden lg:flex items-center gap-4">
               {agent.phone && (
-                <a
-                  href={`tel:${agent.phone}`}
-                  className="p-2 text-zinc-600 hover:text-red-600 transition-colors rounded-lg hover:bg-zinc-100"
-                  title={`Call ${agent.phone}`}
-                >
-                  <Phone className="w-5 h-5" />
+                <a href={`tel:${agent.phone}`} className="flex items-center gap-2 text-sm text-zinc-700 hover:text-zinc-950">
+                  <Phone className="w-4 h-4" />
+                  <span>({agent.phone})</span>
                 </a>
               )}
               
               {agent.phone && (
-                <a
-                  href={`https://wa.me/${agent.phone.replace(/\D/g, '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 text-green-600 hover:text-green-700 transition-colors rounded-lg hover:bg-green-50"
-                  title="WhatsApp"
-                >
-                  <WhatsAppIcon className="w-5 h-5" />
+                <a href={`https://wa.me/${agent.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-zinc-700 hover:text-zinc-950">
+                  <WhatsAppIcon className="w-4 h-4" />
+                  <span>WhatsApp</span>
                 </a>
               )}
               
               {agent.user.email && (
-                <a
-                  href={`mailto:${agent.user.email}`}
-                  className="p-2 text-zinc-600 hover:text-red-600 transition-colors rounded-lg hover:bg-zinc-100"
-                  title={`Email ${agent.user.email}`}
-                >
-                  <Mail className="w-5 h-5" />
+                <a href={`mailto:${agent.user.email}`} className="flex items-center gap-2 text-sm text-zinc-700 hover:text-zinc-950">
+                  <Mail className="w-4 h-4" />
+                  <span>Email</span>
                 </a>
               )}
             </div>
@@ -136,7 +141,7 @@ export default function Header({ agent }: HeaderProps) {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2 text-zinc-700 hover:text-red-600 transition-colors"
+              className="lg:hidden p-2 text-zinc-700 hover:text-zinc-950 transition-colors"
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -147,27 +152,27 @@ export default function Header({ agent }: HeaderProps) {
         {isMenuOpen && (
           <div className="lg:hidden border-t border-zinc-200 py-4">
             <nav className="flex flex-col space-y-4">
+                {isOwner && (
+                  <Link href="/agent/dashboard" className="text-zinc-700 hover:text-zinc-950 transition-colors text-sm font-medium capitalize">
+                    Dashboard
+                  </Link>
+                )}
               {navItems.map((item) => (
                 <button
                   key={item.href}
                   onClick={() => scrollToSection(item.href)}
-                  className="text-zinc-700 hover:text-red-600 transition-colors text-sm font-medium text-left capitalize"
+                  className="text-zinc-700 hover:text-zinc-950 transition-colors text-sm font-medium text-left capitalize"
                 >
                   {item.label}
                 </button>
               ))}
-              
-              {/* Mobile Dashboard Button */}
-              <div className="pt-4 border-t border-zinc-200">
-                <DashboardButton agentUserId={agent.user.id} />
-              </div>
               
               {/* Mobile Contact */}
               <div className="pt-4 border-t border-zinc-200 space-y-3">
                 {agent.phone && (
                   <a
                     href={`tel:${agent.phone}`}
-                    className="flex items-center space-x-2 text-sm text-zinc-600 hover:text-red-600 transition-colors"
+                    className="flex items-center space-x-2 text-sm text-zinc-700 hover:text-zinc-950 transition-colors"
                   >
                     <Phone className="w-4 h-4" />
                     <span>{agent.phone}</span>
@@ -179,9 +184,9 @@ export default function Header({ agent }: HeaderProps) {
                     href={`https://wa.me/${agent.phone.replace(/\D/g, '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center space-x-2 text-sm text-zinc-600 hover:text-green-600 transition-colors"
+                    className="flex items-center space-x-2 text-sm text-zinc-700 hover:text-zinc-950 transition-colors"
                   >
-                    <WhatsAppIcon className="w-4 h-4 text-green-600" />
+                    <WhatsAppIcon className="w-4 h-4" />
                     <span>WhatsApp</span>
                   </a>
                 )}
@@ -189,7 +194,7 @@ export default function Header({ agent }: HeaderProps) {
                 {agent.user.email && (
                   <a
                     href={`mailto:${agent.user.email}`}
-                    className="flex items-center space-x-2 text-sm text-zinc-600 hover:text-red-600 transition-colors"
+                    className="flex items-center space-x-2 text-sm text-zinc-700 hover:text-zinc-950 transition-colors"
                   >
                     <Mail className="w-4 h-4" />
                     <span>Email</span>

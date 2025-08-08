@@ -40,14 +40,8 @@ export const getCachedDashboardProperties = cache(async (userId: string) => {
 // Cache all properties for properties page
 export const getCachedAllProperties = cache(async (userId: string) => {
   return prisma.property.findMany({
-    where: {
-      agent: {
-        userId: userId
-      }
-    },
-    orderBy: {
-      createdAt: 'desc'
-    }
+    where: { agent: { userId } },
+    orderBy: { createdAt: 'desc' }
   });
 });
 
@@ -92,4 +86,51 @@ export const getPropertyCounts = cache(async (userId: string) => {
     rentProperties: rentCount,
     availableProperties: availableCount
   };
+});
+
+// Filtered, paginated properties for dashboard (lean select)
+export const getFilteredAgentProperties = cache(async (
+  userId: string,
+  opts: {
+    listingType?: string;
+    propertyType?: string;
+    status?: string;
+    page?: number;
+    take?: number;
+  }
+) => {
+  const page = Math.max(1, opts.page || 1);
+  const take = Math.min(50, Math.max(1, opts.take || 12));
+  const skip = (page - 1) * take;
+
+  const where = {
+    agent: { userId },
+    ...(opts.listingType ? { listingType: opts.listingType } : {}),
+    ...(opts.propertyType ? { propertyType: opts.propertyType } : {}),
+    ...(opts.status ? { status: opts.status } : {}),
+    slug: { not: null as unknown as undefined },
+  } as const;
+
+  const [items, total] = await Promise.all([
+    prisma.property.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take,
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        price: true,
+        listingType: true,
+        propertyType: true,
+        status: true,
+        createdAt: true,
+        photos: true,
+      },
+    }),
+    prisma.property.count({ where }),
+  ]);
+
+  return { items, total, page, take, pages: Math.max(1, Math.ceil(total / take)) };
 });

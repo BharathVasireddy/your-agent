@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { User, Upload, X, Loader2, Check, Sparkles, Save } from 'lucide-react';
 import { updateAgentProfile, generateBio } from '@/app/actions';
+import { logoFontOptions } from '@/lib/logo-fonts';
 import toast from 'react-hot-toast';
 
 interface Agent {
@@ -46,6 +47,9 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
     area: agent.area || '',
     template: agent.template === 'fresh-minimal' ? 'fresh-minimal' : 'legacy-pro',
     profilePhotoUrl: agent.profilePhotoUrl || '',
+    logoFont: (agent as unknown as { logoFont?: string }).logoFont || 'sans',
+    logoMaxHeight: (agent as unknown as { logoMaxHeight?: number }).logoMaxHeight || 48,
+    logoMaxWidth: (agent as unknown as { logoMaxWidth?: number }).logoMaxWidth || 160,
     slug: agent.slug || '',
     dateOfBirth: agent.dateOfBirth ? agent.dateOfBirth.toISOString().split('T')[0] : '',
   });
@@ -581,6 +585,58 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
           </div>
         </div>
 
+        {/* Logo Settings */}
+        <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
+          <h3 className="text-lg font-semibold text-zinc-950 mb-4">Logo</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label className="text-zinc-600">Text Logo Font (used when no image logo)</Label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {logoFontOptions.map((opt) => (
+                  <label key={opt.value} className={`flex items-center gap-2 p-2 border rounded ${formData.logoFont === opt.value ? 'border-zinc-900' : 'border-zinc-200'}`}>
+                    <input
+                      type="radio"
+                      name="logoFont"
+                      value={opt.value}
+                      checked={formData.logoFont === opt.value}
+                      onChange={(e) => handleInputChange('logoFont', e.target.value)}
+                    />
+                    <span className={opt.className}>{opt.label}</span>
+                  </label>
+                ))}
+              </div>
+              <p className="text-xs text-zinc-500">If you haven&apos;t uploaded a logo image, your name will be rendered in this font as the logo.</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-zinc-600">Logo Size</Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="logoMaxWidth" className="text-zinc-600 text-xs">Max Width (px)</Label>
+                  <Input
+                    id="logoMaxWidth"
+                    type="number"
+                    value={formData.logoMaxWidth}
+                    onChange={(e) => handleInputChange('logoMaxWidth', parseInt(e.target.value) || 0)}
+                    className="mt-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="logoMaxHeight" className="text-zinc-600 text-xs">Max Height (px)</Label>
+                  <Input
+                    id="logoMaxHeight"
+                    type="number"
+                    value={formData.logoMaxHeight}
+                    onChange={(e) => handleInputChange('logoMaxHeight', parseInt(e.target.value) || 0)}
+                    className="mt-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-zinc-500">Logos render with object-contain so they scale evenly without distortion.</p>
+            </div>
+          </div>
+        </div>
+
         {/* Bio Section */}
         <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
           <div className="flex items-center justify-between mb-4">
@@ -743,7 +799,6 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
           </RadioGroup>
         </div>
       </form>
-
       {/* Sticky Save Button */}
       <div className="sticky bottom-20 md:bottom-6 z-50 flex justify-end pb-4">
         <Button
