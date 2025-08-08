@@ -16,6 +16,7 @@ import EditToggleButton from '@/components/EditToggleButton';
 function getTemplateName(template: string): string {
   if (template === 'fresh-minimal') return 'fresh-minimal';
   if (template === 'mono-modern') return 'mono-modern';
+  if (template === 'mono-elite') return 'mono-elite';
   return 'legacy-pro';
 }
 

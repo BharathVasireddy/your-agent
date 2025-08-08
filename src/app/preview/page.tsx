@@ -9,6 +9,7 @@ type SearchParams = {
 function getTemplateName(template: string | undefined): string {
   if (template === 'fresh-minimal') return 'fresh-minimal';
   if (template === 'mono-modern') return 'mono-modern';
+  if (template === 'mono-elite') return 'mono-elite';
   return 'legacy-pro';
 }
 

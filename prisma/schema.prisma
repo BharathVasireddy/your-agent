@@ -74,6 +74,9 @@ model Property {
   agent           Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId, slug])
+  @@index([agentId, createdAt])
+  @@index([agentId, listingType])
+  @@index([agentId, status])
 }
 
 model Payment {

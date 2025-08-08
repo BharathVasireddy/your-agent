@@ -713,6 +713,32 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
                   <div className="w-full h-4 bg-zinc-800 rounded mt-3"></div>
                 </div>
               </label>
+
+              {/* Mono Elite */}
+              <label
+                htmlFor="mono-elite"
+                className={`flex items-center space-x-4 p-4 rounded-lg border-2 transition-all cursor-pointer ${formData.template === 'mono-elite' ? 'border-red-200 bg-red-50' : 'border-zinc-200 hover:bg-zinc-50'}`}
+              >
+                <RadioGroupItem value="mono-elite" id="mono-elite" />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-zinc-950">Mono Elite</p>
+                      <p className="text-sm text-zinc-600">Premium monochrome with grid pattern and motion reveals</p>
+                    </div>
+                    <a
+                      href="/preview?template=mono-elite"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="px-3 py-1 rounded text-xs font-medium bg-zinc-50 text-zinc-900 border border-zinc-200 hover:opacity-90"
+                    >
+                      Preview
+                    </a>
+                  </div>
+                  <div className="w-full h-4 bg-zinc-700 rounded mt-3"></div>
+                </div>
+              </label>
             </div>
           </RadioGroup>
         </div>

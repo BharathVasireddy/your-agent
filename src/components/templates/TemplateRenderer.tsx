@@ -70,6 +70,8 @@ interface TemplateRendererProps {
 
 async function loadTemplateComponents(templateName: string) {
   switch (templateName) {
+    case 'mono-elite':
+      return await import('./mono-elite');
     case 'mono-modern':
       return await import('./mono-modern');
     case 'fresh-minimal':

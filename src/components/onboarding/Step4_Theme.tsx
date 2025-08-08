@@ -34,6 +34,15 @@ export default function Step4_Theme() {
       textColor: 'text-zinc-900',
       bgColor: 'bg-zinc-50',
       borderColor: 'border-zinc-200'
+    },
+    {
+      value: 'mono-elite',
+      name: 'Mono Elite',
+      description: 'Premium monochrome design with grid pattern and motion reveals',
+      preview: 'bg-zinc-700',
+      textColor: 'text-zinc-900',
+      bgColor: 'bg-zinc-50',
+      borderColor: 'border-zinc-200'
     }
   ];
 

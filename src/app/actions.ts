@@ -16,27 +16,17 @@ function generateSlug(name: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-async function generateUniquePropertySlug(baseSlug: string, agentId: string): Promise<string> {
-  let slug = baseSlug;
+async function generateUniquePropertySlug(baseSlug: string): Promise<string> {
+  // Fetch all existing slugs that start with baseSlug in one round-trip
+  const existing = await prisma.property.findMany({
+    where: { slug: { startsWith: baseSlug } },
+    select: { slug: true },
+  });
+  const taken = new Set(existing.map(e => e.slug));
+  if (!taken.has(baseSlug)) return baseSlug;
   let counter = 1;
-
-  while (true) {
-    // Check if slug exists for this agent
-    const existingProperty = await prisma.property.findFirst({
-      where: {
-        agentId,
-        slug
-      }
-    });
-
-    if (!existingProperty) {
-      return slug;
-    }
-
-    // If slug exists, add number and try again
-    slug = `${baseSlug}-${counter}`;
-    counter++;
-  }
+  while (taken.has(`${baseSlug}-${counter}`)) counter++;
+  return `${baseSlug}-${counter}`;
 }
 
 export async function createPropertyAction(formData: FormData) {
@@ -103,43 +93,40 @@ export async function createPropertyAction(formData: FormData) {
     const photoFiles = formData.getAll('photos') as File[];
     const photoUrls: string[] = [];
 
-    // Upload photos to Cloudinary (if any)
-    for (const file of photoFiles) {
-      if (file.size > 0) {
+    // Upload photos to Cloudinary (if any) in parallel
+    const uploads = photoFiles
+      .filter(f => f.size > 0)
+      .map(async (file) => {
         try {
-          // Convert file to base64 for Cloudinary upload
           const bytes = await file.arrayBuffer();
           const buffer = Buffer.from(bytes);
           const base64 = buffer.toString('base64');
           const dataUri = `data:${file.type};base64,${base64}`;
-
-          // Upload to Cloudinary
           const { v2: cloudinary } = await import('cloudinary');
           cloudinary.config({
             cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
             api_key: process.env.CLOUDINARY_API_KEY,
             api_secret: process.env.CLOUDINARY_API_SECRET,
           });
-
           const uploadResult = await cloudinary.uploader.upload(dataUri, {
             folder: 'properties',
             resource_type: 'image',
             transformation: [
-              { width: 1200, height: 800, crop: 'limit', quality: 'auto' }
-            ]
+              { width: 1200, height: 800, crop: 'limit', quality: 'auto' },
+            ],
           });
-
-          photoUrls.push(uploadResult.secure_url);
-        } catch (uploadError) {
-          console.error('Photo upload error:', uploadError);
-          // Continue with other photos if one fails
+          return uploadResult.secure_url as string;
+        } catch (e) {
+          console.error('Photo upload error:', e);
+          return null;
         }
-      }
-    }
+      });
+    const results = await Promise.all(uploads);
+    photoUrls.push(...results.filter((u): u is string => !!u));
 
     // Generate unique slug for the property
     const baseSlug = generateSlug(title);
-    const uniqueSlug = await generateUniquePropertySlug(baseSlug, agent.id);
+    const uniqueSlug = await generateUniquePropertySlug(baseSlug);
 
     // Create the property
     const property = await prisma.property.create({
@@ -199,7 +186,8 @@ export async function updatePropertyAction(propertySlug: string, formData: FormD
       where: {
         slug: propertySlug,
         agentId: agent.id
-      }
+      },
+      select: { id: true, title: true }
     });
 
     if (!existingProperty) {
@@ -230,39 +218,36 @@ export async function updatePropertyAction(propertySlug: string, formData: FormD
     const existingPhotoUrls = existingPhotos ? JSON.parse(existingPhotos) : [];
     const photoUrls: string[] = [...existingPhotoUrls];
 
-    // Upload new photos to Cloudinary (if any)
-    for (const file of photoFiles) {
-      if (file.size > 0) {
+    // Upload new photos to Cloudinary (if any) in parallel
+    const newUploads = photoFiles
+      .filter(f => f.size > 0)
+      .map(async (file) => {
         try {
-          // Convert file to base64 for Cloudinary upload
           const bytes = await file.arrayBuffer();
           const buffer = Buffer.from(bytes);
           const base64 = buffer.toString('base64');
           const dataUri = `data:${file.type};base64,${base64}`;
-
-          // Upload to Cloudinary
           const { v2: cloudinary } = await import('cloudinary');
           cloudinary.config({
             cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
             api_key: process.env.CLOUDINARY_API_KEY,
             api_secret: process.env.CLOUDINARY_API_SECRET,
           });
-
           const uploadResult = await cloudinary.uploader.upload(dataUri, {
             folder: 'properties',
             resource_type: 'image',
             transformation: [
-              { width: 1200, height: 800, crop: 'limit', quality: 'auto' }
-            ]
+              { width: 1200, height: 800, crop: 'limit', quality: 'auto' },
+            ],
           });
-
-          photoUrls.push(uploadResult.secure_url);
-        } catch (uploadError) {
-          console.error('Photo upload error:', uploadError);
-          // Continue with other photos if one fails
+          return uploadResult.secure_url as string;
+        } catch (e) {
+          console.error('Photo upload error:', e);
+          return null;
         }
-      }
-    }
+      });
+    const newResults = await Promise.all(newUploads);
+    photoUrls.push(...newResults.filter((u): u is string => !!u));
 
     // Generate new slug if title changed
     const updateData: {
@@ -297,7 +282,7 @@ export async function updatePropertyAction(propertySlug: string, formData: FormD
     // If title changed, generate new slug
     if (existingProperty.title !== title) {
       const baseSlug = generateSlug(title);
-      const uniqueSlug = await generateUniquePropertySlug(baseSlug, agent.id);
+      const uniqueSlug = await generateUniquePropertySlug(baseSlug);
       updateData.slug = uniqueSlug;
     }
 
@@ -308,6 +293,7 @@ export async function updatePropertyAction(propertySlug: string, formData: FormD
     });
 
     // Revalidate the properties page
+    revalidatePath('/agent/dashboard');
     revalidatePath('/agent/dashboard/properties');
     
     return { success: true, propertyId: property.id };
@@ -382,6 +368,7 @@ export async function deletePropertyAction(propertySlug: string) {
     });
 
     // Revalidate the properties page
+    revalidatePath('/agent/dashboard');
     revalidatePath('/agent/dashboard/properties');
     
     return { success: true };
