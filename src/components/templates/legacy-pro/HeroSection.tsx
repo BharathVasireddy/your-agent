@@ -75,10 +75,31 @@ export default async function HeroSection({ agent }: HeroSectionProps) {
                     <br />
                     <span className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl">in {agent.city || 'Hyderabad'}</span>
                   </h1>
-                  <p className="text-lg md:text-xl lg:text-2xl mb-12 text-white/90 font-light max-w-2xl">
+                  <p className="text-lg md:text-xl lg:text-2xl mb-8 text-white/90 font-light max-w-2xl">
                     {agent.heroSubtitle ||
                       `Luxury Homes & Premium Properties${agent.area ? ` in ${agent.area}` : ' in Beverly Hills'}`}
                   </p>
+                  {/* CTA Buttons */}
+                  <div className="flex flex-wrap gap-3 mb-10">
+                    <a
+                      href="#properties"
+                      className="inline-flex items-center px-5 py-3 rounded-full bg-white text-zinc-900 font-medium hover:bg-zinc-100"
+                    >
+                      Explore Properties
+                      <span className="ml-2">↗</span>
+                    </a>
+                    {agent.phone && (
+                      <a
+                        href={`https://wa.me/${agent.phone.replace(/\D/g, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-5 py-3 rounded-full border border-white/70 text-white hover:bg-white/10 font-medium"
+                      >
+                        Schedule a call
+                        <span className="ml-2">↗</span>
+                      </a>
+                    )}
+                  </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
                     {stats.map((stat, index) => (
                       <div key={index} className="text-white">

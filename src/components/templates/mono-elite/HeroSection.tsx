@@ -22,6 +22,12 @@ export default function HeroSection({ agent }: { agent: { heroTitle: string | nu
                 {agent.heroSubtitle || 'A refined, fast, and distraction-free showcase of listings and expertise.'}
               </p>
             </BlurFade>
+            <BlurFade delay={0.15} inView>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <a href="#properties" className="inline-flex items-center px-5 py-2.5 rounded-lg bg-zinc-900 text-white text-sm hover:bg-zinc-800">Explore Properties<span className="ml-2">↗</span></a>
+                <a href="#contact" className="inline-flex items-center px-5 py-2.5 rounded-lg border border-zinc-300 text-zinc-800 text-sm hover:bg-zinc-50">Schedule a call<span className="ml-2">↗</span></a>
+              </div>
+            </BlurFade>
           </div>
           <div className="md:col-span-6">
             {/* eslint-disable-next-line @next/next/no-img-element */}

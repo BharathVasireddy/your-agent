@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Menu, X, Phone, Mail, Home } from 'lucide-react';
 import { logoFontClassNameByKey } from '@/lib/logo-fonts';
@@ -43,6 +44,9 @@ export default function Header({ agent }: HeaderProps) {
   const { data: session } = useSession();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isOwner = session && (session as any).user && (session as any).user.id === agent.user.id;
+  const pathname = usePathname();
+  const router = useRouter();
+  const onAgentHome = pathname === `/${agent.slug}`;
 
   const navItems = [
     { label: 'Home', href: '#hero' },
@@ -53,12 +57,17 @@ export default function Header({ agent }: HeaderProps) {
     { label: 'Contact', href: '#contact' },
   ];
 
-  const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setIsMenuOpen(false);
+  const handleNav = (href: string) => {
+    if (onAgentHome) {
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+        setIsMenuOpen(false);
+        return;
+      }
     }
+    router.push(`/${agent.slug}${href}`);
+    setIsMenuOpen(false);
   };
 
   return (
@@ -67,31 +76,30 @@ export default function Header({ agent }: HeaderProps) {
         <div className="flex items-center h-16">
           {/* Left - Logo/Brand/Name */}
           <div className="flex items-center gap-3 flex-1">
-            {agent.logoUrl ? (
-              <div
-                className="overflow-hidden"
-                style={{
-                  maxHeight: `${agent.logoMaxHeight ?? 48}px`,
-                  maxWidth: `${agent.logoMaxWidth ?? 160}px`,
-                }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={agent.logoUrl}
-                  alt={`${agent.user.name} Logo`}
-                  className="h-full w-full object-contain"
-                />
-              </div>
-            ) : (
-              <div className="flex items-center">
-                <div className="sr-only">Logo</div>
+            <Link href={`/${agent.slug}`} className="flex items-center" aria-label="Go to home">
+              {agent.logoUrl ? (
+                <div
+                  className="overflow-hidden"
+                  style={{
+                    maxHeight: `${agent.logoMaxHeight ?? 48}px`,
+                    maxWidth: `${agent.logoMaxWidth ?? 160}px`,
+                  }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={agent.logoUrl}
+                    alt={`${agent.user.name} Logo`}
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+              ) : (
                 <h1
                   className={`text-lg font-semibold text-zinc-950 tracking-tight ${logoFontClassNameByKey[agent.logoFont || 'sans']}`}
                 >
                   {agent.user.name || 'REALTOR'}
                 </h1>
-              </div>
-            )}
+              )}
+            </Link>
           </div>
 
           {/* Center - Desktop Navigation */}
@@ -99,7 +107,7 @@ export default function Header({ agent }: HeaderProps) {
             {navItems.map((item) => (
               <button
                 key={item.href}
-                onClick={() => scrollToSection(item.href)}
+                onClick={() => handleNav(item.href)}
                 className="text-zinc-700 hover:text-zinc-950 transition-colors text-sm font-medium capitalize"
               >
                 {item.label}
@@ -160,7 +168,7 @@ export default function Header({ agent }: HeaderProps) {
               {navItems.map((item) => (
                 <button
                   key={item.href}
-                  onClick={() => scrollToSection(item.href)}
+                  onClick={() => handleNav(item.href)}
                   className="text-zinc-700 hover:text-zinc-950 transition-colors text-sm font-medium text-left capitalize"
                 >
                   {item.label}

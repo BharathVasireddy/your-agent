@@ -53,7 +53,26 @@ export default function HeroSection({ agent }: HeroSectionProps) {
             </div>
 
             {/* CTA Buttons */}
-            <div className="h-2" />
+            <div className="flex flex-wrap gap-3 pt-2">
+              <a
+                href="#properties"
+                className="inline-flex items-center px-5 py-3 rounded-template-button bg-template-primary text-white font-template-primary hover:bg-template-primary-hover"
+              >
+                Explore Properties
+                <span className="ml-2">↗</span>
+              </a>
+              {agent.phone && (
+                <a
+                  href={`https://wa.me/${agent.phone.replace(/\D/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-5 py-3 rounded-template-button border border-template-border text-template-text-primary hover:bg-template-background-secondary font-template-primary"
+                >
+                  Schedule a call
+                  <span className="ml-2">↗</span>
+                </a>
+              )}
+            </div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8">
