@@ -120,7 +120,7 @@ export default function Header({ agent }: HeaderProps) {
             )}
           </nav>
 
-          {/* Right - Dashboard Button & Contact Icons */}
+          {/* Right - Contact quick actions (mobile) + Contact (desktop) */}
           <div className="flex items-center gap-4 flex-1 justify-end">
             {/* Contact Icons (Desktop) */}
             <div className="hidden lg:flex items-center gap-4">
@@ -146,72 +146,135 @@ export default function Header({ agent }: HeaderProps) {
               )}
             </div>
 
+            {/* Mobile quick actions */}
+            <div className="lg:hidden flex items-center gap-2 mr-1">
+              {agent.phone && (
+                <a
+                  href={`tel:${agent.phone}`}
+                  aria-label="Call"
+                  title="Call"
+                  className="inline-flex items-center gap-2 h-9 px-3 rounded-full border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-100 focus-visible:ring-2 focus-visible:ring-zinc-400 shadow-xs active:scale-95 transition"
+                >
+                  <Phone className="w-4 h-4" />
+                  <span className="text-xs font-medium">Call</span>
+                </a>
+              )}
+              {agent.phone && (
+                <a
+                  href={`https://wa.me/${agent.phone.replace(/\D/g, '')}`}
+                  aria-label="WhatsApp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="WhatsApp"
+                  className="inline-flex items-center gap-2 h-9 px-3 rounded-full border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-100 focus-visible:ring-2 focus-visible:ring-zinc-400 shadow-xs active:scale-95 transition"
+                >
+                  <WhatsAppIcon className="w-4 h-4" />
+                  <span className="text-xs font-medium">WhatsApp</span>
+                </a>
+              )}
+            </div>
+
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="lg:hidden p-2 text-zinc-700 hover:text-zinc-950 transition-colors"
+            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isMenuOpen}
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="lg:hidden border-t border-zinc-200 py-4">
-            <nav className="flex flex-col space-y-4">
-                {isOwner && (
-                  <Link href="/agent/dashboard" className="text-zinc-700 hover:text-zinc-950 transition-colors text-sm font-medium capitalize">
-                    Dashboard
-                  </Link>
-                )}
-              {navItems.map((item) => (
-                <button
-                  key={item.href}
-                  onClick={() => handleNav(item.href)}
-                  className="text-zinc-700 hover:text-zinc-950 transition-colors text-sm font-medium text-left capitalize"
-                >
-                  {item.label}
-                </button>
-              ))}
-              
-              {/* Mobile Contact */}
-              <div className="pt-4 border-t border-zinc-200 space-y-3">
-                {agent.phone && (
-                  <a
-                    href={`tel:${agent.phone}`}
-                    className="flex items-center space-x-2 text-sm text-zinc-700 hover:text-zinc-950 transition-colors"
-                  >
-                    <Phone className="w-4 h-4" />
-                    <span>{agent.phone}</span>
-                  </a>
-                )}
-                
-                {agent.phone && (
-                  <a
-                    href={`https://wa.me/${agent.phone.replace(/\D/g, '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center space-x-2 text-sm text-zinc-700 hover:text-zinc-950 transition-colors"
-                  >
-                    <WhatsAppIcon className="w-4 h-4" />
-                    <span>WhatsApp</span>
-                  </a>
-                )}
-                
-                {agent.user.email && (
-                  <a
-                    href={`mailto:${agent.user.email}`}
-                    className="flex items-center space-x-2 text-sm text-zinc-700 hover:text-zinc-950 transition-colors"
-                  >
-                    <Mail className="w-4 h-4" />
-                    <span>Email</span>
-                  </a>
-                )}
-              </div>
-            </nav>
+      {/* Mobile Off-canvas Navigation */}
+      {/* Backdrop */}
+      <div
+        className={`lg:hidden fixed inset-0 bg-black/40 transition-opacity duration-300 ${
+          isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setIsMenuOpen(false)}
+        aria-hidden="true"
+      />
+
+      {/* Panel */}
+      <aside
+        className={`lg:hidden fixed inset-y-0 right-0 w-80 max-w-[85%] bg-white shadow-2xl border-l border-zinc-200 z-50 transform transition-transform duration-300 ${
+          isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+        role="dialog"
+        aria-modal="true"
+      >
+        <div className="flex items-center justify-between px-4 py-4 border-b border-zinc-200">
+          <div className="flex items-center gap-2">
+            <Home className="w-5 h-5 text-zinc-700" />
+            <span className="text-sm font-medium text-zinc-900">Menu</span>
           </div>
-        )}
+          <button
+            onClick={() => setIsMenuOpen(false)}
+            aria-label="Close menu"
+            className="p-2 text-zinc-700 hover:text-zinc-950"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <nav className="flex flex-col space-y-3 p-4 overflow-y-auto h-[calc(100%-56px)]">
+          {isOwner && (
+            <Link
+              href="/agent/dashboard"
+              onClick={() => setIsMenuOpen(false)}
+              className="text-zinc-800 hover:text-zinc-950 transition-colors text-sm font-medium capitalize"
+            >
+              Dashboard
+            </Link>
+          )}
+
+          {navItems.map((item) => (
+            <button
+              key={item.href}
+              onClick={() => handleNav(item.href)}
+              className="text-zinc-800 hover:text-zinc-950 transition-colors text-sm font-medium text-left capitalize"
+            >
+              {item.label}
+            </button>
+          ))}
+
+          <div className="pt-4 mt-2 border-t border-zinc-200 space-y-3">
+            {agent.phone && (
+              <div className="flex items-center gap-2">
+                <a
+                  href={`tel:${agent.phone}`}
+                  className="inline-flex items-center gap-2 h-10 px-4 rounded-full border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-100 focus-visible:ring-2 focus-visible:ring-zinc-400 shadow-xs"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Phone className="w-4 h-4" />
+                  <span className="text-sm font-medium">Call</span>
+                </a>
+                <a
+                  href={`https://wa.me/${agent.phone.replace(/\D/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 h-10 px-4 rounded-full border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-100 focus-visible:ring-2 focus-visible:ring-zinc-400 shadow-xs"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <WhatsAppIcon className="w-4 h-4" />
+                  <span className="text-sm font-medium">WhatsApp</span>
+                </a>
+              </div>
+            )}
+            {agent.user.email && (
+              <a
+                href={`mailto:${agent.user.email}`}
+                className="inline-flex items-center gap-2 text-sm text-zinc-700 hover:text-zinc-950"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Mail className="w-4 h-4" />
+                <span>{agent.user.email}</span>
+              </a>
+            )}
+          </div>
+        </nav>
+      </aside>
       </div>
     </header>
   );

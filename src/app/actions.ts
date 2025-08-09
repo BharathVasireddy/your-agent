@@ -1109,6 +1109,156 @@ export async function updateAgentHeroSubtitle(agentSlug: string, heroSubtitle: s
   }
 }
 
+export async function updateAgentHeroPrimaryCtaLabel(agentSlug: string, heroPrimaryCtaLabel: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!session || !(session as any).user || !(session as any).user.id) {
+      throw new Error("You must be signed in to update profile");
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any).user.id as string;
+
+    const agent = await prisma.agent.findFirst({ where: { slug: agentSlug, userId } });
+    if (!agent) throw new Error("Agent not found or you don't have permission to edit");
+
+    await prisma.agent.update({ where: { id: agent.id }, data: { heroPrimaryCtaLabel } });
+    revalidatePath(`/${agentSlug}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating hero primary CTA label:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to update hero primary CTA label');
+  }
+}
+
+export async function updateAgentHeroSecondaryCtaLabel(agentSlug: string, heroSecondaryCtaLabel: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!session || !(session as any).user || !(session as any).user.id) {
+      throw new Error("You must be signed in to update profile");
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any).user.id as string;
+
+    const agent = await prisma.agent.findFirst({ where: { slug: agentSlug, userId } });
+    if (!agent) throw new Error("Agent not found or you don't have permission to edit");
+
+    await prisma.agent.update({ where: { id: agent.id }, data: { heroSecondaryCtaLabel } });
+    revalidatePath(`/${agentSlug}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating hero secondary CTA label:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to update hero secondary CTA label');
+  }
+}
+
+export async function updateAgentHeroStat(
+  agentSlug: string,
+  index: number,
+  field: 'number' | 'label',
+  value: string
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!session || !(session as any).user || !(session as any).user.id) {
+      throw new Error('You must be signed in to update profile');
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any).user.id as string;
+
+    const agent = await prisma.agent.findFirst({ where: { slug: agentSlug, userId } });
+    if (!agent) throw new Error("Agent not found or you don't have permission to edit");
+
+    const existingStats = (agent as unknown as { heroStats?: unknown }).heroStats as
+      | Array<{ number: string; label: string }>
+      | null
+      | undefined;
+    const fallback = [
+      { number: '200+', label: 'Property Sold' },
+      { number: '70+', label: 'Happy Clients' },
+      { number: '140+', label: 'Builders' },
+      { number: `${agent.experience || 14}+`, label: 'Years Experience' },
+    ];
+
+    const stats = Array.isArray(existingStats) && existingStats.length === 4 ? existingStats : fallback;
+    const updated = stats.map((s, i) => (i === index ? { ...s, [field]: value } : s));
+
+    await prisma.agent.update({ where: { id: agent.id }, data: { heroStats: updated } });
+    revalidatePath(`/${agentSlug}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating hero stat:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to update hero stat');
+  }
+}
+
+export async function updateAgentCity(agentSlug: string, city: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!session || !(session as any).user || !(session as any).user.id) {
+      throw new Error('You must be signed in to update profile');
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any).user.id as string;
+
+    const agent = await prisma.agent.findFirst({ where: { slug: agentSlug, userId } });
+    if (!agent) throw new Error("Agent not found or you don't have permission to edit");
+
+    await prisma.agent.update({ where: { id: agent.id }, data: { city } });
+    revalidatePath(`/${agentSlug}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating city:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to update city');
+  }
+}
+
+// Generic template data editor for front-end editable static text across sections
+export async function updateAgentTemplateValue(
+  agentSlug: string,
+  path: string,
+  value: unknown
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!session || !(session as any).user || !(session as any).user.id) {
+      throw new Error('You must be signed in to update content');
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any).user.id as string;
+
+    const agent = await prisma.agent.findFirst({ where: { slug: agentSlug, userId } });
+    if (!agent) throw new Error("Agent not found or you don't have permission to edit");
+
+    // Build updated templateData by applying a simple dotted path set
+    const current = (agent as unknown as { templateData?: unknown }).templateData as Record<string, unknown> | null | undefined;
+    const clone: Record<string, unknown> = current ? JSON.parse(JSON.stringify(current)) : {};
+
+    const segments = path.split('.');
+    let node: Record<string, unknown> = clone;
+    for (let i = 0; i < segments.length - 1; i++) {
+      const key = segments[i] as string;
+      const next = node[key];
+      if (typeof next !== 'object' || next === null || Array.isArray(next)) {
+        node[key] = {} as Record<string, unknown>;
+      }
+      node = node[key] as Record<string, unknown>;
+    }
+    node[segments[segments.length - 1] as string] = value as unknown;
+
+    // Cast to JSON-safe type for Prisma (InputJsonValue)
+    await prisma.agent.update({ where: { id: agent.id }, data: { templateData: clone as unknown as import('@prisma/client').Prisma.InputJsonValue } });
+    revalidatePath(`/${agentSlug}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating template value:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to update content');
+  }
+}
 export async function updateAgentBio(agentSlug: string, bio: string) {
   try {
     const session = await getServerSession(authOptions);

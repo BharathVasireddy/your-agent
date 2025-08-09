@@ -4,6 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { Button } from "@/components/ui/button";
 
 interface SignUpFormProps {
@@ -16,7 +17,10 @@ export default function SignUpForm({ onSuccess }: SignUpFormProps) {
     name: "",
     email: "",
     password: "",
+    phone: "",
   });
+  const [phoneCountry] = useState('IN');
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -27,6 +31,29 @@ export default function SignUpForm({ onSuccess }: SignUpFormProps) {
     setError("");
 
     try {
+      // Phone is required; validate Indian number
+      let valueToValidate = formData.phone;
+      if (!valueToValidate) {
+        setPhoneError('Phone number is required');
+        setIsLoading(false);
+        return;
+      }
+      // Expect 10 digits India
+      if (!/^\d{10}$/.test(valueToValidate)) {
+        setPhoneError('Enter a valid 10-digit Indian mobile number');
+        setIsLoading(false);
+        return;
+      }
+      // Persist E.164 for backend
+      valueToValidate = `+91${valueToValidate}`;
+      setFormData(prev => ({ ...prev, phone: valueToValidate }));
+      const parsed = parsePhoneNumberFromString(valueToValidate, 'IN');
+      if (!parsed || !parsed.isValid()) {
+        setPhoneError('Please enter a valid Indian phone number');
+        setIsLoading(false);
+        return;
+      }
+      setPhoneError(null);
       // Register user
       const response = await fetch("/api/auth/register", {
         method: "POST",
@@ -153,6 +180,30 @@ export default function SignUpForm({ onSuccess }: SignUpFormProps) {
               placeholder="Enter your email"
             />
           </div>
+        </div>
+
+        <div>
+          <label 
+            className="block text-sm font-medium text-gray-700 mb-2"
+            style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+          >
+            Phone
+          </label>
+          <input
+            type="tel"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={formData.phone}
+            onChange={(e)=>{
+              const digits = e.target.value.replace(/\D/g,'').slice(0,10);
+              setFormData(prev=>({ ...prev, phone: digits }));
+            }}
+            placeholder="Enter 10-digit mobile number (India)"
+            className="w-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent input-lg"
+          />
+          {phoneError && (
+            <p className="text-xs text-red-600 mt-1">{phoneError}</p>
+          )}
         </div>
 
         <div>

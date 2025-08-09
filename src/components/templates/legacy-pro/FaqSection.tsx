@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ChevronDown } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
 
 interface FAQ {
   id: string;
@@ -60,32 +60,32 @@ export default function FaqSection({ faqs }: FaqSectionProps) {
   const displayFaqs = faqs.length > 0 ? faqs : defaultFaqs;
 
   return (
-    <section id="faq" className="w-full py-12 md:py-16 lg:py-20 bg-gray-50">
+    <section id="faq" className="w-full py-12 md:py-16 lg:py-20 bg-white">
       <div className="w-full px-4 md:px-8 lg:px-12 xl:px-16">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-3 gap-8 md:gap-12 lg:gap-16">
             {/* Left Column - Sticky */}
             <div className="lg:sticky lg:top-8 lg:self-start">
               {/* Tag */}
-              <div className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-white rounded-full border border-gray-200 text-xs md:text-sm text-gray-600 mb-6 md:mb-8">
+              <div className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-white rounded-full border border-zinc-200 text-xs md:text-sm text-zinc-700 mb-6 md:mb-8">
                 Help Center
               </div>
               
               {/* Heading */}
-              <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-4 md:mb-6">
+              <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-zinc-900 leading-tight mb-4 md:mb-6 uppercase">
                 FREQUENTLY ASKED<br />
                 QUESTIONS
               </h2>
               
               {/* Description */}
-              <p className="text-gray-600 text-base md:text-lg leading-relaxed mb-6">
+              <p className="text-zinc-600 text-base md:text-lg leading-relaxed mb-6">
                 Find answers to common questions about real estate transactions, my services, and the buying/selling process.
               </p>
 
               {/* Contact CTA */}
-              <div className="p-6 bg-white rounded-lg border border-gray-200 shadow-sm">
-                <h3 className="text-lg font-bold text-gray-900 mb-2">Still Have Questions?</h3>
-                <p className="text-gray-600 text-sm mb-4">
+              <div className="p-6 bg-white rounded-lg border border-zinc-200 shadow-sm">
+                <h3 className="text-lg font-bold text-zinc-950 mb-2">Still Have Questions?</h3>
+                <p className="text-zinc-600 text-sm mb-4">
                   I&apos;m here to help! Feel free to reach out with any questions about real estate or my services.
                 </p>
                 <button
@@ -104,7 +104,7 @@ export default function FaqSection({ faqs }: FaqSectionProps) {
 
             {/* Right Column - FAQ Accordion */}
             <div className="lg:col-span-2">
-              <div className="space-y-3">
+              <div className="border-t border-b border-zinc-200 divide-y divide-zinc-200">
                 {displayFaqs.map((faq, index) => (
                   <FaqAccordionItem
                     key={faq.id}
@@ -127,22 +127,19 @@ function FaqAccordionItem({ question, answer }: { question: string; answer: stri
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+    <div>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+        className="w-full py-5 md:py-6 text-left flex items-center justify-between"
       >
-        <span className="font-semibold text-gray-900 pr-4 text-sm md:text-base">{question}</span>
-        <div className={`transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}>
-          <ChevronDown className="w-5 h-5 text-red-600" />
-        </div>
+        <span className="font-medium md:font-semibold text-zinc-900 pr-6 text-base md:text-lg">{question}</span>
+        <span className="inline-flex items-center justify-center w-7 h-7 rounded-full border border-zinc-300 text-zinc-700">
+          {isOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+        </span>
       </button>
-      
       {isOpen && (
-        <div className="px-6 pb-4 border-t border-gray-100">
-          <div className="pt-4 text-gray-700 leading-relaxed text-sm md:text-base">
-            {answer}
-          </div>
+        <div className="pb-6">
+          <div className="pt-1 text-zinc-700 leading-relaxed text-sm md:text-base">{answer}</div>
         </div>
       )}
     </div>

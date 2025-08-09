@@ -190,7 +190,7 @@ export default function LegacyPropertyDetail({ agent, property, similar }: { age
 
       {/* Contact reuse */}
       <section className="mt-12">
-        <ContactSection agent={agent as unknown as { id: string; phone: string | null; city: string | null; area: string | null; user: { name: string | null; email: string | null } }} />
+        <ContactSection agent={agent as unknown as { id: string; slug: string; phone: string | null; city: string | null; area: string | null; user: { name: string | null; email: string | null } }} />
       </section>
 
       {/* Footer */}

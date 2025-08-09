@@ -54,6 +54,40 @@ export const authOptions = {
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
     }),
     Credentials({
+      id: 'whatsapp',
+      name: 'whatsapp',
+      credentials: {
+        identifier: { label: 'Phone', type: 'text' },
+        token: { label: 'Token', type: 'text' },
+      },
+      async authorize(credentials) {
+        try {
+          if (!credentials?.identifier || !credentials?.token) return null;
+          const identifier = credentials.identifier as string; // phone E.164
+          const rawToken = credentials.token as string;
+          const crypto = await import('crypto');
+          const hash = crypto.createHash('sha256').update(rawToken).digest('hex');
+          // Use VerificationToken as a one-time login token store
+          const tokenRecord = await prisma.verificationToken.findFirst({
+            where: { identifier, token: hash, expires: { gt: new Date() } },
+          });
+          if (!tokenRecord) return null;
+          // consume token
+          await prisma.verificationToken.delete({ where: { token: tokenRecord.token } });
+          // Find user by phone - use findFirst since findUnique might not work if phone field isn't properly indexed
+          const user = await prisma.user.findFirst({ where: { phone: identifier } });
+          if (!user) {
+            console.log('WhatsApp auth: No user found with phone:', identifier);
+            return null;
+          }
+          return { id: user.id, email: user.email, name: user.name, image: user.image };
+        } catch (error) {
+          console.error('WhatsApp auth provider error:', error);
+          return null;
+        }
+      },
+    }),
+    Credentials({
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },

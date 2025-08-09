@@ -95,6 +95,25 @@ export default function Step1_Professional() {
     }
   }, [session?.user?.name, slug, setData]);
 
+  // Pre-populate phone for WhatsApp logins and enforce Indian-only
+  useEffect(() => {
+    if (!phone) {
+      try {
+        const local = localStorage.getItem('wa_phone_local');
+        const e164 = localStorage.getItem('wa_phone_e164');
+        // prefer local 10-digit, fallback to e164
+        if (local && /^\d{10}$/.test(local)) {
+          setData({ phone: `+91${local}` });
+          validatePhone(`+91${local}`);
+        } else if (e164 && /^\+919\d{9}$/.test(e164)) {
+          setData({ phone: e164 });
+          validatePhone(e164);
+        }
+      } catch {}
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Debounced slug validation
   useEffect(() => {
     if (!slug) {
@@ -278,9 +297,14 @@ export default function Step1_Professional() {
                 <Input
                   id="phone"
                   type="tel"
-                  value={phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
-                  placeholder="+91 98765 43210"
+                  value={phone || ''}
+                  onChange={(e) => {
+                    // Always store as E.164 +91XXXXXXXXXX
+                    const digits = e.target.value.replace(/\D/g,'').slice(-10);
+                    const e164 = digits ? `+91${digits}` : '';
+                    handleInputChange('phone', e164);
+                  }}
+                  placeholder="10-digit Indian mobile number"
                   className={`pl-10 h-11 ${
                     phoneValidation.message && !phoneValidation.isValid 
                       ? 'border-red-300 focus:border-red-500' 

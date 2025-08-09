@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Edit2, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,6 +28,8 @@ export default function EditableWrapper({
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
   const [isSaving, setIsSaving] = useState(false);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const [reservedHeight, setReservedHeight] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     setEditValue(value);
@@ -62,15 +64,19 @@ export default function EditableWrapper({
   }
 
   if (isEditing) {
+    // Reserve the current height to minimize layout shift while editing
+    if (!reservedHeight && contentRef.current) {
+      setReservedHeight(contentRef.current.getBoundingClientRect().height);
+    }
     return (
-      <div className="relative group">
+      <div className="relative group" style={{ minHeight: reservedHeight }}>
         <div className="flex items-center gap-2">
           {type === 'textarea' ? (
             <Textarea
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
               placeholder={placeholder}
-              className={`w-full ${className}`}
+              className={`${className}`}
               rows={4}
               autoFocus
             />
@@ -79,7 +85,7 @@ export default function EditableWrapper({
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
               placeholder={placeholder}
-              className={`w-full ${className}`}
+              className={`${className}`}
               autoFocus
             />
           )}
@@ -108,8 +114,8 @@ export default function EditableWrapper({
   }
 
   return (
-    <div className="relative group">
-      <div className={className}>
+    <div className="relative group" style={{ minHeight: reservedHeight }}>
+      <div ref={contentRef} className={className}>
         {children}
       </div>
       <button

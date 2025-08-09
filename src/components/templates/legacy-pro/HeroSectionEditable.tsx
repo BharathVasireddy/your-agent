@@ -45,8 +45,8 @@ export default function HeroSectionEditable({ agent }: HeroSectionProps) {
   ];
 
   return (
-    <section id="hero" className="relative h-screen flex flex-col">
-      <div className="absolute inset-0 z-0 mx-2 md:mx-4 mt-4 rounded-3xl overflow-hidden">
+    <section id="hero" className="relative min-h-[65vh] md:min-h-[calc(100vh-64px)] flex flex-col">
+      <div className="absolute inset-0 z-0 mx-2 md:mx-4 mt-1 md:mt-2 rounded-3xl overflow-hidden">
         {agent.heroImage ? (
           <Image
             src={agent.heroImage}
@@ -77,12 +77,12 @@ export default function HeroSectionEditable({ agent }: HeroSectionProps) {
         <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent" />
       </div>
 
-      <div className="relative z-10 flex-1 flex items-center pt-20">
-        <div className="w-full px-8 md:px-12 lg:px-16 mt-4">
+      <div className="relative z-10 flex-1 flex items-center justify-center md:justify-start pt-2 pb-4 md:pt-12 md:pb-0">
+        <div className="w-full px-4 sm:px-6 md:pl-10 md:pr-0 lg:pl-12 lg:pr-0 xl:pl-16 xl:pr-0 mt-0 md:mt-4">
           <div className="w-full">
             <div className="flex items-center h-full">
-              <div className="text-white w-full md:w-3/4 lg:w-2/3">
-                <div className="max-w-3xl">
+              <div className="text-white w-full md:w-3/4 lg:w-2/3 mx-auto md:mx-0">
+                <div className="max-w-3xl mx-auto md:mx-0 text-center md:text-left">
                   <EditableWrapper
                     value={agent.heroTitle || 'Trusted Real Estate Advisor'}
                     onSave={async (newTitle) => {
@@ -91,10 +91,10 @@ export default function HeroSectionEditable({ agent }: HeroSectionProps) {
                     type="title"
                     placeholder="Enter hero title..."
                   >
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 leading-tight">
+                      <h1 className="text-[9vw] sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-3 md:mb-6 leading-tight">
                       {agent.heroTitle || 'Trusted Real Estate Advisor'}
                       <br />
-                      <span className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl">in {agent.city || 'Hyderabad'}</span>
+                        <span className="text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl">in {agent.city || 'Hyderabad'}</span>
                     </h1>
                   </EditableWrapper>
 
@@ -108,17 +108,17 @@ export default function HeroSectionEditable({ agent }: HeroSectionProps) {
                     type="textarea"
                     placeholder="Enter hero subtitle..."
                   >
-                    <p className="text-lg md:text-xl lg:text-2xl mb-12 text-white/90 font-light max-w-2xl">
+                    <p className="text-base md:text-xl lg:text-2xl mb-4 md:mb-12 text-white/90 font-light max-w-2xl mx-auto md:mx-0">
                       {agent.heroSubtitle ||
                         `Luxury Homes & Premium Properties${agent.area ? ` in ${agent.area}` : ' in Beverly Hills'}`}
                     </p>
                   </EditableWrapper>
 
-                  <div className="flex flex-col sm:flex-row gap-4 mb-16">
+                  <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-6 md:mb-16 justify-center md:justify-start">
                     <Button
                       onClick={() => scrollTo('#properties')}
                       size="lg"
-                      className="bg-white text-black hover:bg-gray-100 px-8 py-4 text-base lg:text-lg font-semibold rounded-full transition-all duration-300 hover:scale-105 border-0"
+                      className="bg-white text-black hover:bg-gray-100 px-6 py-3 md:px-8 md:py-4 text-sm md:text-base lg:text-lg font-semibold rounded-full transition-all duration-300 hover:scale-105 border-0"
                     >
                       Explore Properties
                       <div className="ml-3 w-6 h-6 bg-black rounded-full flex items-center justify-center">
@@ -129,7 +129,7 @@ export default function HeroSectionEditable({ agent }: HeroSectionProps) {
                       onClick={() => scrollTo('#contact')}
                       variant="outline"
                       size="lg"
-                      className="border-2 border-white/50 text-white hover:bg-white/10 px-8 py-4 text-base lg:text-lg font-semibold rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
+                      className="border-2 border-white/50 text-white hover:bg-white/10 px-6 py-3 md:px-8 md:py-4 text-sm md:text-base lg:text-lg font-semibold rounded-full transition-all duration-300 hover:scale-105 bg-transparent"
                     >
                       Schedule a call
                       <div className="ml-3 w-6 h-6 border border-white/50 rounded-full flex items-center justify-center">
@@ -138,13 +138,13 @@ export default function HeroSectionEditable({ agent }: HeroSectionProps) {
                     </Button>
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
+                  <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4 md:gap-8 lg:gap-12">
                     {stats.map((stat, index) => (
-                      <div key={index} className="text-white">
-                        <div className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-2 leading-none">
+                      <div key={index} className="text-white text-center md:text-left">
+                        <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-1 md:mb-2 leading-none">
                           {stat.number}
                         </div>
-                        <div className="text-sm md:text-base lg:text-lg text-white/80 font-medium">{stat.label}</div>
+                        <div className="text-xs sm:text-sm md:text-base lg:text-lg text-white/80 font-medium">{stat.label}</div>
                       </div>
                     ))}
                   </div>

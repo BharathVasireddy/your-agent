@@ -44,6 +44,7 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
     const routes = [
       '/agent/dashboard',
       '/agent/dashboard/properties',
+      '/agent/dashboard/leads',
       '/agent/dashboard/profile',
       '/agent/dashboard/customise-website',
       '/agent/dashboard/customise-website/testimonials',
@@ -80,6 +81,11 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
       name: 'Properties',
       href: '/agent/dashboard/properties',
       icon: Building,
+    },
+    {
+      name: 'Leads',
+      href: '/agent/dashboard/leads',
+      icon: MessageSquare,
     },
     {
       name: 'Profile',
