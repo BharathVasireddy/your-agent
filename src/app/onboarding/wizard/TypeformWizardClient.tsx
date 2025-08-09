@@ -1,0 +1,397 @@
+'use client';
+
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { useWizardStore } from '@/store/wizard-store';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { updateAgentProfile } from '@/app/actions';
+import Step3_Photo from '@/components/onboarding/Step3_Photo';
+import Step4_Theme from '@/components/onboarding/Step4_Theme';
+import { AnimatePresence, motion } from 'motion/react';
+
+export default function TypeformWizardClient() {
+  const { data: session } = useSession();
+  const router = useRouter();
+  const store = useWizardStore();
+
+  // Ordered questions: one at a time
+  // 0 city, 1 area, 2 phone, 3 dob, 4 exp, 5 slug, 6 bio, 7 photo, 8 template
+  const TOTAL = 9;
+  const [index, setIndex] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Cities/Areas (same as Step1)
+  const citiesWithAreas = useMemo(() => ({
+    Hyderabad: [
+      { label: 'Madhapur', value: 'Madhapur' },
+      { label: 'Gachibowli', value: 'Gachibowli' },
+      { label: 'Kondapur', value: 'Kondapur' },
+      { label: 'HITEC City', value: 'HITEC City' },
+      { label: 'Financial District', value: 'Financial District' },
+      { label: 'Kokapet', value: 'Kokapet' },
+      { label: 'Banjara Hills', value: 'Banjara Hills' },
+      { label: 'Jubilee Hills', value: 'Jubilee Hills' },
+      { label: 'Punjagutta', value: 'Punjagutta' },
+      { label: 'Ameerpet', value: 'Ameerpet' },
+      { label: 'Secunderabad', value: 'Secunderabad' },
+      { label: 'Kukatpally', value: 'Kukatpally' },
+      { label: 'Miyapur', value: 'Miyapur' },
+      { label: 'Uppal', value: 'Uppal' },
+      { label: 'LB Nagar', value: 'LB Nagar' },
+      { label: 'Dilsukhnagar', value: 'Dilsukhnagar' },
+      { label: 'Charminar', value: 'Charminar' },
+      { label: 'Abids', value: 'Abids' },
+    ],
+    Bangalore: [
+      { label: 'Koramangala', value: 'Koramangala' },
+      { label: 'Indiranagar', value: 'Indiranagar' },
+      { label: 'Whitefield', value: 'Whitefield' },
+      { label: 'Electronic City', value: 'Electronic City' },
+      { label: 'HSR Layout', value: 'HSR Layout' },
+      { label: 'BTM Layout', value: 'BTM Layout' },
+      { label: 'Marathahalli', value: 'Marathahalli' },
+      { label: 'Sarjapur Road', value: 'Sarjapur Road' },
+    ],
+    Mumbai: [
+      { label: 'Bandra', value: 'Bandra' },
+      { label: 'Andheri', value: 'Andheri' },
+      { label: 'Powai', value: 'Powai' },
+      { label: 'Lower Parel', value: 'Lower Parel' },
+      { label: 'Worli', value: 'Worli' },
+      { label: 'Malad', value: 'Malad' },
+      { label: 'Thane', value: 'Thane' },
+      { label: 'Navi Mumbai', value: 'Navi Mumbai' },
+    ],
+  } as const), []);
+
+  const availableCities = Object.keys(citiesWithAreas);
+  const availableAreas = store.city ? citiesWithAreas[store.city as keyof typeof citiesWithAreas] || [] : [];
+
+  // Prefill phone from WhatsApp
+  useEffect(() => {
+    if (!store.phone && typeof window !== 'undefined') {
+      const local = localStorage.getItem('wa_phone_local');
+      const e164 = localStorage.getItem('wa_phone_e164');
+      if (local && /^\d{10}$/.test(local)) {
+        store.setData({ phone: `+91${local}` });
+      } else if (e164 && /^\+91[6-9]\d{9}$/.test(e164)) {
+        store.setData({ phone: e164 });
+      }
+    }
+  }, [store]);
+
+  // Generate slug from session name if empty
+  useEffect(() => {
+    if (!store.slug && session?.user?.name) {
+      const s = session.user.name
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      if (s) store.setData({ slug: s });
+    }
+  }, [session?.user?.name, store]);
+
+  const isPhoneValid = (val: string) => /^\+91[6-9]\d{9}$/.test(val);
+
+  const validateCurrent = async (): Promise<boolean> => {
+    setError(null);
+    if (index === 0) return !!store.city;
+    if (index === 1) return !!store.area;
+    if (index === 2) return !!store.phone && isPhoneValid(store.phone);
+    if (index === 3) return !!store.dateOfBirth;
+    if (index === 4) return Number.isFinite(store.experience) && store.experience >= 0;
+    if (index === 5) {
+      if (!store.slug || store.slug.length < 3) {
+        setError('Profile URL must be at least 3 characters');
+        return false;
+      }
+      try {
+        const res = await fetch('/api/check-slug', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slug: store.slug }),
+        });
+        const data = await res.json();
+        if (!data.available && data.slug && data.slug !== store.slug) {
+          store.setData({ slug: data.slug });
+        }
+        if (!data.available) {
+          setError('That URL is taken. We suggested a close alternative.');
+          return false;
+        }
+      } catch {
+        setError('Could not validate URL. Please try again.');
+        return false;
+      }
+      return true;
+    }
+    if (index === 6) return store.bio.length <= 500; // optional but limited
+    if (index === 7) return true; // photo optional
+    if (index === 8) return !!store.template;
+    return true;
+  };
+
+  const next = async () => {
+    if (busy) return;
+    setBusy(true);
+    const ok = await validateCurrent();
+    setBusy(false);
+    if (!ok) return;
+    if (index < TOTAL - 1) setIndex((i) => i + 1);
+    else await finish();
+  };
+
+  const prev = () => {
+    if (index > 0) setIndex((i) => i - 1);
+  };
+
+  const finish = async () => {
+    try {
+      setBusy(true);
+      if (!store.slug || !store.phone || !store.city || !store.dateOfBirth) {
+        setError('Please complete all required fields.');
+        return;
+      }
+      const result = await updateAgentProfile({
+        experience: store.experience,
+        bio: store.bio,
+        phone: store.phone,
+        city: store.city,
+        area: store.area,
+        template: store.template,
+        profilePhotoUrl: store.profilePhotoUrl,
+        slug: store.slug,
+        dateOfBirth: store.dateOfBirth,
+      });
+      if (result.success && result.agent?.slug) {
+        useWizardStore.getState().reset();
+        router.push(`/${result.agent.slug}`);
+      } else {
+        setError('Failed to create profile.');
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // Keyboard: Enter to continue
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        const tag = (e.target as HTMLElement)?.tagName?.toLowerCase();
+        const isTextArea = tag === 'textarea';
+        if (!isTextArea) {
+          e.preventDefault();
+          void next();
+        }
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  const progress = Math.round(((index + 1) / TOTAL) * 100);
+
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        {/* Progress */}
+        <div className="mb-8">
+          <div className="h-2 w-full bg-zinc-100 rounded-full overflow-hidden">
+            <div className="h-2 bg-red-600" style={{ width: `${progress}%` }} />
+          </div>
+          <div className="mt-2 text-sm text-zinc-600">Step {index + 1} of {TOTAL}</div>
+        </div>
+
+        <div className="relative min-h-[360px]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              className="bg-white border border-zinc-200 rounded-xl p-6 sm:p-8 shadow-sm"
+            >
+              {index === 0 && (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold text-zinc-950">Which city do you operate in?</h2>
+                  <div>
+                    <Label className="text-sm text-zinc-700">City</Label>
+                    <Select value={store.city} onValueChange={(v) => store.setData({ city: v, area: '' })}>
+                      <SelectTrigger className="w-full h-11 mt-2">
+                        <SelectValue placeholder="Select your city" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableCities.map((c) => (
+                          <SelectItem value={c} key={c}>{c}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
+
+              {index === 1 && (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold text-zinc-950">Your primary area in {store.city || 'the city'}?</h2>
+                  <div>
+                    <Label className="text-sm text-zinc-700">Area</Label>
+                    <Select value={store.area} onValueChange={(v) => store.setData({ area: v })}>
+                      <SelectTrigger className="w-full h-11 mt-2">
+                        <SelectValue placeholder={store.city ? `Select area in ${store.city}` : 'Select area'} />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[200px]">
+                        {availableAreas.map((a) => (
+                          <SelectItem value={a.value} key={a.value}>{a.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
+
+              {index === 2 && (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold text-zinc-950">What is your WhatsApp number?</h2>
+                  <div>
+                    <Label htmlFor="phone" className="text-sm text-zinc-700">Phone (India only)</Label>
+                    <div className="mt-2 relative flex items-center border border-zinc-300 rounded-md overflow-hidden">
+                      <span className="pl-3 pr-2 text-sm text-zinc-700 font-medium select-none">+91</span>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={10}
+                        value={(store.phone || '').replace(/^\+91/, '')}
+                        onChange={(e) => {
+                          const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+                          store.setData({ phone: digits ? `+91${digits}` : '' });
+                        }}
+                        placeholder="9876543210"
+                        className="flex-1 h-11 border-0 px-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      />
+                    </div>
+                    {!!store.phone && !isPhoneValid(store.phone) && (
+                      <p className="mt-1 text-xs text-red-600">Enter a valid 10-digit Indian number (e.g., +919876543210)</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {index === 3 && (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold text-zinc-950">When is your date of birth?</h2>
+                  <div>
+                    <Label htmlFor="dob" className="text-sm text-zinc-700">Date of birth</Label>
+                    <Input
+                      id="dob"
+                      type="date"
+                      value={store.dateOfBirth}
+                      onChange={(e) => store.setData({ dateOfBirth: e.target.value })}
+                      max={new Date().toISOString().split('T')[0]}
+                      className="mt-2 h-11"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {index === 4 && (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold text-zinc-950">How many years of experience do you have?</h2>
+                  <div>
+                    <Label htmlFor="exp" className="text-sm text-zinc-700">Experience (years)</Label>
+                    <Input
+                      id="exp"
+                      type="number"
+                      value={store.experience}
+                      onChange={(e) => store.setData({ experience: parseInt(e.target.value || '0', 10) || 0 })}
+                      min={0}
+                      max={50}
+                      className="mt-2 h-11"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {index === 5 && (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold text-zinc-950">Pick your profile URL</h2>
+                  <div>
+                    <Label htmlFor="slug" className="text-sm text-zinc-700">Profile URL</Label>
+                    <div className="mt-2 flex">
+                      <span className="inline-flex items-center px-4 text-sm font-medium text-zinc-600 bg-zinc-100 border border-r-0 border-zinc-300 rounded-l-lg">youragent.in/</span>
+                      <Input
+                        id="slug"
+                        type="text"
+                        value={store.slug}
+                        onChange={(e) => store.setData({ slug: e.target.value })}
+                        placeholder="your-name"
+                        className="rounded-l-none h-11"
+                      />
+                    </div>
+                    {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+                  </div>
+                </div>
+              )}
+
+              {index === 6 && (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold text-zinc-950">Write a short professional bio</h2>
+                  <div>
+                    <Label htmlFor="bio" className="text-sm text-zinc-700">Bio (optional)</Label>
+                    <textarea
+                      id="bio"
+                      value={store.bio}
+                      onChange={(e) => store.setData({ bio: e.target.value.slice(0, 500) })}
+                      placeholder="Tell clients about your background and expertise..."
+                      className="mt-2 w-full min-h-[160px] rounded-md border border-zinc-300 px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-red-500"
+                    />
+                    <div className="text-xs text-zinc-500 mt-1">{store.bio.length}/500</div>
+                  </div>
+                </div>
+              )}
+
+              {index === 7 && (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold text-zinc-950">Add a profile photo (optional)</h2>
+                  <Step3_Photo />
+                </div>
+              )}
+
+              {index === 8 && (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold text-zinc-950">Choose your template</h2>
+                  <Step4_Theme />
+                </div>
+              )}
+
+              {/* Nav */}
+              <div className="mt-6 flex items-center justify-between">
+                <Button type="button" variant="outline" onClick={prev} disabled={index === 0} className="flex items-center gap-2">
+                  <ChevronLeft className="w-4 h-4" />
+                  Back
+                </Button>
+                <Button type="button" onClick={next} disabled={busy} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white">
+                  {index === TOTAL - 1 ? 'Finish' : 'Continue'}
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+

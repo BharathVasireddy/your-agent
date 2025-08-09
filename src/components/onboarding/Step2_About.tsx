@@ -76,24 +76,20 @@ export default function Step2_About() {
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-semibold text-zinc-950 mb-2">
-          About You
-        </h2>
-        <p className="text-zinc-600">
-          Write a brief bio that highlights your expertise and what makes you unique as a real estate agent.
-        </p>
+        <h2 className="text-2xl font-semibold text-zinc-950 mb-2">About You</h2>
+        <p className="text-zinc-600">Write a concise professional bio that highlights your expertise.</p>
       </div>
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <Label htmlFor="bio" className="text-zinc-600">Professional Bio</Label>
+          <Label htmlFor="bio" className="text-zinc-700 font-medium">Professional Bio</Label>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={handleGenerateBio}
             disabled={isGenerating || !experience || !city}
-            className="text-red-600 border-red-200 hover:bg-red-50 min-w-[180px] justify-center px-6 py-3 h-auto"
+            className="text-red-600 border-red-200 hover:bg-red-50 min-w-[180px] justify-center px-4 py-2 h-auto"
           >
             {isGenerating ? (
               <>
@@ -119,8 +115,8 @@ export default function Step2_About() {
           id="bio"
           value={bio}
           onChange={(e) => handleBioChange(e.target.value)}
-          placeholder="Tell potential clients about your background, expertise, and what sets you apart in the real estate market..."
-          className="min-h-[150px] resize-none"
+          placeholder="Tell potential clients about your background, expertise, and what sets you apart..."
+          className="min-h-[150px] resize-none text-base"
         />
         <div className="flex justify-between items-center">
           <p className="text-xs text-zinc-500">

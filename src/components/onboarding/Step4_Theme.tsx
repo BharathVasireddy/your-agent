@@ -54,12 +54,8 @@ export default function Step4_Theme() {
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-semibold text-zinc-950 mb-2">
-          Choose Your Profile Template
-        </h2>
-        <p className="text-zinc-600">
-          Select a template that reflects your professional style and brand.
-        </p>
+        <h2 className="text-2xl font-semibold text-zinc-950 mb-2">Choose Your Profile Template</h2>
+        <p className="text-zinc-600">Select a template that reflects your professional style.</p>
       </div>
 
       <div className="space-y-4">

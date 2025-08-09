@@ -51,32 +51,12 @@ export default function Step1_Professional() {
 
   // Phone validation function
   const validatePhone = (phoneNumber: string) => {
-    // Remove all spaces, dashes, and country code prefix
-    const cleanPhone = phoneNumber.replace(/[\s\-\(\)\+]/g, '');
-    
-    // Check for Indian mobile number pattern
-    const indianMobileRegex = /^(?:91)?[6-9]\d{9}$/;
-    
-    if (!phoneNumber.trim()) {
-      setPhoneValidation({ isValid: false, message: '' });
+    // Enforce strict E.164 for India: +91XXXXXXXXXX and first digit 6-9
+    if (!phoneNumber || !/^\+91[6-9]\d{9}$/.test(phoneNumber)) {
+      setPhoneValidation({ isValid: false, message: 'Enter a valid 10-digit Indian number (e.g., +919876543210)' });
       return;
     }
-    
-    if (cleanPhone.length < 10) {
-      setPhoneValidation({ isValid: false, message: 'Phone number is too short' });
-      return;
-    }
-    
-    if (cleanPhone.length > 13) {
-      setPhoneValidation({ isValid: false, message: 'Phone number is too long' });
-      return;
-    }
-    
-    if (indianMobileRegex.test(cleanPhone)) {
-      setPhoneValidation({ isValid: true, message: 'Valid phone number' });
-    } else {
-      setPhoneValidation({ isValid: false, message: 'Please enter a valid Indian mobile number' });
-    }
+    setPhoneValidation({ isValid: true, message: 'Valid phone number' });
   };
 
   // Generate initial slug from user's name
@@ -289,33 +269,33 @@ export default function Step1_Professional() {
           </div>
           
           <div className="space-y-4">
-            {/* Phone Number with Validation */}
+             {/* Phone Number with Validation - fixed +91 prefix, no overlap */}
             <div className="space-y-2">
               <Label htmlFor="phone" className="text-sm font-medium text-zinc-700">Phone Number *</Label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-zinc-400" />
+              <div className="relative flex items-center border border-zinc-300 rounded-md overflow-hidden">
+                <span className="pl-3 pr-2 text-sm text-zinc-700 font-medium select-none">+91</span>
                 <Input
                   id="phone"
                   type="tel"
-                  value={phone || ''}
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={10}
+                  value={(phone || '').replace(/^\+91/, '')}
                   onChange={(e) => {
-                    // Always store as E.164 +91XXXXXXXXXX
-                    const digits = e.target.value.replace(/\D/g,'').slice(-10);
+                    const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
                     const e164 = digits ? `+91${digits}` : '';
                     handleInputChange('phone', e164);
                   }}
-                  placeholder="10-digit Indian mobile number"
-                  className={`pl-10 h-11 ${
-                    phoneValidation.message && !phoneValidation.isValid 
-                      ? 'border-red-300 focus:border-red-500' 
-                      : phoneValidation.isValid 
-                        ? 'border-green-300 focus:border-green-500' 
-                        : ''
+                  placeholder="9876543210"
+                  className={`flex-1 h-11 border-0 px-2 focus:ring-2 focus:ring-red-500 focus:border-transparent ${
+                    phoneValidation.message && !phoneValidation.isValid
+                      ? 'ring-red-500'
+                      : ''
                   }`}
                 />
                 {/* Phone Validation Icon */}
                 {phone && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
                     {phoneValidation.isValid ? (
                       <Check className="w-4 h-4 text-green-600" />
                     ) : (

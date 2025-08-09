@@ -111,12 +111,8 @@ export default function Step3_Photo() {
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-semibold text-zinc-950 mb-2">
-          Upload Your Profile Photo
-        </h2>
-        <p className="text-zinc-600">
-          Add a professional photo to help clients recognize and connect with you.
-        </p>
+        <h2 className="text-2xl font-semibold text-zinc-950 mb-2">Upload Your Profile Photo</h2>
+        <p className="text-zinc-600">Use a clear headshot with good lighting.</p>
       </div>
 
       <div className="flex flex-col items-center space-y-6">
@@ -127,7 +123,7 @@ export default function Step3_Photo() {
           onDragOver={handleDragOver}
         >
           {/* Photo Preview */}
-          <div className="w-32 h-32 rounded-full bg-zinc-100 border-2 border-zinc-200 flex items-center justify-center overflow-hidden relative">
+          <div className="w-32 h-32 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center overflow-hidden relative">
             {displayImageUrl ? (
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element */}

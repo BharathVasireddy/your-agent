@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getUserFlowStatus } from '@/lib/userFlow';
-import OnboardingWizardClient from './OnboardingWizardClient';
+import TypeformWizardClient from './TypeformWizardClient';
 
 export default async function OnboardingWizardPage() {
   // Check user flow status server-side
@@ -22,5 +22,5 @@ export default async function OnboardingWizardPage() {
   }
 
   // User needs onboarding - show the wizard
-  return <OnboardingWizardClient />;
+  return <TypeformWizardClient />;
 }
