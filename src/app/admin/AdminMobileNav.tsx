@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Home, Users, UserCheck, Building, CreditCard, Settings } from 'lucide-react';
+import { Home, Users, UserCheck, Building, Settings } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminMobileNav() {

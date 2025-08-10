@@ -1,4 +1,4 @@
-import { headers } from 'next/headers';
+// import { headers } from 'next/headers';
 import { requireAdmin } from '@/lib/admin';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
@@ -76,16 +76,16 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
           <div>
             <h1 className="text-xl font-semibold text-zinc-900">{user.name || 'Unnamed User'}</h1>
             <p className="text-sm text-zinc-600">{user.email}</p>
-            <div className="flex items-center gap-2 mt-1">
+      <div className="flex items-center gap-2 mt-1">
               <span className={`inline-flex px-2 py-1 text-xs rounded-full ${
                 user.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
               }`}>
                 {user.isActive ? 'Active' : 'Suspended'}
               </span>
               {user.agentProfile && (
-                <a href={`/${user.agentProfile.slug}`} target="_blank" className="text-xs text-red-600 hover:underline">
-                  Agent: {user.agentProfile.slug}
-                </a>
+            <a href={`/${user.agentProfile.slug}`} target="_blank" className="text-xs text-red-600 hover:underline">
+              Agent: {user.agentProfile.slug}
+            </a>
               )}
             </div>
           </div>

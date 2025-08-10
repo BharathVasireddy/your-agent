@@ -3,9 +3,10 @@ import { headers } from 'next/headers';
 import { requireAdmin } from '@/lib/admin';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import prisma from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
-import bcrypt from 'bcryptjs';
+// Unused here (used in server actions on other pages)
+// import prisma from '@/lib/prisma';
+// import { revalidatePath } from 'next/cache';
+// import bcrypt from 'bcryptjs';
 
 export const dynamic = 'force-dynamic';
 

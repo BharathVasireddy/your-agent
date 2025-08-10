@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import DashboardSidebar from './DashboardSidebar';
 import DashboardMobileNav from './DashboardMobileNav';
 import { InstantNavProvider } from '@/components/InstantNavProvider';
@@ -57,12 +58,12 @@ export default async function DashboardLayout({
                   {isExpired && hasEverSubscribed ? (
                     <>
                       Your subscription expired on {subscriptionEndsAt?.toLocaleDateString('en-IN')}. Renew to restore publishing and all features.
-                      <a href="/agent/dashboard/subscription" className="ml-2 underline text-yellow-900 hover:text-yellow-800">Renew now</a>
+                      <Link href="/agent/dashboard/subscription" className="ml-2 underline text-yellow-900 hover:text-yellow-800">Renew now</Link>
                     </>
                   ) : (
                     <>
                       You’re not subscribed. Subscribe to publish your profile and unlock all features.
-                      <a href="/agent/dashboard/subscription" className="ml-2 underline text-yellow-900 hover:text-yellow-800">Subscribe now</a>
+                      <Link href="/agent/dashboard/subscription" className="ml-2 underline text-yellow-900 hover:text-yellow-800">Subscribe now</Link>
                     </>
                   )}
                 </div>
@@ -83,12 +84,12 @@ export default async function DashboardLayout({
                 {isExpired && hasEverSubscribed ? (
                   <>
                     Subscription expired on {subscriptionEndsAt?.toLocaleDateString('en-IN')}. 
-                    <a href="/agent/dashboard/subscription" className="ml-1 underline text-yellow-900 hover:text-yellow-800">Renew</a>
+                    <Link href="/agent/dashboard/subscription" className="ml-1 underline text-yellow-900 hover:text-yellow-800">Renew</Link>
                   </>
                 ) : (
                   <>
                     You’re not subscribed. 
-                    <a href="/agent/dashboard/subscription" className="ml-1 underline text-yellow-900 hover:text-yellow-800">Subscribe</a>
+                    <Link href="/agent/dashboard/subscription" className="ml-1 underline text-yellow-900 hover:text-yellow-800">Subscribe</Link>
                   </>
                 )}
               </div>

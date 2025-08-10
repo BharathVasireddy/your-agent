@@ -3,16 +3,14 @@
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
-import { Home, Users, UserCheck, Building, CreditCard, Settings, LogOut, Shield, ChevronDown, ChevronRight } from 'lucide-react';
-import { useState, useMemo } from 'react';
-import { adminNavItems } from './nav-items';
+import { Home, Users, UserCheck, Building, CreditCard, Settings, LogOut, Shield } from 'lucide-react';
+import { useMemo } from 'react';
 
 interface AdminSidebarProps {
   adminEmail: string;
 }
 
 export default function AdminSidebar({ adminEmail }: AdminSidebarProps) {
-  const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
   const pathname = usePathname();
 
   const navigationItems = useMemo(() => [

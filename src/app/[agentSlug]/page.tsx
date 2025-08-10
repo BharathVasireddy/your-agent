@@ -178,7 +178,6 @@ export default async function AgentProfilePage({ params }: AgentProfilePageProps
       {agent.faqs && agent.faqs.length > 0 && (
         <script
           type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
@@ -200,7 +199,6 @@ export default async function AgentProfilePage({ params }: AgentProfilePageProps
       {agent.testimonials && agent.testimonials.length > 0 && (
         <script
           type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
@@ -225,7 +223,6 @@ export default async function AgentProfilePage({ params }: AgentProfilePageProps
       {ratingValue && ratingCount > 0 && (
         <script
           type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
