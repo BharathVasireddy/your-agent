@@ -13,7 +13,12 @@ export default async function LoginPage() {
   if (session?.user) {
     // Check their flow status to determine where to redirect
     const flowStatus = await getUserFlowStatus();
-    redirect(flowStatus.redirectTo);
+    // If session is valid and authenticated, follow the flow
+    if (flowStatus.isAuthenticated) {
+      redirect(flowStatus.redirectTo);
+    }
+    // Orphaned/invalid session: force sign-out to break loops
+    redirect('/api/auth/signout?callbackUrl=/login?error=session_expired');
   }
 
   return (
