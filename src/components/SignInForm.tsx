@@ -14,7 +14,7 @@ interface SignInFormProps {
 export default function SignInForm({ onSuccess }: SignInFormProps) {
   const router = useRouter();
   // legacy fields no longer used
-  // UI state for legacy paths removed
+  const [isLoading, setIsLoading] = useState(false);
   const [showWhatsApp, setShowWhatsApp] = useState(false);
   const [waPhone, setWaPhone] = useState('');
   const [waStage, setWaStage] = useState<'enter' | 'otp'>('enter');
