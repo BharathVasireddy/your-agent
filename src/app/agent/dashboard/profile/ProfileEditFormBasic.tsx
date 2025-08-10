@@ -57,7 +57,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
 
   // Determine plan restrictions for template selection
   const plan: Plan = (agent as unknown as { subscriptionPlan?: Plan | null }).subscriptionPlan ?? 'starter';
-  const allowedTemplates = ENTITLEMENTS[plan].templates === 'all' ? null : new Set<string>(ENTITLEMENTS[plan].templates as string[]);
+  const allowedTemplates = ENTITLEMENTS[plan].templates === 'all' ? null : new Set<string>((ENTITLEMENTS[plan].templates as unknown) as string[]);
 
   // UI state
   const [isSubmitting, setIsSubmitting] = useState(false);

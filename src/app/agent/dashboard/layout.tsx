@@ -15,12 +15,17 @@ export default async function DashboardLayout({
   const session = await getCachedSession();
   
   if (!session?.user) {
-    redirect('/api/auth/signin');
+    redirect('/login');
   }
 
   // Check user flow status to ensure they should be on dashboard
   const flowStatus = await getUserFlowStatus();
   
+  // Orphaned/invalid session or unauthenticated – kick back to proper location
+  if (!flowStatus.isAuthenticated) {
+    redirect(flowStatus.redirectTo || '/login');
+  }
+
   // If user needs onboarding, redirect them
   if (flowStatus.needsOnboarding) {
     redirect('/onboarding/wizard');

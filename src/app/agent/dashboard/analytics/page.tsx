@@ -10,7 +10,7 @@ export default async function AnalyticsPage() {
   const session = await getCachedSession();
   
   if (!session?.user) {
-    redirect('/api/auth/signin');
+    redirect('/login');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

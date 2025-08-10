@@ -18,7 +18,7 @@ export default async function EditPropertyPage({ params }: EditPropertyPageProps
   const session = await getServerSession(authOptions);
   
   if (!session?.user) {
-    redirect('/api/auth/signin');
+    redirect('/login');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

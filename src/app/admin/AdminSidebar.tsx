@@ -1,6 +1,7 @@
-'use client';
+ 'use client';
 
 import Link from 'next/link';
+import { signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { Home, Users, UserCheck, Building, CreditCard, Settings, LogOut, Shield, ChevronDown, ChevronRight } from 'lucide-react';
 import { useState, useMemo } from 'react';
@@ -98,13 +99,13 @@ export default function AdminSidebar({ adminEmail }: AdminSidebarProps) {
           Admin: {adminEmail}
         </div>
         
-        <Link
-          href="/api/auth/signout"
+        <button
+          onClick={() => signOut({ callbackUrl: '/' })}
           className="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 hover:bg-red-50 hover:text-red-700 transition-colors w-full text-left"
         >
           <LogOut className="w-5 h-5 text-zinc-500" />
           <span>Sign Out</span>
-        </Link>
+        </button>
       </div>
     </div>
   );

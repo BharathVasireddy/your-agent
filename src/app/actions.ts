@@ -711,7 +711,7 @@ export async function updateAgentProfile(data: {
     const plan = (existingAgent?.subscriptionPlan as 'starter'|'growth'|'pro' | undefined) ?? 'starter';
     const templatesEntitlement = ENTITLEMENTS[plan].templates;
     if (templatesEntitlement !== 'all') {
-      const allowed = new Set<string>(templatesEntitlement as string[]);
+      const allowed = new Set<string>((templatesEntitlement as unknown) as string[]);
       if (!allowed.has(validatedData.template)) {
         throw new Error('Your plan does not include this template. Please upgrade to use it.');
       }

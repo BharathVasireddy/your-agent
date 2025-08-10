@@ -10,6 +10,19 @@ export const authOptions = {
   pages: {
     signIn: '/login',
   },
+  cookies: {
+    sessionToken: {
+      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        // Share session across subdomains
+        domain: process.env.PRIMARY_DOMAIN ? `.${process.env.PRIMARY_DOMAIN}` : undefined,
+      },
+    },
+  },
   callbacks: {
     async signIn() {
       // Allow all sign-ins - we'll handle flow in the redirect callback

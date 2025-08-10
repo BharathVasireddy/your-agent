@@ -57,6 +57,22 @@ export default function LoginButton() {
     );
   }
 
+  // If session exists but server says invalid (orphaned), treat as logged out
+  if (session && serverValid === false) {
+    return (
+      <Link
+        href="/login"
+        className="flex items-center gap-2 text-white transition-all duration-200 font-medium btn-primary btn-lg"
+        style={{ backgroundColor: "var(--primary-red)" }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--primary-red-hover)"}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--primary-red)"}
+      >
+        <LogIn size={16} />
+        Sign in
+      </Link>
+    );
+  }
+
   // Not authenticated state - show sign in button
   return (
     <>

@@ -7,7 +7,7 @@ export default async function SettingsPage() {
   const session = await getCachedSession();
   
   if (!session?.user) {
-    redirect('/api/auth/signin');
+    redirect('/login');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,7 +24,7 @@ export default async function SettingsPage() {
   };
 
   if (!user) {
-    redirect('/api/auth/signin');
+    redirect('/login');
   }
 
   return <SettingsContent user={user} agent={agent} />;

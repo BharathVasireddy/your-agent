@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
@@ -11,6 +11,8 @@ export const dynamic = 'force-dynamic';
 
 // Import the new template renderer
 import TemplateRenderer from '@/components/templates/TemplateRenderer';
+import { headers } from 'next/headers';
+import { getHostInfo } from '@/lib/utils';
 import { EditModeProvider } from '@/components/EditModeProvider';
 import EditToggleButton from '@/components/EditToggleButton';
 
@@ -124,6 +126,21 @@ export default async function AgentProfilePage({ params }: AgentProfilePageProps
   
   // Find the agent by slug
   const agent = await getAgentData(agentSlug);
+  // If we are on primary domain path-based route, canonicalize to subdomain if available
+  try {
+    const hdrs = await headers();
+    const { hostname, primaryDomain } = getHostInfo(hdrs.get('host'));
+    const onPrimary = hostname === primaryDomain || hostname.endsWith(`.${primaryDomain}`);
+    if (onPrimary && agent?.slug) {
+      const reserved = new Set(['', 'www', 'app', 'admin']);
+      if (!reserved.has(agent.slug)) {
+        redirect(`https://${agent.slug}.${primaryDomain}`);
+      }
+    }
+  } catch {
+    // headers() may fail in some edge cases; ignore canonicalization
+  }
+
 
   if (!agent) {
     notFound();

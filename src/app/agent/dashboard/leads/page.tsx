@@ -12,7 +12,7 @@ function parseLeadMetadata(metadata: string | null) {
 export default async function LeadsPage({ searchParams }: { searchParams: Promise<Record<string, string>> }) {
   const session = await getCachedSession();
   if (!session?.user) {
-    redirect('/api/auth/signin');
+    redirect('/login');
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userId = (session as any).user.id as string;
