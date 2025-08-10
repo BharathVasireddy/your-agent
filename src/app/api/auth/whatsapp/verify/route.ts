@@ -6,7 +6,7 @@ import { authOptions } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    const { phone, code, name } = await request.json();
+    const { phone, code } = await request.json();
     if (!phone || !code) {
       return NextResponse.json({ error: 'Phone and code are required' }, { status: 400 });
     }
@@ -49,9 +49,9 @@ export async function POST(request: NextRequest) {
       });
       console.log('Linked phone to existing user:', session.user.id);
     } else {
-      // Create new user with phone number
+      // Create new user with phone number (name will be collected during onboarding)
       user = await prisma.user.create({ 
-        data: { phone, name: name || null, phoneVerifiedAt: new Date() } 
+        data: { phone, phoneVerifiedAt: new Date() } 
       });
     }
 

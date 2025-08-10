@@ -6,6 +6,8 @@ import { cookies } from 'next/headers';
 // import { PerformanceUtils } from '@/lib/performance';
 import prisma from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 
 // Import the new template renderer
 import TemplateRenderer from '@/components/templates/TemplateRenderer';
@@ -96,6 +98,7 @@ export async function generateMetadata({ params }: AgentProfilePageProps): Promi
     };
   }
 
+  const isActive = !!agent.subscriptionEndsAt && agent.subscriptionEndsAt > new Date();
   // Generate description from first 160 characters of bio
   const description = agent.bio 
     ? agent.bio.length > 160 
@@ -106,35 +109,14 @@ export async function generateMetadata({ params }: AgentProfilePageProps): Promi
   return {
     title: `${agent.user.name} - Real Estate Agent in ${agent.city}`,
     description,
+    robots: isActive ? undefined : { index: false, follow: false },
   };
 }
 
 // Dynamic revalidation based on performance config
 // Dynamic revalidation based on performance config
 // Next.js requires a primitive here; avoid TS-only expressions
-export const revalidate = 300;
-
-// Generate static paths for popular agents (optional)
-export async function generateStaticParams() {
-  // You can pre-generate paths for your most popular agents
-  // This is optional but will make those pages even faster
-  try {
-    const popularAgents = await prisma.agent.findMany({
-      select: { slug: true },
-      take: 10, // Pre-generate top 10 agents
-      orderBy: {
-        createdAt: 'desc'
-      }
-    });
-    
-    return popularAgents.map((agent) => ({
-      agentSlug: agent.slug,
-    }));
-  } catch (error) {
-    console.error('Error generating static params:', error);
-    return [];
-  }
-}
+// Disable static pre-rendering to avoid build-time DB coupling
 
 export default async function AgentProfilePage({ params }: AgentProfilePageProps) {
   // Await the params in Next.js 15
@@ -146,6 +128,9 @@ export default async function AgentProfilePage({ params }: AgentProfilePageProps
   if (!agent) {
     notFound();
   }
+
+  // Determine active subscription state
+  const isActive = !!agent.subscriptionEndsAt && agent.subscriptionEndsAt > new Date();
 
   // Only check session if user has an auth cookie to avoid extra work for anonymous users
   const cookieStore = await cookies();
@@ -160,9 +145,98 @@ export default async function AgentProfilePage({ params }: AgentProfilePageProps
   // Get template name for rendering
   const templateName = getTemplateName(agent.template);
 
+  // Compute aggregate rating from testimonials (server-side)
+  const testimonialRatings = (agent.testimonials || [])
+    .map((t: { rating: number | null }) => (typeof t.rating === 'number' ? t.rating : null))
+    .filter((r: number | null): r is number => typeof r === 'number');
+  const ratingCount = testimonialRatings.length;
+  const reviewCount = (agent.testimonials || []).length;
+  const ratingValue = ratingCount
+    ? Math.round((testimonialRatings.reduce((sum: number, r: number) => sum + r, 0) / ratingCount) * 10) / 10
+    : null;
+
   return (
     <EditModeProvider isOwner={!!isOwner}>
-      <TemplateRenderer templateName={templateName} agentData={agent} />
+      {/* SEO: FAQPage schema */}
+      {agent.faqs && agent.faqs.length > 0 && (
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'FAQPage',
+              mainEntity: agent.faqs.map((f: { question: string; answer: string }) => ({
+                '@type': 'Question',
+                name: f.question,
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: f.answer,
+                },
+              })),
+            }),
+          }}
+        />
+      )}
+
+      {/* SEO: Reviews schema (Testimonials) */}
+      {agent.testimonials && agent.testimonials.length > 0 && (
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'ItemList',
+              itemListElement: agent.testimonials.map((t: { text: string; author: string | null; rating: number | null }, index: number) => ({
+                '@type': 'Review',
+                position: index + 1,
+                reviewBody: t.text,
+                author: t.author ? { '@type': 'Person', name: t.author } : undefined,
+                reviewRating: typeof t.rating === 'number' ? { '@type': 'Rating', ratingValue: t.rating, bestRating: 5, worstRating: 1 } : undefined,
+                itemReviewed: {
+                  '@type': 'RealEstateAgent',
+                  name: agent.user?.name || 'Real Estate Agent',
+                },
+              })),
+            }),
+          }}
+        />
+      )}
+
+      {/* SEO: Aggregate rating for the agent based on testimonials */}
+      {ratingValue && ratingCount > 0 && (
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'RealEstateAgent',
+              name: agent.user?.name || 'Real Estate Agent',
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue,
+                ratingCount,
+                reviewCount,
+                bestRating: 5,
+                worstRating: 1,
+              },
+            }),
+          }}
+        />
+      )}
+
+      {!isActive && !isOwner ? (
+        <main className="min-h-[50vh] bg-white">
+          <div className="max-w-3xl mx-auto px-6 py-16 text-center">
+            <h1 className="text-3xl font-bold text-zinc-950 mb-3">Profile not published</h1>
+            <p className="text-zinc-600">This agent profile is currently unpublished.</p>
+          </div>
+        </main>
+      ) : (
+        <TemplateRenderer templateName={templateName} agentData={agent} />
+      )}
       <EditToggleButton />
     </EditModeProvider>
   );

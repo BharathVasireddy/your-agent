@@ -4,9 +4,20 @@ import { useSession } from "next-auth/react";
 import { LogIn, User, LayoutDashboard } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import React from "react";
 
 export default function LoginButton() {
   const { data: session, status } = useSession();
+  // Fetch server confirmation that session maps to an existing DB user
+  const [serverValid, setServerValid] = React.useState<boolean | null>(null);
+  React.useEffect(() => {
+    let mounted = true;
+    fetch('/api/auth/session-health')
+      .then(r => r.json())
+      .then(d => { if (mounted) setServerValid(!!d?.valid); })
+      .catch(() => { if (mounted) setServerValid(false); });
+    return () => { mounted = false; };
+  }, []);
 
   // Loading state - pulsing gray placeholder
   if (status === "loading") {
@@ -16,7 +27,7 @@ export default function LoginButton() {
   }
 
   // Authenticated state - show user image and dashboard button
-  if (session) {
+  if (session && serverValid) {
     return (
       <div className="flex items-center gap-3">
         {session.user?.image ? (

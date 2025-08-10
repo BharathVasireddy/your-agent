@@ -74,13 +74,13 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
     }
   });
 
-  // No agent profile - needs subscription and onboarding
+  // No agent profile - first time user → go to onboarding wizard directly
   if (!agent) {
     return {
       isAuthenticated: true,
-      needsSubscription: !bypassSubscription,
+      needsSubscription: false,
       needsOnboarding: true,
-      redirectTo: bypassSubscription ? '/onboarding/welcome' : '/onboarding/welcome',
+      redirectTo: '/onboarding/wizard',
       agent: null
     };
   }
@@ -103,7 +103,7 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
 
   // Check if onboarding is complete (has essential fields)
   const hasCompletedOnboarding = !!(
-    agent.experience && 
+    (agent.experience !== null && agent.experience !== undefined) &&
     agent.phone && 
     agent.city && 
     agent.slug

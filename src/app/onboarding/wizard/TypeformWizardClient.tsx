@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { updateAgentProfile } from '@/app/actions';
+import { updateAgentProfile, generateBio } from '@/app/actions';
 import Step3_Photo from '@/components/onboarding/Step3_Photo';
 import Step4_Theme from '@/components/onboarding/Step4_Theme';
 import { AnimatePresence, motion } from 'motion/react';
@@ -20,11 +20,12 @@ export default function TypeformWizardClient() {
   const store = useWizardStore();
 
   // Ordered questions: one at a time
-  // 0 city, 1 area, 2 phone, 3 dob, 4 exp, 5 slug, 6 bio, 7 photo, 8 template
-  const TOTAL = 9;
+  // 0 welcome, 1 name, 2 email, 3 city, 4 area, 5 phone, 6 dob, 7 exp, 8 slug, 9 bio, 10 photo, 11 template
+  const TOTAL = 12;
   const [index, setIndex] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [generatingBio, setGeneratingBio] = useState(false);
 
   // Cities/Areas (same as Step1)
   const citiesWithAreas = useMemo(() => ({
@@ -73,9 +74,10 @@ export default function TypeformWizardClient() {
   const availableCities = Object.keys(citiesWithAreas);
   const availableAreas = store.city ? citiesWithAreas[store.city as keyof typeof citiesWithAreas] || [] : [];
 
-  // Prefill phone from WhatsApp
+  // Prefill phone from WhatsApp (run once on mount)
   useEffect(() => {
-    if (!store.phone && typeof window !== 'undefined') {
+    if (typeof window === 'undefined') return;
+    if (!store.phone) {
       const local = localStorage.getItem('wa_phone_local');
       const e164 = localStorage.getItem('wa_phone_e164');
       if (local && /^\d{10}$/.test(local)) {
@@ -84,31 +86,47 @@ export default function TypeformWizardClient() {
         store.setData({ phone: e164 });
       }
     }
-  }, [store]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Generate slug from session name if empty
+  // Prefill email/name/slug from session with equality guards
   useEffect(() => {
-    if (!store.slug && session?.user?.name) {
-      const s = session.user.name
+    const sessionEmail = session?.user?.email;
+    const sessionName = session?.user?.name;
+
+    if (sessionEmail && store.email !== sessionEmail) {
+      store.setData({ email: sessionEmail });
+    }
+    if (sessionName && !store.name) {
+      store.setData({ name: sessionName });
+    }
+    if (!store.slug && sessionName) {
+      const generated = sessionName
         .toLowerCase()
         .trim()
         .replace(/[^a-z0-9]/g, '-')
         .replace(/-+/g, '-')
         .replace(/^-+|-+$/g, '');
-      if (s) store.setData({ slug: s });
+      if (generated && generated !== store.slug) {
+        store.setData({ slug: generated });
+      }
     }
-  }, [session?.user?.name, store]);
+    // Only re-run when session values change or when local store fields used in guards change
+  }, [session?.user?.name, session?.user?.email, store.email, store.name, store.slug]);
 
   const isPhoneValid = (val: string) => /^\+91[6-9]\d{9}$/.test(val);
 
   const validateCurrent = async (): Promise<boolean> => {
     setError(null);
-    if (index === 0) return !!store.city;
-    if (index === 1) return !!store.area;
-    if (index === 2) return !!store.phone && isPhoneValid(store.phone);
-    if (index === 3) return !!store.dateOfBirth;
-    if (index === 4) return Number.isFinite(store.experience) && store.experience >= 0;
-    if (index === 5) {
+    if (index === 0) return true; // welcome step
+    if (index === 1) return true; // name will be captured into user profile later
+    if (index === 2) return true; // email is from session for Google, optional input for Whatsapp users
+    if (index === 3) return !!store.city;
+    if (index === 4) return !!store.area;
+    if (index === 5) return !!store.phone && isPhoneValid(store.phone);
+    if (index === 6) return !!store.dateOfBirth;
+    if (index === 7) return Number.isFinite(store.experience) && store.experience >= 0;
+    if (index === 8) {
       if (!store.slug || store.slug.length < 3) {
         setError('Profile URL must be at least 3 characters');
         return false;
@@ -133,9 +151,9 @@ export default function TypeformWizardClient() {
       }
       return true;
     }
-    if (index === 6) return store.bio.length <= 500; // optional but limited
-    if (index === 7) return true; // photo optional
-    if (index === 8) return !!store.template;
+    if (index === 9) return store.bio.length <= 500; // optional but limited
+    if (index === 10) return true; // photo optional
+    if (index === 11) return !!store.template;
     return true;
   };
 
@@ -170,10 +188,12 @@ export default function TypeformWizardClient() {
         profilePhotoUrl: store.profilePhotoUrl,
         slug: store.slug,
         dateOfBirth: store.dateOfBirth,
+        name: store.name || session?.user?.name || undefined,
+        email: store.email || session?.user?.email || undefined,
       });
       if (result.success && result.agent?.slug) {
         useWizardStore.getState().reset();
-        router.push(`/${result.agent.slug}`);
+        router.push('/agent/dashboard');
       } else {
         setError('Failed to create profile.');
       }
@@ -221,7 +241,53 @@ export default function TypeformWizardClient() {
               transition={{ duration: 0.18, ease: 'easeOut' }}
               className="bg-white border border-zinc-200 rounded-xl p-6 sm:p-8 shadow-sm"
             >
-              {index === 0 && (
+               {index === 0 && (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold text-zinc-950">Welcome to YourAgent</h2>
+                  <p className="text-zinc-600">We&apos;ll set up your professional profile in a few quick steps. You can adjust everything later in your dashboard.</p>
+                  <ul className="text-sm text-zinc-700 list-disc pl-5 space-y-1">
+                    <li>Tell us your basic details</li>
+                    <li>Pick a clean profile URL</li>
+                    <li>Write a short professional bio</li>
+                    <li>Choose a website template</li>
+                  </ul>
+                </div>
+               )}
+
+               {index === 1 && (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold text-zinc-950">What is your full name?</h2>
+                  <div>
+                    <Label className="text-sm text-zinc-700">Full Name</Label>
+                    <Input
+                      type="text"
+                      placeholder={session?.user?.name || 'Your name'}
+                      className="mt-2 h-11"
+                      value={store.name || ''}
+                      onChange={(e) => store.setData({ name: e.target.value })}
+                    />
+                  </div>
+                </div>
+              )}
+
+               {index === 2 && (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold text-zinc-950">What is your email?</h2>
+                  <div>
+                    <Label className="text-sm text-zinc-700">Email</Label>
+                    <Input
+                      type="email"
+                      placeholder={session?.user?.email || 'you@example.com'}
+                      className="mt-2 h-11"
+                      value={store.email || ''}
+                      onChange={(e) => store.setData({ email: e.target.value })}
+                    />
+                    <p className="mt-1 text-xs text-zinc-500">We prefill if you used Google. WhatsApp users can add it now.</p>
+                  </div>
+                </div>
+              )}
+
+               {index === 3 && (
                 <div className="space-y-4">
                   <h2 className="text-2xl font-semibold text-zinc-950">Which city do you operate in?</h2>
                   <div>
@@ -240,7 +306,7 @@ export default function TypeformWizardClient() {
                 </div>
               )}
 
-              {index === 1 && (
+               {index === 4 && (
                 <div className="space-y-4">
                   <h2 className="text-2xl font-semibold text-zinc-950">Your primary area in {store.city || 'the city'}?</h2>
                   <div>
@@ -259,7 +325,7 @@ export default function TypeformWizardClient() {
                 </div>
               )}
 
-              {index === 2 && (
+               {index === 5 && (
                 <div className="space-y-4">
                   <h2 className="text-2xl font-semibold text-zinc-950">What is your WhatsApp number?</h2>
                   <div>
@@ -288,7 +354,7 @@ export default function TypeformWizardClient() {
                 </div>
               )}
 
-              {index === 3 && (
+               {index === 6 && (
                 <div className="space-y-4">
                   <h2 className="text-2xl font-semibold text-zinc-950">When is your date of birth?</h2>
                   <div>
@@ -305,7 +371,7 @@ export default function TypeformWizardClient() {
                 </div>
               )}
 
-              {index === 4 && (
+               {index === 7 && (
                 <div className="space-y-4">
                   <h2 className="text-2xl font-semibold text-zinc-950">How many years of experience do you have?</h2>
                   <div>
@@ -323,7 +389,7 @@ export default function TypeformWizardClient() {
                 </div>
               )}
 
-              {index === 5 && (
+               {index === 8 && (
                 <div className="space-y-4">
                   <h2 className="text-2xl font-semibold text-zinc-950">Pick your profile URL</h2>
                   <div>
@@ -344,7 +410,7 @@ export default function TypeformWizardClient() {
                 </div>
               )}
 
-              {index === 6 && (
+               {index === 9 && (
                 <div className="space-y-4">
                   <h2 className="text-2xl font-semibold text-zinc-950">Write a short professional bio</h2>
                   <div>
@@ -356,19 +422,51 @@ export default function TypeformWizardClient() {
                       placeholder="Tell clients about your background and expertise..."
                       className="mt-2 w-full min-h-[160px] rounded-md border border-zinc-300 px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-red-500"
                     />
-                    <div className="text-xs text-zinc-500 mt-1">{store.bio.length}/500</div>
+                      <div className="mt-2 flex items-center justify-between">
+                        <div className="text-xs text-zinc-500">{store.bio.length}/500</div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={generatingBio}
+                          onClick={async () => {
+                            try {
+                              setError(null);
+                              setGeneratingBio(true);
+                              const name = store.name || session?.user?.name || 'Agent';
+                              const res = await generateBio({
+                                name,
+                                experience: Number.isFinite(store.experience) ? store.experience : 0,
+                                city: store.city || 'Your City',
+                                area: store.area || undefined,
+                              });
+                              if (res?.success && res?.bio) {
+                                store.setData({ bio: res.bio.slice(0, 500) });
+                              } else {
+                                setError('Could not generate bio. Please try again.');
+                              }
+                            } catch (e) {
+                              setError(e instanceof Error ? e.message : 'Could not generate bio.');
+                            } finally {
+                              setGeneratingBio(false);
+                            }
+                          }}
+                          className="h-9"
+                        >
+                          {generatingBio ? 'Generating...' : 'Generate with AI'}
+                        </Button>
+                      </div>
                   </div>
                 </div>
               )}
 
-              {index === 7 && (
+               {index === 10 && (
                 <div className="space-y-4">
                   <h2 className="text-2xl font-semibold text-zinc-950">Add a profile photo (optional)</h2>
                   <Step3_Photo />
                 </div>
               )}
 
-              {index === 8 && (
+               {index === 11 && (
                 <div className="space-y-4">
                   <h2 className="text-2xl font-semibold text-zinc-950">Choose your template</h2>
                   <Step4_Theme />

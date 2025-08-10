@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Menu, X, Phone, Mail, Home } from 'lucide-react';
 import { logoFontClassNameByKey } from '@/lib/logo-fonts';
+import DashboardButton from '@/components/DashboardButton';
 
 
 // WhatsApp Icon Component
@@ -42,8 +43,6 @@ interface HeaderProps {
 export default function Header({ agent }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { data: session } = useSession();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const isOwner = session && (session as any).user && (session as any).user.id === agent.user.id;
   const pathname = usePathname();
   const router = useRouter();
   const onAgentHome = pathname === `/${agent.slug}`;
@@ -113,11 +112,6 @@ export default function Header({ agent }: HeaderProps) {
                 {item.label}
               </button>
             ))}
-            {isOwner && (
-              <Link href="/agent/dashboard" className="text-zinc-700 hover:text-zinc-950 transition-colors text-sm font-medium capitalize">
-                Dashboard
-              </Link>
-            )}
           </nav>
 
           {/* Right - Contact quick actions (mobile) + Contact (desktop) */}
@@ -144,6 +138,9 @@ export default function Header({ agent }: HeaderProps) {
                   <span>Email</span>
                 </a>
               )}
+
+              {/* Owner dashboard button */}
+              <DashboardButton agentUserId={agent.user.id} />
             </div>
 
             {/* Mobile quick actions */}
@@ -219,15 +216,9 @@ export default function Header({ agent }: HeaderProps) {
         </div>
 
         <nav className="flex flex-col space-y-3 p-4 overflow-y-auto h-[calc(100%-56px)]">
-          {isOwner && (
-            <Link
-              href="/agent/dashboard"
-              onClick={() => setIsMenuOpen(false)}
-              className="text-zinc-800 hover:text-zinc-950 transition-colors text-sm font-medium capitalize"
-            >
-              Dashboard
-            </Link>
-          )}
+          <div className="px-1 py-0.5">
+            <DashboardButton agentUserId={agent.user.id} />
+          </div>
 
           {navItems.map((item) => (
             <button
@@ -272,6 +263,11 @@ export default function Header({ agent }: HeaderProps) {
                 <span>{agent.user.email}</span>
               </a>
             )}
+
+            {/* Owner dashboard button in mobile panel */}
+            <div className="pt-1">
+              <DashboardButton agentUserId={agent.user.id} />
+            </div>
           </div>
         </nav>
       </aside>

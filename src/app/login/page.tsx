@@ -19,10 +19,7 @@ export default async function LoginPage() {
   return (
     <AuthPageLayout 
       title="Welcome Back"
-      subtitle="Sign in to your agent dashboard"
-      footerText="Don't have an account?"
-      footerLink="/register"
-      footerLinkText="Sign up"
+      subtitle="Sign in with Google or WhatsApp"
     >
       <Suspense fallback={<div className="text-center">Loading...</div>}>
         <SignInForm />

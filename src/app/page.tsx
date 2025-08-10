@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import LoginButton from '@/components/LoginButton';
+import { Pricing as AnimatedPricing } from '@/components/ui/pricing';
 
 export default function HomePage() {
   return (
@@ -38,7 +39,7 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-red-50 to-orange-50 py-20">
+      <section className="bg-white py-20">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl md:text-6xl font-bold text-zinc-950 mb-6 leading-tight">
@@ -53,7 +54,7 @@ export default function HomePage() {
               <LoginButton />
               <Link 
                 href="#how-it-works"
-                className="flex items-center gap-2 h-10 px-6 border-2 border-red-600 text-red-600 bg-white rounded-md hover:bg-red-50 transition-all duration-200 font-medium"
+                className="btn-lg border-2 border-red-600 text-red-600 bg-white rounded-md hover:bg-red-50 transition-all duration-200 font-medium flex items-center gap-2"
               >
                 See How It Works
               </Link>
@@ -288,52 +289,66 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section id="pricing" className="py-20 bg-red-600">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Ready to Transform Your Real Estate Business?
-          </h2>
-          <p className="text-xl text-red-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of successful real estate agents who trust YourAgent for their digital presence
-          </p>
-          
-          <div className="bg-white rounded-2xl p-8 max-w-md mx-auto mb-8">
-            <h3 className="text-2xl font-bold text-zinc-950 mb-4">Free Forever Plan</h3>
-            <div className="text-4xl font-bold text-red-600 mb-4">₹0<span className="text-lg text-zinc-600">/month</span></div>
-            <ul className="text-left space-y-3 mb-6">
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                <span className="text-zinc-600">Professional agent profile</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                <span className="text-zinc-600">Unlimited property listings</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                <span className="text-zinc-600">AI-powered content generation</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                <span className="text-zinc-600">Custom profile URL</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                <span className="text-zinc-600">Lead generation tools</span>
-              </li>
-            </ul>
-          </div>
-
-                    <a href="#header">
-            <Button size="lg" className="bg-white text-red-600 hover:bg-red-50 font-medium">
-              Start Your Free Profile Today
-            </Button>
-          </a>
-          
-          <p className="text-red-100 mt-4 text-sm">
-            No credit card required • Setup in 5 minutes • Cancel anytime
-          </p>
+      {/* Pricing Section */}
+      <section id="pricing" className="py-20 bg-zinc-50">
+        <div className="container mx-auto px-6">
+          {/* INR pricing with annual toggle; links go to /subscribe */}
+          <AnimatedPricing
+            plans={[
+              {
+                name: 'STARTER',
+                price: '299',
+                quarterlyPrice: '283',
+                yearlyPrice: '249',
+                period: 'per month',
+                features: [
+                  'Custom domain (youragent.in/your-name)',
+                  '25 Listings',
+                  'Unlimited CRM Leads',
+                  'WhatsApp Enquiry',
+                  'Single Template',
+                ],
+                description: 'Great for getting started',
+                buttonText: 'Choose Starter',
+                href: '/subscribe',
+                isPopular: false,
+              },
+              {
+                name: 'GROWTH',
+                price: '499',
+                quarterlyPrice: '467',
+                yearlyPrice: '416',
+                period: 'per month',
+                features: [
+                  'Everything in Starter',
+                  'Exclusive Listing Deals from YourAgent',
+                  'Access to All Design Templates',
+                  'Priority Support',
+                ],
+                description: 'Best for growing agents',
+                buttonText: 'Choose Growth',
+                href: '/subscribe',
+                isPopular: true,
+              },
+              {
+                name: 'PRO',
+                price: '699',
+                quarterlyPrice: '633',
+                yearlyPrice: '583',
+                period: 'per month',
+                features: [
+                  'Everything in Growth',
+                  'Marketing Support (Meta & Google)',
+                  'SEO Tools',
+                  'Site Analytics',
+                ],
+                description: 'For power users',
+                buttonText: 'Choose Pro',
+                href: '/subscribe',
+                isPopular: false,
+              },
+            ]}
+          />
         </div>
       </section>
 
@@ -404,7 +419,7 @@ export default function HomePage() {
           </div>
 
           <div className="border-t border-zinc-800 mt-8 pt-8 text-center text-zinc-400">
-            <p>&copy; 2024 YourAgent. All rights reserved.</p>
+            <p>&copy; 2025 YourAgent. All rights reserved.</p>
           </div>
         </div>
       </footer>

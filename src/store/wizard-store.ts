@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 
 interface AgentProfileState {
+  name: string;
+  email: string;
   experience: number;
   bio: string;
   phone: string;
@@ -18,6 +20,8 @@ interface AgentProfileActions {
 }
 
 const initialState: AgentProfileState = {
+  name: '',
+  email: '',
   experience: 0,
   bio: '',
   phone: '',

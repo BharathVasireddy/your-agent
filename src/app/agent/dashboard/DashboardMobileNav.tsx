@@ -78,7 +78,7 @@ export default function DashboardMobileNav() {
 
   return (
     <nav id="bottom-nav" className="fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-200">
-      <div className="grid grid-cols-5 h-16">
+      <div className="grid grid-cols-6 h-16">
         {navigationItems.map((item) => {
           const Icon = item.icon;
           const isActive = isActiveLink(item.href);

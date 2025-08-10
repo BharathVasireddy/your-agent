@@ -36,8 +36,8 @@ export const authOptions = {
         return url;
       }
       
-      // Default to welcome page for new sign-ins
-      return `${baseUrl}/onboarding/welcome`;
+      // Default to centralized post-signin redirect
+      return `${baseUrl}/api/auth/post-signin-redirect`;
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     session: ({ session, token }: { session: any; token: any }) => ({
@@ -86,50 +86,6 @@ export const authOptions = {
           return null;
         }
       },
-    }),
-    Credentials({
-      name: "credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-          include: { accounts: true }
-        });
-
-        if (!user) {
-          return null;
-        }
-
-        if (!user.password) {
-          // User exists but has no password (signed up with OAuth)
-          const hasGoogle = user.accounts.some(acc => acc.provider === "google");
-          if (hasGoogle) {
-            console.log(`User ${credentials.email} tried password login but only has Google auth`);
-            throw new Error("GOOGLE_ONLY_ACCOUNT");
-          }
-          return null;
-        }
-
-        const isValidPassword = await bcrypt.compare(credentials.password, user.password);
-
-        if (!isValidPassword) {
-          return null;
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.image,
-        };
-      }
     }),
   ],
   session: { strategy: "jwt" as const },

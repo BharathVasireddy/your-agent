@@ -1,3 +1,5 @@
+// NOTE: This file accidentally contained two default exports. Removing older banner logic in favor of the
+// newer lightweight loading indicator implementation below.
 'use client';
 
 import { useInstantNav } from '@/components/InstantNavProvider';

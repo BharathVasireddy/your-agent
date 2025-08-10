@@ -5,9 +5,9 @@ interface AuthPageLayoutProps {
   children: React.ReactNode;
   title: string;
   subtitle: string;
-  footerText: string;
-  footerLink: string;
-  footerLinkText: string;
+  footerText?: string;
+  footerLink?: string;
+  footerLinkText?: string;
 }
 
 export default function AuthPageLayout({
@@ -43,14 +43,16 @@ export default function AuthPageLayout({
         </div>
 
         {/* Footer */}
-        <div className="text-center">
-          <p className="text-sm text-zinc-600">
-            {footerText}{' '}
-            <Link href={footerLink} className="text-red-600 hover:text-red-700 font-medium">
-              {footerLinkText}
-            </Link>
-          </p>
-        </div>
+        {footerText && footerLink && footerLinkText ? (
+          <div className="text-center">
+            <p className="text-sm text-zinc-600">
+              {footerText}{' '}
+              <Link href={footerLink} className="text-red-600 hover:text-red-700 font-medium">
+                {footerLinkText}
+              </Link>
+            </p>
+          </div>
+        ) : null}
       </div>
     </div>
   );

@@ -11,10 +11,7 @@ export default async function OnboardingWizardPage() {
     redirect('/login');
   }
 
-  // If user needs subscription, redirect to subscribe page
-  if (flowStatus.needsSubscription) {
-    redirect('/subscribe');
-  }
+  // Subscription is not required before onboarding
 
   // If user doesn't need onboarding (already completed), redirect to dashboard
   if (!flowStatus.needsOnboarding) {

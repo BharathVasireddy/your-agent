@@ -28,24 +28,26 @@ export default function WelcomeFlow({ session, flowStatus }: WelcomeFlowProps) {
   useEffect(() => {
     if (flowStatus.needsSubscription) {
       router.push('/subscribe');
+    } else if (flowStatus.needsOnboarding) {
+      router.push('/onboarding/wizard');
+    } else {
+      router.push('/agent/dashboard');
     }
-  }, [flowStatus.needsSubscription, router]);
+  }, [flowStatus.needsSubscription, flowStatus.needsOnboarding, router]);
 
   const handleStartOnboarding = () => {
     router.push('/onboarding/wizard');
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl w-full space-y-8">
         {/* Header */}
         <div className="text-center">
           <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
             <Sparkles className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-4xl font-bold text-zinc-950 mb-4">
-            Welcome to YourAgent! 🎉
-          </h1>
+          <h1 className="text-4xl font-bold text-zinc-950 mb-4">Welcome to YourAgent</h1>
           <p className="text-lg text-zinc-600 max-w-lg mx-auto">
             Let&apos;s set up your professional real estate profile and get you started with your digital presence.
           </p>

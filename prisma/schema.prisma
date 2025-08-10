@@ -36,6 +36,8 @@ model Agent {
   dateOfBirth           DateTime?
   isSubscribed          Boolean       @default(false)
   subscriptionEndsAt    DateTime?
+  subscriptionPlan      String?
+  subscriptionInterval  String?
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt
   profilePhotoUrl       String?
@@ -101,6 +103,10 @@ model Payment {
   currency          String   @default("INR")
   status            String   @default("completed")
   type              String   @default("subscription")
+  plan              String?
+  interval          String?
+  periodEndsAt      DateTime?
+  pricePaidPaise    Int?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   agent             Agent?   @relation(fields: [agentId], references: [id])

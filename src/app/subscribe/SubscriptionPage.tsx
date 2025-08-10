@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Check, Loader2, CreditCard, Shield, Star, Users, Zap, Globe } from 'lucide-react';
 import { UserFlowStatus } from '@/lib/userFlow';
 import { createRazorpayOrder, verifyPayment } from '@/app/actions';
+import type { Plan, Interval } from '@/lib/subscriptions';
 
 interface SubscriptionPageProps {
   session: {
@@ -28,10 +29,24 @@ declare global {
   }
 }
 
+function getPreselected(): { plan?: 'starter'|'growth'|'pro'; interval?: 'monthly'|'quarterly'|'yearly' } {
+  if (typeof document === 'undefined') return {};
+  try {
+    const cookie = document.cookie.split('; ').find(c => c.startsWith('selectedPlan='));
+    if (!cookie) return {};
+    const value = decodeURIComponent(cookie.split('=')[1] || '');
+    const parsed = JSON.parse(value);
+    return { plan: parsed.plan, interval: parsed.interval };
+  } catch { return {}; }
+}
+
 export default function SubscriptionPage({ session, flowStatus }: SubscriptionPageProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const preset = getPreselected();
+  const [plan, setPlan] = useState<Plan>(preset.plan as Plan || 'starter');
+  const [interval, setInterval] = useState<Interval>(preset.interval as Interval || 'monthly');
   
   // Suppress unused variable warning for flowStatus (used by parent for routing logic)
   void flowStatus;
@@ -57,7 +72,7 @@ export default function SubscriptionPage({ session, flowStatus }: SubscriptionPa
       }
 
       // Create Razorpay order
-      const orderResult = await createRazorpayOrder();
+      const orderResult = await createRazorpayOrder(plan, interval);
       
       if (!orderResult.success || !orderResult.order) {
         throw new Error(orderResult.error || 'Failed to create payment order');
@@ -83,15 +98,13 @@ export default function SubscriptionPage({ session, flowStatus }: SubscriptionPa
         amount: typeof order.amount === 'string' ? parseInt(order.amount, 10) : order.amount,
         currency: order.currency,
         name: 'YourAgent.in',
-        description: 'Professional Real Estate Agent Subscription',
+        description: `Subscription: ${plan.toUpperCase()} (${interval})`,
         order_id: order.id,
         prefill: {
           name: session.user.name || '',
           email: session.user.email || '',
         },
-        theme: {
-          color: '#DC2626' // red-600
-        },
+        theme: { color: '#DC2626' },
         handler: async function (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) {
           try {
             // Verify payment on server
@@ -99,7 +112,7 @@ export default function SubscriptionPage({ session, flowStatus }: SubscriptionPa
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
-            });
+            }, plan, interval);
 
             if (verificationResult.success) {
               // Payment successful, redirect to onboarding
@@ -130,7 +143,7 @@ export default function SubscriptionPage({ session, flowStatus }: SubscriptionPa
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         
         {/* Header */}
@@ -145,18 +158,41 @@ export default function SubscriptionPage({ session, flowStatus }: SubscriptionPa
           </p>
         </div>
 
+        {/* Plan Selector */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          {(['starter','growth','pro'] as Plan[]).map(p => (
+            <button
+              key={p}
+              onClick={() => setPlan(p)}
+              className={`border rounded-xl p-4 text-left ${plan===p ? 'border-red-600' : 'border-zinc-200'}`}
+            >
+              <div className="font-semibold text-zinc-900 capitalize">{p}</div>
+              <div className="text-xs text-zinc-500 mt-1">{p==='starter'?'Single Template, 25 Listings':'All Templates, Unlimited Listings'}</div>
+            </button>
+          ))}
+        </div>
+
+        {/* Interval Selector */}
+        <div className="flex gap-2 mb-8">
+          {(['monthly','quarterly','yearly'] as Interval[]).map(i => (
+            <button key={i} onClick={()=>setInterval(i)} className={`px-3 py-2 rounded-lg border text-sm capitalize ${interval===i?'border-red-600 text-red-700':'border-zinc-200 text-zinc-700'}`}>{i}</button>
+          ))}
+        </div>
+
         {/* Pricing Card */}
         <div className="bg-white rounded-2xl shadow-xl border border-zinc-200 overflow-hidden mb-8">
-          <div className="bg-red-600 text-white text-center py-4">
-            <span className="text-sm font-medium uppercase tracking-wide">Limited Time Offer</span>
-          </div>
+          <div className="bg-red-600 text-white text-center py-4" />
           
           <div className="p-8 md:p-12">
             <div className="text-center mb-8">
               <div className="flex items-center justify-center mb-4">
-                <span className="text-6xl md:text-7xl font-bold text-zinc-950">₹499</span>
+                <span className="text-6xl md:text-7xl font-bold text-zinc-950">
+                  {plan==='starter' && (interval==='monthly'?'₹299':interval==='quarterly'?'₹849':'₹2,999')}
+                  {plan==='growth' && (interval==='monthly'?'₹499':interval==='quarterly'?'₹1,399':'₹4,999')}
+                  {plan==='pro' && (interval==='monthly'?'₹699':interval==='quarterly'?'₹1,999':'₹6,999')}
+                </span>
                 <div className="ml-4 text-left">
-                  <div className="text-zinc-600 text-lg">/month</div>
+                  <div className="text-zinc-600 text-lg">/{interval}</div>
                   <div className="text-sm text-zinc-500">Billed monthly</div>
                 </div>
               </div>

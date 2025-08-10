@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { ENTITLEMENTS, type Plan } from '@/lib/subscriptions';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -53,6 +54,10 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
     slug: agent.slug || '',
     dateOfBirth: agent.dateOfBirth ? agent.dateOfBirth.toISOString().split('T')[0] : '',
   });
+
+  // Determine plan restrictions for template selection
+  const plan: Plan = (agent as unknown as { subscriptionPlan?: Plan | null }).subscriptionPlan ?? 'starter';
+  const allowedTemplates = ENTITLEMENTS[plan].templates === 'all' ? null : new Set<string>(ENTITLEMENTS[plan].templates as string[]);
 
   // UI state
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -689,13 +694,19 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
 
         {/* Template Selection */}
         <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
-          <h3 className="text-lg font-semibold text-zinc-950 mb-4">Profile Template</h3>
-          <RadioGroup value={formData.template} onValueChange={(value) => handleInputChange('template', value)}>
+          <h3 className="text-lg font-semibold text-zinc-950 mb-2">Profile Template</h3>
+          {allowedTemplates && (
+            <p className="text-xs text-zinc-600 mb-3">Your current plan allows only selected templates. Upgrade to unlock all templates.</p>
+          )}
+          <RadioGroup value={formData.template} onValueChange={(value) => {
+            if (allowedTemplates && !allowedTemplates.has(value)) return; // block disallowed selection
+            handleInputChange('template', value);
+          }}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Legacy Pro */}
               <label
                 htmlFor="legacy-pro"
-                className={`flex items-center space-x-4 p-4 rounded-lg border-2 transition-all cursor-pointer ${formData.template === 'legacy-pro' ? 'border-red-200 bg-red-50' : 'border-zinc-200 hover:bg-zinc-50'}`}
+                className={`flex items-center space-x-4 p-4 rounded-lg border-2 transition-all ${formData.template === 'legacy-pro' ? 'border-red-200 bg-red-50' : 'border-zinc-200 hover:bg-zinc-50'} ${allowedTemplates && !allowedTemplates.has('legacy-pro') ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <RadioGroupItem value="legacy-pro" id="legacy-pro" />
                 <div className="flex-1">
@@ -721,7 +732,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
               {/* Fresh Minimal */}
               <label
                 htmlFor="fresh-minimal"
-                className={`flex items-center space-x-4 p-4 rounded-lg border-2 transition-all cursor-pointer ${formData.template === 'fresh-minimal' ? 'border-red-200 bg-red-50' : 'border-zinc-200 hover:bg-zinc-50'}`}
+                className={`flex items-center space-x-4 p-4 rounded-lg border-2 transition-all ${formData.template === 'fresh-minimal' ? 'border-red-200 bg-red-50' : 'border-zinc-200 hover:bg-zinc-50'} ${allowedTemplates && !allowedTemplates.has('fresh-minimal') ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <RadioGroupItem value="fresh-minimal" id="fresh-minimal" />
                 <div className="flex-1">
@@ -747,7 +758,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
               {/* Mono Modern */}
               <label
                 htmlFor="mono-modern"
-                className={`flex items-center space-x-4 p-4 rounded-lg border-2 transition-all cursor-pointer ${formData.template === 'mono-modern' ? 'border-red-200 bg-red-50' : 'border-zinc-200 hover:bg-zinc-50'}`}
+                className={`flex items-center space-x-4 p-4 rounded-lg border-2 transition-all ${formData.template === 'mono-modern' ? 'border-red-200 bg-red-50' : 'border-zinc-200 hover:bg-zinc-50'} ${allowedTemplates && !allowedTemplates.has('mono-modern') ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <RadioGroupItem value="mono-modern" id="mono-modern" />
                 <div className="flex-1">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PropertyTypeSelector from './PropertyTypeSelector';
 import PropertyFormFactory from './forms/PropertyFormFactory';
@@ -15,6 +15,31 @@ export default function PropertyCreationWizard({}: PropertyCreationWizardProps) 
   const [currentStep, setCurrentStep] = useState<'type-selection' | 'form'>('type-selection');
   const [selectedListingType, setSelectedListingType] = useState<ListingType | null>(null);
   const [selectedPropertyType, setSelectedPropertyType] = useState<PropertyType | null>(null);
+  const [quotaText, setQuotaText] = useState<string | null>(null);
+  const [quotaPercent, setQuotaPercent] = useState<number | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    // Fetch plan/entitlements and current usage to show a small indicator
+    Promise.all([
+      fetch('/api/subscription/entitlements').then(r => r.json()).catch(() => null),
+      fetch('/api/properties', { method: 'HEAD' }).catch(() => null)
+    ]).then(async ([ent, _]) => {
+      if (!mounted || !ent) return;
+      try {
+        const resp = await fetch('/api/properties?count=1');
+        const data = await resp.json().catch(() => ({}));
+        const used = typeof data.count === 'number' ? data.count : null;
+        const limit = ent.entitlements?.listingLimit;
+        if (typeof used === 'number' && Number.isFinite(limit)) {
+          const percent = Math.min(100, Math.round((used / limit) * 100));
+          setQuotaPercent(percent);
+          setQuotaText(`${used} / ${limit} listings used`);
+        }
+      } catch { /* ignore */ }
+    });
+    return () => { mounted = false; };
+  }, []);
 
   const handleTypeSelection = (listingType: ListingType, propertyType: PropertyType) => {
     setSelectedListingType(listingType);
@@ -57,6 +82,14 @@ export default function PropertyCreationWizard({}: PropertyCreationWizardProps) 
 
   return (
     <div>
+      {quotaText && quotaPercent !== null && (
+        <div className="mb-4">
+          <div className="text-xs text-zinc-600 mb-1">{quotaText}</div>
+          <div className="w-full h-2 bg-zinc-200 rounded overflow-hidden">
+            <div className="h-2 bg-red-600" style={{ width: `${quotaPercent}%` }} />
+          </div>
+        </div>
+      )}
       {currentStep === 'type-selection' && (
         <PropertyTypeSelector
           onSelect={handleTypeSelection}

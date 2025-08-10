@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import OpenAI from "openai";
+import { PRICE_PAISE, DURATION_MONTHS, addMonths, ENTITLEMENTS, type Plan, type Interval } from '@/lib/subscriptions';
 
 function generateSlug(name: string): string {
   return name
@@ -45,7 +46,7 @@ export async function createPropertyAction(formData: FormData) {
     // Find the user's agent profile
     const agent = await prisma.agent.findUnique({
       where: { userId },
-      select: { id: true, isSubscribed: true }
+      select: { id: true, isSubscribed: true, subscriptionPlan: true }
     });
 
     if (!agent) {
@@ -68,6 +69,14 @@ export async function createPropertyAction(formData: FormData) {
             subscriptionEndsAt: subscriptionEndsAt
           }
         });
+      }
+    }
+
+    // Enforce listing limit based on plan
+    if (agent.subscriptionPlan === 'starter') {
+      const count = await prisma.property.count({ where: { agentId: agent.id } });
+      if (count >= 25) {
+        throw new Error('Listing limit reached for Starter plan. Upgrade to add more listings.');
       }
     }
 
@@ -380,7 +389,7 @@ export async function deletePropertyAction(propertySlug: string) {
 
 
 
-export async function grantSubscription() {
+export async function grantSubscription(opts?: { plan?: Plan; interval?: Interval; endsAt?: Date; amountPaise?: number }) {
   try {
     // Get the current user's session
     const session = await getServerSession(authOptions);
@@ -398,9 +407,10 @@ export async function grantSubscription() {
       where: { userId }
     });
 
-    // Set subscription end date to 1 year from now
-    const subscriptionEndsAt = new Date();
-    subscriptionEndsAt.setFullYear(subscriptionEndsAt.getFullYear() + 1);
+    // Determine plan/interval/end date
+    const plan: Plan = opts?.plan ?? 'growth';
+    const interval: Interval = opts?.interval ?? 'monthly';
+    const subscriptionEndsAt = opts?.endsAt ?? addMonths(new Date(), DURATION_MONTHS[interval]);
 
     if (!agent) {
       // Create new agent profile
@@ -430,6 +440,8 @@ export async function grantSubscription() {
           slug,
           isSubscribed: true,
           subscriptionEndsAt,
+          subscriptionPlan: plan,
+          subscriptionInterval: interval,
           template: "classic-professional",
           bio: `Professional real estate agent with expertise in property sales and customer service.`,
           city: "Your City",
@@ -452,6 +464,8 @@ export async function grantSubscription() {
         data: {
           isSubscribed: true,
           subscriptionEndsAt,
+          subscriptionPlan: plan,
+          subscriptionInterval: interval,
           updatedAt: new Date()
         }
       });
@@ -461,7 +475,7 @@ export async function grantSubscription() {
       
       return {
         success: true,
-        message: `Agent profile updated! Subscription active until ${subscriptionEndsAt.toLocaleDateString()}.`,
+        message: `Agent profile updated! Subscription (${plan}/${interval}) active until ${subscriptionEndsAt.toLocaleDateString()}.`,
         agent
       };
     }
@@ -489,7 +503,7 @@ export async function subscribeAndRedirect() {
 }
 
 // Razorpay payment integration
-export async function createRazorpayOrder() {
+export async function createRazorpayOrder(plan: Plan, interval: Interval) {
   try {
     const session = await getServerSession(authOptions);
     
@@ -504,7 +518,7 @@ export async function createRazorpayOrder() {
       key_secret: process.env.RAZORPAY_KEY_SECRET!,
     });
 
-    const amount = 49900; // ₹499 in paise (smallest currency unit)
+    const amount = PRICE_PAISE[plan][interval];
     const currency = 'INR';
 
     const order = await razorpay.orders.create({
@@ -515,7 +529,9 @@ export async function createRazorpayOrder() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         userId: (session as any).user.id,
         email: session.user.email,
-        type: 'monthly_subscription'
+        type: 'subscription',
+        plan,
+        interval
       }
     });
 
@@ -533,7 +549,7 @@ export async function verifyPayment(paymentData: {
   razorpay_order_id: string;
   razorpay_payment_id: string;
   razorpay_signature: string;
-}) {
+}, plan: Plan, interval: Interval) {
   try {
     const crypto = await import('crypto');
     const session = await getServerSession(authOptions);
@@ -552,7 +568,8 @@ export async function verifyPayment(paymentData: {
     }
 
     // Payment verified successfully, grant subscription
-    await grantSubscription();
+    const endsAt = addMonths(new Date(), DURATION_MONTHS[interval]);
+    await grantSubscription({ plan, interval, endsAt, amountPaise: PRICE_PAISE[plan][interval] });
 
     // Store payment record
     const userId = session.user?.id as string;
@@ -567,10 +584,14 @@ export async function verifyPayment(paymentData: {
         agentId: agent?.id || null,
         razorpayOrderId: paymentData.razorpay_order_id,
         razorpayPaymentId: paymentData.razorpay_payment_id,
-        amount: 49900,
+        amount: PRICE_PAISE[plan][interval],
         currency: 'INR',
         status: 'completed',
-        type: 'subscription'
+        type: 'subscription',
+        plan,
+        interval,
+        periodEndsAt: endsAt,
+        pricePaidPaise: PRICE_PAISE[plan][interval]
       }
     });
 
@@ -585,13 +606,13 @@ export async function verifyPayment(paymentData: {
 }
 
 // Validation schema for agent profile data
-const agentProfileSchema = z.object({
+  const agentProfileSchema = z.object({
   experience: z.number().min(0).max(50),
   bio: z.string().max(500, "Bio must be 500 characters or less"),
   phone: z.string().min(1, "Phone number is required"),
   city: z.string().min(1, "City is required"),
   area: z.string().optional(),
-  template: z.string().min(1, "Template is required"),
+    template: z.string().min(1, "Template is required"),
   profilePhotoUrl: z.string().optional(),
   slug: z.string().min(3, "Profile URL must be at least 3 characters").max(50, "Profile URL must be less than 50 characters"),
   dateOfBirth: z.string().min(1, "Date of birth is required"),
@@ -621,6 +642,9 @@ export async function updateAgentProfile(data: {
   heroImage?: string;
   heroTitle?: string;
   heroSubtitle?: string;
+  // Optionally collect and update user fields during onboarding
+  name?: string;
+  email?: string;
 }) {
   try {
     // Get the current user's session
@@ -637,13 +661,60 @@ export async function updateAgentProfile(data: {
     // Validate the incoming data
     const validatedData = agentProfileSchema.parse(data);
 
+    // Optionally update the User record with name/email if provided
+    if (data.name || data.email) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          ...(data.name ? { name: data.name } : {}),
+          ...(data.email ? { email: data.email } : {}),
+        }
+      });
+    }
+
     // Find existing agent profile
-    const existingAgent = await prisma.agent.findUnique({
+    let existingAgent = await prisma.agent.findUnique({
       where: { userId }
     });
 
     if (!existingAgent) {
-      throw new Error("Agent profile not found. Please subscribe first.");
+      // Create a new agent profile for first-time users (no subscription yet)
+      existingAgent = await prisma.agent.create({
+        data: {
+          userId,
+          slug: validatedData.slug,
+          isSubscribed: false,
+          experience: validatedData.experience,
+          bio: validatedData.bio,
+          phone: validatedData.phone,
+          city: validatedData.city,
+          area: validatedData.area || null,
+          template: validatedData.template,
+          profilePhotoUrl: validatedData.profilePhotoUrl || null,
+          dateOfBirth: validatedData.dateOfBirth ? new Date(validatedData.dateOfBirth) : null,
+          logoUrl: validatedData.logoUrl || null,
+          logoFont: validatedData.logoFont || null,
+          logoMaxHeight: validatedData.logoMaxHeight ?? null,
+          logoMaxWidth: validatedData.logoMaxWidth ?? null,
+          heroImage: validatedData.heroImage || null,
+          heroTitle: validatedData.heroTitle || null,
+          heroSubtitle: validatedData.heroSubtitle || null,
+        }
+      });
+      revalidatePath(`/${existingAgent.slug}`);
+      revalidatePath('/agent/dashboard');
+      revalidatePath('/agent/dashboard/profile');
+      return { success: true, agent: existingAgent };
+    }
+
+    // Enforce template entitlement based on plan
+    const plan = (existingAgent?.subscriptionPlan as 'starter'|'growth'|'pro' | undefined) ?? 'starter';
+    const templatesEntitlement = ENTITLEMENTS[plan].templates;
+    if (templatesEntitlement !== 'all') {
+      const allowed = new Set<string>(templatesEntitlement as string[]);
+      if (!allowed.has(validatedData.template)) {
+        throw new Error('Your plan does not include this template. Please upgrade to use it.');
+      }
     }
 
     // Check if the custom slug is available (unless it's the same agent)

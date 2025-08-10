@@ -2,7 +2,38 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { ENTITLEMENTS, type Plan } from '@/lib/subscriptions';
 import { type BasePropertyFormData } from '@/types/property';
+
+export async function GET(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any).user.id as string;
+    const agent = await prisma.agent.findUnique({
+      where: { userId },
+      select: { id: true, subscriptionPlan: true }
+    });
+    if (!agent) {
+      return NextResponse.json({ error: 'Agent profile not found' }, { status: 404 });
+    }
+
+    const url = new URL(request.url);
+    const countOnly = url.searchParams.get('count') === '1';
+    const count = await prisma.property.count({ where: { agentId: agent.id } });
+    if (countOnly) {
+      const plan: Plan = (agent.subscriptionPlan as Plan | null) ?? 'starter';
+      const limit = ENTITLEMENTS[plan].listingLimit;
+      return NextResponse.json({ count, plan, limit });
+    }
+    return NextResponse.json({ count });
+  } catch {
+    return NextResponse.json({ error: 'Failed to fetch properties' }, { status: 500 });
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,7 +49,7 @@ export async function POST(request: NextRequest) {
     // Get the user's agent profile
     const agent = await prisma.agent.findUnique({
       where: { userId },
-      select: { id: true, isSubscribed: true }
+      select: { id: true, isSubscribed: true, subscriptionPlan: true }
     });
 
     if (!agent) {
@@ -27,6 +58,16 @@ export async function POST(request: NextRequest) {
 
     if (!agent.isSubscribed) {
       return NextResponse.json({ error: 'Subscription required to create properties' }, { status: 403 });
+    }
+
+    // Enforce listing limit based on plan
+    const plan = (agent.subscriptionPlan as Plan | null) ?? 'starter';
+    const listingLimit = ENTITLEMENTS[plan].listingLimit;
+    if (Number.isFinite(listingLimit)) {
+      const currentCount = await prisma.property.count({ where: { agentId: agent.id } });
+      if (currentCount >= (listingLimit as number)) {
+        return NextResponse.json({ error: 'Listing limit reached for your plan. Upgrade to add more listings.' }, { status: 403 });
+      }
     }
 
     const data: BasePropertyFormData = await request.json();

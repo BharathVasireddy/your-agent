@@ -1,7 +1,9 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Plus, Home } from 'lucide-react';
-import { getCachedSession, getFilteredAgentProperties } from '@/lib/dashboard-data';
+import { getCachedSession, getFilteredAgentProperties, getCachedAgent } from '@/lib/dashboard-data';
+import prisma from '@/lib/prisma';
+import { ENTITLEMENTS, type Plan } from '@/lib/subscriptions';
 import PropertiesViewToggle from '@/components/PropertiesViewToggle';
 import PropertiesFilterBar from '@/components/PropertiesFilterBar';
 import PropertiesTable from '@/components/PropertiesTable';
@@ -57,6 +59,13 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
     q,
   });
 
+  // Quota info
+  const agent = await getCachedAgent(userId);
+  const plan: Plan = (agent?.subscriptionPlan as Plan | null) ?? 'starter';
+  const limit = ENTITLEMENTS[plan].listingLimit;
+  const limitNumber = Number.isFinite(limit) ? (limit as number) : null;
+  const overallCount = await prisma.property.count({ where: { agent: { userId } } });
+
   const saleProperties = items.filter(p => p.listingType === 'Sale') as unknown as Property[];
   const rentProperties = items.filter(p => p.listingType === 'Rent') as unknown as Property[];
 
@@ -71,6 +80,17 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
               <span>Sale: {saleProperties.length}</span>
               <span>Rent: {rentProperties.length}</span>
             </div>
+            {limitNumber !== null && (
+              <div className="mt-2 text-[10px] text-zinc-600">
+                <div className="w-full h-1.5 bg-zinc-200 rounded overflow-hidden">
+                  <div
+                    className="h-1.5 bg-red-600"
+                    style={{ width: `${Math.min(100, Math.round((total / limitNumber) * 100))}%` }}
+                  />
+                </div>
+                <div className="mt-1">{total} / {limitNumber} used</div>
+              </div>
+            )}
           </div>
           <Link
             href="/agent/dashboard/properties/new"
@@ -86,12 +106,34 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
         <div>
           <h1 className="text-3xl font-bold text-zinc-950">Properties</h1>
           <p className="text-zinc-600 mt-1">Manage your property listings</p>
+          {limitNumber !== null && (
+            <div className="mt-2 text-xs text-zinc-600">
+              <div className="flex items-center gap-2">
+                <div className="w-40 h-2 bg-zinc-200 rounded overflow-hidden">
+                  <div
+                    className="h-2 bg-red-600"
+                    style={{ width: `${Math.min(100, Math.round((overallCount / limitNumber) * 100))}%` }}
+                  />
+                </div>
+                <span>
+                  {overallCount} / {limitNumber} listings used
+                </span>
+              </div>
+              {overallCount >= Math.max(0, limitNumber - 5) && overallCount < limitNumber && (
+                <div className="text-orange-600 mt-1">Approaching your plan limit. Consider upgrading.</div>
+              )}
+              {overallCount >= limitNumber && (
+                <div className="text-red-600 mt-1">You have reached your plan limit. Upgrade to add more listings.</div>
+              )}
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <PropertiesViewToggle initial={view} />
           <Link
           href="/agent/dashboard/properties/new"
-          className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          className={`inline-flex items-center px-4 py-2 rounded-lg transition-colors ${limitNumber !== null && overallCount >= limitNumber ? 'bg-zinc-200 text-zinc-500 cursor-not-allowed' : 'bg-red-600 text-white hover:bg-red-700'}`}
+          aria-disabled={limitNumber !== null && overallCount >= limitNumber}
         >
           <Plus className="w-5 h-5 mr-2" />
           Add Property
