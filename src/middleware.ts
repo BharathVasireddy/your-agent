@@ -18,11 +18,15 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Handle subdomain only when hostname ends with our primary domain and has a subdomain
-  if (hostname.endsWith(primaryDomain)) {
-    const parts = hostname.replace(`.${primaryDomain}`, '').split('.');
-    const subdomain = parts.length >= 1 ? parts[0] : '';
+  // If request is for apex domain exactly, do nothing
+  if (hostname === primaryDomain) {
+    return NextResponse.next();
+  }
 
+  // Handle subdomain only when hostname ends with ".{primaryDomain}"
+  if (hostname.endsWith(`.${primaryDomain}`)) {
+    const prefix = hostname.slice(0, -(primaryDomain.length + 1));
+    const subdomain = prefix.split('.')[0] || '';
     const reserved = new Set(['', 'www', 'app', 'admin']);
     if (subdomain && !reserved.has(subdomain)) {
       const url = req.nextUrl.clone();
