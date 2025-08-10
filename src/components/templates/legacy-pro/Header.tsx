@@ -42,7 +42,8 @@ interface HeaderProps {
 
 export default function Header({ agent }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { data: session } = useSession();
+  // session not used in this header; querying would cost extra
+  // const { data: session } = useSession();
   const pathname = usePathname();
   const router = useRouter();
   const onAgentHome = pathname === `/${agent.slug}`;

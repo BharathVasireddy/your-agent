@@ -10,7 +10,7 @@ import {
   Mail,
   MapPin
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+// import { Button } from '@/components/ui/button';
 import LoginButton from '@/components/LoginButton';
 import { Pricing as AnimatedPricing } from '@/components/ui/pricing';
 

@@ -13,10 +13,8 @@ interface SignInFormProps {
 
 export default function SignInForm({ onSuccess }: SignInFormProps) {
   const router = useRouter();
-  const [formData] = useState({ email: "", password: "" });
-  const [showPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [, setError] = useState("");
+  // legacy fields no longer used
+  // UI state for legacy paths removed
   const [showWhatsApp, setShowWhatsApp] = useState(false);
   const [waPhone, setWaPhone] = useState('');
   const [waStage, setWaStage] = useState<'enter' | 'otp'>('enter');
@@ -28,18 +26,7 @@ export default function SignInForm({ onSuccess }: SignInFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError("");
-    
-
-    try {
-      // Credentials sign-in removed; use Google or WhatsApp below
-      setError("Please use Continue with Google or Continue with WhatsApp");
-    } catch {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+    setWaMsg('Please use Continue with Google or Continue with WhatsApp');
   };
 
   const handleGoogleSignIn = () => {
@@ -153,7 +140,10 @@ export default function SignInForm({ onSuccess }: SignInFormProps) {
             className="w-full border-2 hover:bg-gray-50 btn-lg transition-all duration-200"
             style={{ borderColor: 'var(--border-color)' }}
           >
-            <img src="/whatsapp.svg" alt="WhatsApp" className="w-5 h-5 mr-3" />
+            {/* Use Next Image for optimal LCP */}
+            <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path fill="#25D366" d="M20.52 3.48A11.77 11.77 0 0012.06 0C5.47 0 .12 5.35.12 11.94c0 2.1.55 4.16 1.6 5.98L0 24l6.24-1.65a11.9 11.9 0 005.82 1.48h.01c6.59 0 11.94-5.35 11.94-11.94 0-3.19-1.24-6.19-3.49-8.41zM12.07 21.3h-.01a9.4 9.4 0 01-4.79-1.31l-.34-.2-3.7.98.99-3.6-.22-.37A9.42 9.42 0 012.7 11.94C2.7 6.77 6.9 2.57 12.07 2.57c2.49 0 4.82.97 6.59 2.73a9.24 9.24 0 012.73 6.64c0 5.17-4.2 9.36-9.32 9.36zm5.39-7.02c-.29-.14-1.7-.84-1.96-.94-.26-.1-.46-.14-.65.14-.19.29-.75.94-.92 1.13-.17.19-.34.22-.63.08-.29-.14-1.21-.45-2.31-1.43-.85-.76-1.42-1.7-1.59-1.99-.17-.29-.02-.45.13-.59.13-.13.29-.34.43-.51.14-.17.19-.29.29-.48.1-.19.05-.36-.02-.5-.08-.14-.65-1.57-.89-2.15-.23-.55-.48-.48-.65-.49l-.55-.01c-.19 0-.5.07-.76.36-.26.29-1 1-1 2.43s1.03 2.82 1.18 3.02c.14.19 2.02 3.09 4.89 4.34.68.29 1.21.46 1.62.59.68.22 1.3.19 1.79.12.55-.08 1.7-.69 1.94-1.35.24-.66.24-1.22.17-1.35-.07-.13-.26-.2-.55-.34z"/>
+            </svg>
             Continue with WhatsApp
           </Button>
       </div>

@@ -30,7 +30,6 @@ export default function HeroSection({ agent }: { agent: { heroTitle: string | nu
             </BlurFade>
           </div>
           <div className="md:col-span-6">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <BlurFade delay={0.15} inView>
               <img
                 src={agent.heroImage || '/images/hero-background.jpg'}

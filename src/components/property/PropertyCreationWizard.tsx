@@ -24,7 +24,7 @@ export default function PropertyCreationWizard({}: PropertyCreationWizardProps) 
     Promise.all([
       fetch('/api/subscription/entitlements').then(r => r.json()).catch(() => null),
       fetch('/api/properties', { method: 'HEAD' }).catch(() => null)
-    ]).then(async ([ent, _]) => {
+    ]).then(async ([ent]) => {
       if (!mounted || !ent) return;
       try {
         const resp = await fetch('/api/properties?count=1');

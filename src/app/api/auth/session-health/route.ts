@@ -18,7 +18,7 @@ export async function GET() {
     }
     const flow = await getUserFlowStatus();
     return NextResponse.json({ valid: true, flow });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ valid: false });
   }
 }

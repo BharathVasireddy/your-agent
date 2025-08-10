@@ -18,7 +18,6 @@ export default function HeroSection({ agent }: { agent: { heroTitle: string | nu
           </div>
         </div>
         <div className="md:col-span-6">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={agent.heroImage || '/images/hero-background.jpg'}
             alt="Hero"

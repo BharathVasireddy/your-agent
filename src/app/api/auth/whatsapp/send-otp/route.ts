@@ -36,7 +36,6 @@ export async function POST(request: NextRequest) {
     const phoneId = process.env.WHATSAPP_PHONE_ID;
     const template = process.env.WHATSAPP_TEMPLATE || 'otp';
     const lang = process.env.WHATSAPP_TEMPLATE_LANG || 'en_US';
-    const appName = process.env.APP_NAME || 'YourAgent';
 
     if (!token || !phoneId) {
       return NextResponse.json({ error: 'WhatsApp credentials not configured' }, { status: 500 });

@@ -112,7 +112,7 @@ export default function TypeformWizardClient() {
       }
     }
     // Only re-run when session values change or when local store fields used in guards change
-  }, [session?.user?.name, session?.user?.email, store.email, store.name, store.slug]);
+  }, [session?.user?.name, session?.user?.email, store.email, store.name, store.slug, store.setData]);
 
   const isPhoneValid = (val: string) => /^\+91[6-9]\d{9}$/.test(val);
 
@@ -157,7 +157,7 @@ export default function TypeformWizardClient() {
     return true;
   };
 
-  const next = async () => {
+  const next = useCallback(async () => {
     if (busy) return;
     setBusy(true);
     const ok = await validateCurrent();
@@ -165,7 +165,7 @@ export default function TypeformWizardClient() {
     if (!ok) return;
     if (index < TOTAL - 1) setIndex((i) => i + 1);
     else await finish();
-  };
+  }, [busy, index, validateCurrent]);
 
   const prev = () => {
     if (index > 0) setIndex((i) => i - 1);
@@ -216,7 +216,7 @@ export default function TypeformWizardClient() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [next]);
 
   const progress = Math.round(((index + 1) / TOTAL) * 100);
 

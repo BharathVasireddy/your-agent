@@ -35,7 +35,7 @@ export default async function HeroSection({ agent }: HeroSectionProps) {
     { number: `${agent.experience || 14}+`, label: 'Years Experience' },
   ];
 
-  const isOwner = false; // default server rendering without owner check
+  // const isOwner = false; // owner check handled client-side in editable variant
 
   return (
     <section id="hero" className="relative min-h-[65vh] md:min-h-[calc(100vh-64px)] flex flex-col">
