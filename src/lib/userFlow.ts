@@ -21,7 +21,7 @@ export interface UserFlowStatus {
 export async function getUserFlowStatus(): Promise<UserFlowStatus> {
   const session = await getServerSession(authOptions);
 
-  // Not authenticated - redirect to sign in
+  // Not authenticated
   if (!session?.user) {
     return {
       isAuthenticated: false,
@@ -45,15 +45,14 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
     select: { id: true }
   });
 
-  // If User record doesn't exist, the session is orphaned
+  // If User record doesn't exist
   if (!user) {
     console.warn(`Orphaned session detected for userId: ${userId}. User record missing.`);
     return {
       isAuthenticated: false,
       needsSubscription: false,
       needsOnboarding: false,
-      // send back to login; client/session-health will handle clearing cookie if present
-      redirectTo: '/login?error=session_expired',
+      redirectTo: '/login',
       agent: null
     };
   }
