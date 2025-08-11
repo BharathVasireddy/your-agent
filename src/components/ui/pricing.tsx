@@ -1,6 +1,7 @@
 "use client";
 
 import { buttonVariants } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -36,6 +37,7 @@ export function Pricing({
   title = "Simple, Transparent Pricing",
   description = "Choose the plan that works for you\nAll plans include access to our platform, lead generation tools, and dedicated support.",
 }: PricingProps) {
+  const router = useRouter();
   const [interval, setInterval] = useState<Interval>('monthly');
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const tabsRef = useRef<HTMLDivElement>(null);
@@ -88,7 +90,7 @@ export function Pricing({
                 setInterval(tab);
                 if (tab === 'yearly') celebrateAnnual();
               }}
-              className={`px-4 py-2 rounded-full text-sm font-semibold capitalize transition-colors ${interval===tab ? 'bg-[#F55625] text-white' : 'text-zinc-700 hover:bg-zinc-50'}`}
+              className={`px-4 py-2 rounded-full text-sm font-semibold capitalize transition-colors ${interval===tab ? 'bg-brand text-white' : 'text-zinc-700 hover:bg-zinc-50'}`}
               type="button"
             >
               {tab}
@@ -97,7 +99,7 @@ export function Pricing({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 sm:2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {plans.map((plan, index) => (
           <motion.div
             key={index}
@@ -124,7 +126,7 @@ export function Pricing({
             className={cn(
               "rounded-2xl border p-6 text-center lg:flex lg:flex-col lg:justify-center relative flex flex-col shadow-sm",
               plan.isPopular
-                ? "border-[#F55625] bg-[#F55625] text-white"
+                ? "border-brand bg-brand text-white"
                 : "border-zinc-200 bg-white",
               !plan.isPopular && "mt-5",
               index === 0 || index === 2
@@ -174,7 +176,7 @@ export function Pricing({
               <ul className="mt-5 gap-2 flex flex-col">
                 {plan.features.map((feature, idx) => (
                   <li key={idx} className="flex items-start gap-2">
-                    <Check className={cn("h-4 w-4 mt-1 flex-shrink-0", plan.isPopular ? "text-white" : "text-[#F55625]") } />
+                    <Check className={cn("h-4 w-4 mt-1 flex-shrink-0", plan.isPopular ? "text-white" : "text-brand") } />
                     <span className={cn("text-left", plan.isPopular ? "text-white" : "")}>{feature}</span>
                   </li>
                 ))}
@@ -182,18 +184,23 @@ export function Pricing({
 
               <hr className={cn("w-full my-4", plan.isPopular ? "border-white/30" : "border-zinc-200") } />
 
-              <Link
-                href={`/api/remember-plan?plan=${encodeURIComponent(plan.name.toLowerCase())}&interval=${interval}`}
+              <button
+                onClick={async () => {
+                  try {
+                    await fetch(`/api/remember-plan?plan=${encodeURIComponent(plan.name.toLowerCase())}&interval=${interval}`);
+                  } catch {}
+                  router.push('/subscribe');
+                }}
                 className={cn(
                   buttonVariants({ variant: "outline" }),
                   "btn-lg group relative w-full gap-2 overflow-hidden text-lg font-semibold tracking-tighter transform-gpu ring-offset-current transition-all duration-300 ease-out",
                   plan.isPopular
-                  ? "bg-white text-[#F55625] hover:bg-[#FFE9E1] hover:text-[#D94B20] hover:ring-2 hover:ring-[#FFC4B0]"
+                  ? "bg-white text-brand hover:bg-brand-light hover:text-brand-hover hover:ring-2 hover:ring-brand-soft"
                     : "bg-background text-foreground hover:ring-2 hover:ring-primary hover:ring-offset-1 hover:bg-primary hover:text-primary-foreground"
                 )}
               >
                 {plan.buttonText}
-              </Link>
+              </button>
               <p className={cn("mt-6 text-xs leading-5", plan.isPopular ? "text-white/80" : "text-zinc-500") }>
                 {plan.description}
               </p>

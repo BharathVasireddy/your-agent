@@ -89,7 +89,7 @@ export default function Step2_About() {
             size="sm"
             onClick={handleGenerateBio}
             disabled={isGenerating || !experience || !city}
-            className="text-red-600 border-red-200 hover:bg-red-50 min-w-[180px] justify-center px-4 py-2 h-auto"
+            className="text-brand border-brand-soft hover:bg-brand-light min-w-[180px] justify-center px-4 py-2 h-auto"
           >
             {isGenerating ? (
               <>
@@ -106,8 +106,8 @@ export default function Step2_About() {
         </div>
 
         {generationError && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-700">{generationError}</p>
+          <div className="p-3 bg-brand-light border border-brand-soft rounded-lg">
+            <p className="text-sm text-brand-hover">{generationError}</p>
           </div>
         )}
 
@@ -122,15 +122,15 @@ export default function Step2_About() {
           <p className="text-xs text-zinc-500">
             This will appear on your public profile
           </p>
-          <p className={`text-xs ${characterCount > maxLength * 0.9 ? 'text-red-600' : 'text-zinc-500'}`}>
+          <p className={`text-xs ${characterCount > maxLength * 0.9 ? 'text-brand' : 'text-zinc-500'}`}>
             {characterCount}/{maxLength}
           </p>
         </div>
       </div>
 
       {/* Helper Text */}
-      <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-sm text-red-800">
+      <div className="mt-6 p-4 bg-brand-light border border-brand-soft rounded-lg">
+        <p className="text-sm text-[#8A3317]">
           <strong>Tip:</strong> Use the AI generator for a professional starting point, then customize it to reflect your unique personality and strengths. 
           A compelling bio should mention your experience, areas of expertise, and what makes you the right choice for clients.
         </p>

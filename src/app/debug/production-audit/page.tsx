@@ -96,11 +96,11 @@ export default async function ProductionAuditPage() {
 
         {/* Critical Issues Alert */}
         {(stats.orphanedAgents > 0 || stats.orphanedSessions > 0) && (
-          <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-8">
+          <div className="bg-brand-light border-l-4 border-brand-soft p-6 mb-8">
             <div className="flex">
               <div className="ml-3">
-                <h3 className="text-lg font-medium text-red-800">🚨 CRITICAL PRODUCTION ISSUES DETECTED</h3>
-                <div className="mt-2 text-sm text-red-700">
+                <h3 className="text-lg font-medium text-brand-deep">🚨 CRITICAL PRODUCTION ISSUES DETECTED</h3>
+                <div className="mt-2 text-sm text-brand-deep">
                   <ul className="list-disc list-inside space-y-1">
                     {stats.orphanedAgents > 0 && (
                       <li><strong>{stats.orphanedAgents}</strong> agents have no corresponding User records (foreign key violation)</li>
@@ -131,7 +131,7 @@ export default async function ProductionAuditPage() {
               </p>
               {stats.orphanedAgents > 0 && (
                 <p className="text-sm">
-                  <span className="text-red-600">{stats.orphanedAgents} orphaned</span>
+                  <span className="text-brand">{stats.orphanedAgents} orphaned</span>
                 </p>
               )}
             </div>
@@ -161,7 +161,7 @@ export default async function ProductionAuditPage() {
               </p>
               {stats.orphanedSessions > 0 && (
                 <p className="text-sm">
-                  <span className="text-red-600">{stats.orphanedSessions} orphaned</span>
+                  <span className="text-brand">{stats.orphanedSessions} orphaned</span>
                 </p>
               )}
             </div>
@@ -175,7 +175,7 @@ export default async function ProductionAuditPage() {
                   ? 'text-green-600' 
                   : stats.orphanedAgents < 5 
                     ? 'text-yellow-600' 
-                    : 'text-red-600'
+                    : 'text-brand'
               }`}>
                 {stats.orphanedAgents === 0 && stats.orphanedSessions === 0 ? '✅' : '⚠️'}
               </p>
@@ -234,7 +234,7 @@ export default async function ProductionAuditPage() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                             agent.isSubscribed 
-                              ? 'bg-red-100 text-red-800' 
+                              ? 'bg-brand-light text-brand-deep' 
                               : 'bg-yellow-100 text-yellow-800'
                           }`}>
                             {agent.isSubscribed ? 'Cannot access dashboard' : 'Cannot subscribe'}

@@ -142,7 +142,7 @@ export default function Step3_Photo() {
                 {!isUploading && profilePhotoUrl && (
                   <button
                     onClick={handleRemovePhoto}
-                    className="absolute top-0 right-0 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center border-2 border-white hover:bg-red-700 transition-colors"
+                    className="absolute top-0 right-0 w-6 h-6 bg-brand rounded-full flex items-center justify-center border-2 border-white hover:bg-brand-hover transition-colors"
                     title="Remove photo"
                   >
                     <X className="w-3 h-3 text-white" />
@@ -156,7 +156,7 @@ export default function Step3_Photo() {
           
           {/* Camera overlay (only show if no image or not uploading) */}
           {!displayImageUrl && !isUploading && (
-            <div className="absolute bottom-0 right-0 w-8 h-8 bg-red-600 rounded-full flex items-center justify-center border-2 border-white">
+            <div className="absolute bottom-0 right-0 w-8 h-8 bg-brand rounded-full flex items-center justify-center border-2 border-white">
               <Camera className="w-4 h-4 text-white" />
             </div>
           )}
@@ -164,8 +164,8 @@ export default function Step3_Photo() {
 
         {/* Upload Error */}
         {uploadError && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg max-w-sm">
-            <p className="text-sm text-red-700 text-center">{uploadError}</p>
+          <div className="p-3 bg-brand-light border border-brand-soft rounded-lg max-w-sm">
+            <p className="text-sm text-brand-hover text-center">{uploadError}</p>
           </div>
         )}
 
@@ -173,7 +173,7 @@ export default function Step3_Photo() {
         <Button
           onClick={handleUploadClick}
           disabled={isUploading}
-          className="bg-red-600 hover:bg-red-700 text-white px-6 py-2"
+          className="bg-brand hover:bg-brand-hover text-white px-6 py-2"
         >
           {isUploading ? (
             <>
@@ -205,8 +205,8 @@ export default function Step3_Photo() {
       </div>
 
       {/* Helper Text */}
-      <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-sm text-red-800">
+      <div className="mt-6 p-4 bg-brand-light border border-brand-soft rounded-lg">
+        <p className="text-sm text-brand-deep">
           <strong>Tip:</strong> A professional photo increases trust and connection with potential clients. 
           Make sure you&apos;re well-lit, smiling, and dressed professionally. Your photo will be automatically optimized for web display.
         </p>

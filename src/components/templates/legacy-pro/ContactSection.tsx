@@ -176,7 +176,7 @@ export default function ContactSection({ agent }: ContactSectionProps) {
                     placeholder="Phone (India)"
                     className="w-full rounded-none border-0 border-b border-zinc-200 focus-visible:ring-0 focus-visible:border-zinc-900 px-0 py-2"
                   />
-                  {phoneError && <p className="mt-1 text-xs text-red-600">{phoneError}</p>}
+                  {phoneError && <p className="mt-1 text-xs text-brand">{phoneError}</p>}
                 </div>
               </div>
 

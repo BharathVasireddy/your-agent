@@ -26,7 +26,7 @@ export default function DashboardAgentHeader({ agent }: DashboardAgentHeaderProp
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           {/* Profile Photo */}
-          <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+          <div className="w-16 h-16 rounded-full bg-[#FFDCCF] flex items-center justify-center">
             {agent?.profilePhotoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -35,7 +35,7 @@ export default function DashboardAgentHeader({ agent }: DashboardAgentHeaderProp
                 className="w-16 h-16 rounded-full object-cover"
               />
             ) : (
-              <User className="w-8 h-8 text-red-600" />
+              <User className="w-8 h-8 text-brand" />
             )}
           </div>
           
@@ -58,7 +58,7 @@ export default function DashboardAgentHeader({ agent }: DashboardAgentHeaderProp
         {/* Edit Profile Button */}
         <Link
           href="/agent/dashboard/profile"
-          className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          className="inline-flex items-center px-4 py-2 bg-brand text-white rounded-lg hover:bg-brand-hover transition-colors"
         >
           <Settings className="w-4 h-4 mr-2" />
           Edit Profile

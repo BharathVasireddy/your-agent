@@ -107,7 +107,7 @@ export default function SettingsContent({ user, agent }: SettingsContentProps) {
             onClick={() => setActiveSection('profile')}
             className={`p-3 text-xs font-medium rounded-lg transition-colors ${
               activeSection === 'profile'
-                ? 'bg-red-50 text-red-600'
+                ? 'bg-brand-light text-brand'
                 : 'text-zinc-600 hover:text-zinc-900'
             }`}
           >
@@ -118,7 +118,7 @@ export default function SettingsContent({ user, agent }: SettingsContentProps) {
             onClick={() => setActiveSection('account')}
             className={`p-3 text-xs font-medium rounded-lg transition-colors ${
               activeSection === 'account'
-                ? 'bg-red-50 text-red-600'
+                ? 'bg-brand-light text-brand'
                 : 'text-zinc-600 hover:text-zinc-900'
             }`}
           >
@@ -129,7 +129,7 @@ export default function SettingsContent({ user, agent }: SettingsContentProps) {
             onClick={() => setActiveSection('privacy')}
             className={`p-3 text-xs font-medium rounded-lg transition-colors ${
               activeSection === 'privacy'
-                ? 'bg-red-50 text-red-600'
+                ? 'bg-brand-light text-brand'
                 : 'text-zinc-600 hover:text-zinc-900'
             }`}
           >
@@ -140,7 +140,7 @@ export default function SettingsContent({ user, agent }: SettingsContentProps) {
             onClick={() => setActiveSection('notifications')}
             className={`p-3 text-xs font-medium rounded-lg transition-colors ${
               activeSection === 'notifications'
-                ? 'bg-red-50 text-red-600'
+                ? 'bg-brand-light text-brand'
                 : 'text-zinc-600 hover:text-zinc-900'
             }`}
           >

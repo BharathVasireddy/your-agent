@@ -49,7 +49,7 @@ function PropertyCard({ property }: { property: Property }) {
             property.status === 'Available' 
               ? 'bg-green-100 text-green-800'
               : property.status === 'Sold'
-              ? 'bg-red-100 text-red-800'
+              ? 'bg-brand-light text-brand-deep'
               : property.status === 'Rented'
               ? 'bg-blue-100 text-blue-800'
               : 'bg-zinc-100 text-zinc-800'
@@ -71,7 +71,7 @@ function PropertyCard({ property }: { property: Property }) {
         <h3 className="font-semibold text-lg text-zinc-950 mb-2 line-clamp-2">
           {property.title}
         </h3>
-        <p className="text-2xl font-bold text-red-600 mb-4">
+        <p className="text-2xl font-bold text-brand mb-4">
           ₹{property.price.toLocaleString('en-IN')}
           <span className="text-sm font-normal text-zinc-500 ml-1">
             / {property.listingType === 'Rent' ? 'month' : 'total'}
@@ -89,7 +89,7 @@ function PropertyCard({ property }: { property: Property }) {
           </Link>
           <Link
             href={`/agent/dashboard/properties/${property.slug}/delete`}
-            className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-sm font-medium"
+            className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-brand-light text-brand-deep rounded-lg hover:bg-brand-muted transition-colors text-sm font-medium"
           >
             <Trash2 className="w-4 h-4 mr-1" />
             Delete

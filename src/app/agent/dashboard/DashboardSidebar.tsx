@@ -181,7 +181,7 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
               className="w-8 h-8 rounded-full object-cover"
             />
           ) : (
-            <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-brand rounded-lg flex items-center justify-center">
               <span className="text-white text-sm font-bold">YA</span>
             </div>
           )}
@@ -204,11 +204,11 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
               <div
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                   isActive
-                    ? 'bg-red-50 text-red-700 border border-red-200'
+                    ? 'bg-brand-light text-brand-hover border border-brand-soft'
                     : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
                 }`}
               >
-                <Icon className={`w-5 h-5 ${isActive ? 'text-red-600' : 'text-zinc-500'}`} />
+                <Icon className={`w-5 h-5 ${isActive ? 'text-brand' : 'text-zinc-500'}`} />
                 <button
                   onMouseEnter={() => prefetchOnHover(item.href)}
                   onClick={() => navigateInstantly(item.href)}
@@ -221,11 +221,11 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
                     onClick={() => toggleMenu(item.name)}
                     className="ml-auto p-1 hover:bg-black/5 rounded transition-colors"
                   >
-                    {expandedMenus[item.name] ? (
-                      <ChevronDown className={`w-4 h-4 ${isActive ? 'text-red-600' : 'text-zinc-500'}`} />
-                    ) : (
-                      <ChevronRight className={`w-4 h-4 ${isActive ? 'text-red-600' : 'text-zinc-500'}`} />
-                    )}
+                        {expandedMenus[item.name] ? (
+                          <ChevronDown className={`w-4 h-4 ${isActive ? 'text-brand' : 'text-zinc-500'}`} />
+                        ) : (
+                          <ChevronRight className={`w-4 h-4 ${isActive ? 'text-brand' : 'text-zinc-500'}`} />
+                        )}
                   </button>
                 )}
               </div>
@@ -243,11 +243,11 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
                         onClick={() => navigateInstantly(subItem.href)}
                         className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-sm transition-all duration-200 ${
                           isSubActive
-                            ? 'bg-red-50 text-red-700 border border-red-200'
+                            ? 'bg-brand-light text-brand-hover border border-brand-soft'
                             : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-700'
                         }`}
                       >
-                        <SubIcon className={`w-4 h-4 ${isSubActive ? 'text-red-600' : 'text-zinc-400'}`} />
+                        <SubIcon className={`w-4 h-4 ${isSubActive ? 'text-brand' : 'text-zinc-400'}`} />
                         <span>{subItem.name}</span>
                       </button>
                     );
@@ -267,7 +267,7 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
             href={`/${agent.slug}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors w-full"
+          className="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white bg-brand hover:bg-brand-hover transition-colors w-full"
           >
             <ExternalLink className="w-5 h-5 text-white" />
             <span>Visit My Website</span>
@@ -293,7 +293,7 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
           <span>Help & Support</span>
         </Link>
         
-        <SignOutButton className="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 hover:bg-red-50 hover:text-red-700 transition-colors w-full text-left">
+        <SignOutButton className="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 hover:bg-brand-light hover:text-brand-hover transition-colors w-full text-left">
           <LogOut className="w-5 h-5 text-zinc-500" />
           <span>Sign Out</span>
         </SignOutButton>

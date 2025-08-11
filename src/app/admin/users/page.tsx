@@ -154,14 +154,14 @@ function CompactUserRow({ user }: { user: UserListItem }) {
         <span className={`inline-flex px-2 py-1 text-xs rounded-full ${
           user.isActive 
             ? 'bg-green-100 text-green-700' 
-            : 'bg-red-100 text-red-700'
+            : 'bg-brand-light text-brand-hover'
         }`}>
           {user.isActive ? 'Active' : 'Suspended'}
         </span>
       </td>
       <td className="px-3 py-2">
         {user.hasAgent && user.agentSlug ? (
-          <Link href={`/${user.agentSlug}`} className="text-red-600 hover:underline text-sm">
+          <Link href={`/${user.agentSlug}`} className="text-brand hover:underline text-sm">
             {user.agentSlug}
           </Link>
         ) : (

@@ -57,12 +57,12 @@ export default async function CustomiseWebsitePage() {
             <Link
               key={section.title}
               href={section.href}
-              className="block bg-white rounded-lg shadow-sm border border-zinc-200 p-6 hover:border-red-200 hover:shadow-md transition-all duration-200"
+            className="block bg-white rounded-lg shadow-sm border border-zinc-200 p-6 hover:border-brand-soft hover:shadow-md transition-all duration-200"
             >
               <div className="flex items-start space-x-4">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
-                    <Icon className="w-6 h-6 text-red-600" />
+                  <div className="w-12 h-12 bg-brand-muted rounded-lg flex items-center justify-center">
+                    <Icon className="w-6 h-6 text-brand" />
                   </div>
                 </div>
                 
@@ -74,7 +74,7 @@ export default async function CustomiseWebsitePage() {
                     <span className="text-sm text-zinc-500">
                       {section.count} {section.countLabel}
                     </span>
-                    <span className="text-sm text-red-600 font-medium">
+                    <span className="text-sm text-brand font-medium">
                       Manage →
                     </span>
                   </div>

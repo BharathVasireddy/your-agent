@@ -70,8 +70,8 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
       {/* Mobile Header */}
       <div className="md:hidden bg-white rounded-lg shadow-sm border border-zinc-200 p-4">
         <div className="flex items-center space-x-3">
-          <div className="flex items-center justify-center w-10 h-10 bg-red-50 rounded-lg">
-            <BarChart3 className="w-5 h-5 text-red-600" />
+          <div className="flex items-center justify-center w-10 h-10 bg-brand-light rounded-lg">
+            <BarChart3 className="w-5 h-5 text-brand" />
           </div>
           <div>
             <h1 className="text-lg font-bold text-zinc-950">Analytics</h1>
@@ -89,13 +89,13 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
 
 
       {/* Section 1: The "At-a-Glance" KPI Bar */}
-      <div className="bg-gradient-to-r from-red-50 to-red-100 rounded-lg p-4 md:p-6 border border-red-200">
-        <h2 className="text-lg md:text-xl font-bold text-red-800 mb-4">📊 At-a-Glance Health Check (Last 30 Days)</h2>
+      <div className="bg-gradient-to-r from-brand-light to-brand-muted rounded-lg p-4 md:p-6 border border-brand-soft">
+        <h2 className="text-lg md:text-xl font-bold text-brand-deep mb-4">📊 At-a-Glance Health Check (Last 30 Days)</h2>
         
         {/* Mobile KPI Grid */}
         <div className="md:hidden grid grid-cols-2 gap-4">
           <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-            <Users className="w-6 h-6 text-red-600 mx-auto mb-2" />
+            <Users className="w-6 h-6 text-brand mx-auto mb-2" />
             <p className="text-2xl font-bold text-zinc-950">{data.totalVisitors}</p>
             <p className="text-xs text-zinc-600">Total Visitors</p>
           </div>
@@ -119,7 +119,7 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
         {/* Desktop KPI Grid */}
         <div className="hidden md:grid grid-cols-4 gap-6">
           <div className="bg-white rounded-lg p-6 text-center shadow-sm">
-            <Users className="w-8 h-8 text-red-600 mx-auto mb-3" />
+            <Users className="w-8 h-8 text-brand mx-auto mb-3" />
             <p className="text-3xl font-bold text-zinc-950">{data.totalVisitors}</p>
             <p className="text-sm text-zinc-600 mt-1">Total Visitors</p>
             <p className="text-xs text-zinc-500 mt-2">Unique people who visited your site</p>
@@ -231,7 +231,7 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
               {data.topProperties.slice(0, 5).map((property, index) => (
                 <div key={property.id} className="flex items-center justify-between p-3 bg-zinc-50 rounded-lg">
                   <div className="flex items-center">
-                    <div className="flex items-center justify-center w-6 h-6 bg-red-600 text-white rounded-full text-xs font-bold mr-3">
+                    <div className="flex items-center justify-center w-6 h-6 bg-brand text-white rounded-full text-xs font-bold mr-3">
                       {index + 1}
                     </div>
                     <div>
@@ -279,7 +279,7 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                     <span className="text-sm text-zinc-600">{lead.value}</span>
                     <div className="w-20 bg-zinc-200 rounded-full h-2">
                       <div 
-                        className="bg-red-500 h-2 rounded-full" 
+                        className="bg-brand h-2 rounded-full" 
                         style={{ 
                           width: `${Math.max(10, (lead.value / Math.max(...leadTypeData.map(l => l.value))) * 100)}%` 
                         }}

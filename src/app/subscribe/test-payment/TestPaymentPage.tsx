@@ -112,8 +112,8 @@ export default function TestPaymentPage({ session }: TestPaymentPageProps) {
 
             {/* Error Message */}
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-800 text-sm">{error}</p>
+              <div className="mb-6 p-4 bg-brand-light border border-brand-soft rounded-lg">
+                <p className="text-brand-deep text-sm">{error}</p>
               </div>
             )}
 

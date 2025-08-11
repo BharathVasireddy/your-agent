@@ -76,11 +76,11 @@ export default function AdminSidebar({ adminEmail }: AdminSidebarProps) {
               href={item.href}
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                 isActive
-                  ? 'bg-red-50 text-red-700 border border-red-200'
+              ? 'bg-brand-light text-brand-hover border border-brand-soft'
                   : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
               }`}
             >
-              <Icon className={`w-5 h-5 ${isActive ? 'text-red-600' : 'text-zinc-500'}`} />
+            <Icon className={`w-5 h-5 ${isActive ? 'text-brand' : 'text-zinc-500'}`} />
               <span>{item.name}</span>
             </Link>
           );
@@ -95,7 +95,7 @@ export default function AdminSidebar({ adminEmail }: AdminSidebarProps) {
         
         <button
           onClick={() => signOut({ callbackUrl: '/' })}
-          className="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 hover:bg-red-50 hover:text-red-700 transition-colors w-full text-left"
+          className="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 hover:bg-brand-light hover:text-brand-hover transition-colors w-full text-left"
         >
           <LogOut className="w-5 h-5 text-zinc-500" />
           <span>Sign Out</span>

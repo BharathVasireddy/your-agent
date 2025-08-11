@@ -55,8 +55,8 @@ export default function AdminMobileNav() {
               href={item.href}
               className={`flex flex-col items-center justify-center space-y-1 transition-all duration-200 ${
                 isActive
-                  ? 'text-red-600'
-                  : 'text-zinc-600 hover:text-red-600'
+                  ? 'text-brand'
+                  : 'text-zinc-600 hover:text-brand'
               }`}
             >
               <Icon className="w-4 h-4" />

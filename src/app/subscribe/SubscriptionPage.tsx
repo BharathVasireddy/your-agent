@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { Pricing as AnimatedPricing } from '@/components/ui/pricing';
 import { Check, Loader2, CreditCard, Shield, Star, Users, Zap, Globe } from 'lucide-react';
 import { UserFlowStatus } from '@/lib/userFlow';
 import { createRazorpayOrder, verifyPayment } from '@/app/actions';
@@ -150,7 +151,7 @@ export default function SubscriptionPage({ session, flowStatus }: SubscriptionPa
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-zinc-950 mb-4">
             Launch Your Professional
-            <span className="text-red-600 block">Real Estate Business</span>
+            <span className="text-brand block">Real Estate Business</span>
           </h1>
           <p className="text-xl text-zinc-600 max-w-3xl mx-auto">
             Join thousands of successful agents who use YourAgent.in to generate leads, 
@@ -158,115 +159,80 @@ export default function SubscriptionPage({ session, flowStatus }: SubscriptionPa
           </p>
         </div>
 
-        {/* Plan Selector */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          {(['starter','growth','pro'] as Plan[]).map(p => (
-            <button
-              key={p}
-              onClick={() => setPlan(p)}
-              className={`border rounded-xl p-4 text-left ${plan===p ? 'border-red-600' : 'border-zinc-200'}`}
-            >
-              <div className="font-semibold text-zinc-900 capitalize">{p}</div>
-              <div className="text-xs text-zinc-500 mt-1">{p==='starter'?'Single Template, 25 Listings':'All Templates, Unlimited Listings'}</div>
-            </button>
-          ))}
-        </div>
-
-        {/* Interval Selector */}
-        <div className="flex gap-2 mb-8">
-          {(['monthly','quarterly','yearly'] as Interval[]).map(i => (
-            <button key={i} onClick={()=>setInterval(i)} className={`px-3 py-2 rounded-lg border text-sm capitalize ${interval===i?'border-red-600 text-red-700':'border-zinc-200 text-zinc-700'}`}>{i}</button>
-          ))}
-        </div>
-
-        {/* Pricing Card */}
-        <div className="bg-white rounded-2xl shadow-xl border border-zinc-200 overflow-hidden mb-8">
-          <div className="bg-red-600 text-white text-center py-4" />
-          
-          <div className="p-8 md:p-12">
-            <div className="text-center mb-8">
-              <div className="flex items-center justify-center mb-4">
-                <span className="text-6xl md:text-7xl font-bold text-zinc-950">
-                  {plan==='starter' && (interval==='monthly'?'₹299':interval==='quarterly'?'₹849':'₹2,999')}
-                  {plan==='growth' && (interval==='monthly'?'₹499':interval==='quarterly'?'₹1,399':'₹4,999')}
-                  {plan==='pro' && (interval==='monthly'?'₹699':interval==='quarterly'?'₹1,999':'₹6,999')}
-                </span>
-                <div className="ml-4 text-left">
-                  <div className="text-zinc-600 text-lg">/{interval}</div>
-                  <div className="text-sm text-zinc-500">Billed monthly</div>
-                </div>
-              </div>
-              <p className="text-zinc-600 text-lg">
-                Everything you need to succeed in real estate
-              </p>
-            </div>
-
-            {/* Features */}
-            <div className="grid md:grid-cols-2 gap-4 mb-8">
-              {features.map((feature, index) => {
-                const IconComponent = feature.icon;
-                return (
-                  <div key={index} className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-1">
-                      <Check className="w-4 h-4 text-green-600" />
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <IconComponent className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
-                      <span className="text-zinc-700">{feature.text}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-800 text-sm">{error}</p>
-              </div>
-            )}
-
-            {/* CTA Button */}
-            <Button
-              onClick={handlePayment}
-              disabled={isLoading}
-              className="w-full bg-red-600 hover:bg-red-700 text-white text-lg py-6 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-3 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <CreditCard className="w-5 h-5 mr-3" />
-                  Start Your Real Estate Journey
-                </>
-              )}
-            </Button>
-
-            <p className="text-center text-sm text-zinc-500 mt-4">
-              Secure payment powered by Razorpay • Cancel anytime • 7-day money-back guarantee
-            </p>
-          </div>
-        </div>
+        {/* Pricing: reuse the same responsive component as homepage */}
+        <AnimatedPricing
+          plans={[
+            {
+              name: 'STARTER',
+              price: '299',
+              quarterlyPrice: '849',
+              yearlyPrice: '2999',
+              period: 'per month',
+              features: [
+                'Custom domain (youragent.in/your-name)',
+                '25 Listings',
+                'Unlimited CRM Leads',
+                'WhatsApp Enquiry',
+                'Single Template',
+              ],
+              description: 'Great for getting started',
+              buttonText: 'Choose Starter',
+              href: '/subscribe',
+              isPopular: false,
+            },
+            {
+              name: 'GROWTH',
+              price: '499',
+              quarterlyPrice: '1399',
+              yearlyPrice: '4999',
+              period: 'per month',
+              features: [
+                'Everything in Starter',
+                'Exclusive Listing Deals from YourAgent',
+                'Access to All Design Templates',
+                'Priority Support',
+              ],
+              description: 'Best for growing agents',
+              buttonText: 'Choose Growth',
+              href: '/subscribe',
+              isPopular: true,
+            },
+            {
+              name: 'PRO',
+              price: '699',
+              quarterlyPrice: '1999',
+              yearlyPrice: '6999',
+              period: 'per month',
+              features: [
+                'Everything in Growth',
+                'Marketing Support (Meta & Google)',
+                'SEO Tools',
+                'Site Analytics',
+              ],
+              description: 'For power users',
+              buttonText: 'Choose Pro',
+              href: '/subscribe',
+              isPopular: false,
+            },
+          ]}
+        />
 
         {/* Trust Indicators */}
         <div className="grid md:grid-cols-3 gap-8 text-center">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-zinc-200">
-            <Users className="w-12 h-12 text-red-600 mx-auto mb-4" />
+            <Users className="w-12 h-12 text-brand mx-auto mb-4" />
             <h3 className="font-semibold text-zinc-950 mb-2">Trusted by 1000+ Agents</h3>
             <p className="text-zinc-600 text-sm">Real estate professionals across India trust our platform</p>
           </div>
           
           <div className="bg-white p-6 rounded-xl shadow-sm border border-zinc-200">
-            <Shield className="w-12 h-12 text-red-600 mx-auto mb-4" />
+            <Shield className="w-12 h-12 text-brand mx-auto mb-4" />
             <h3 className="font-semibold text-zinc-950 mb-2">Secure & Reliable</h3>
             <p className="text-zinc-600 text-sm">Bank-grade security with 99.9% uptime guarantee</p>
           </div>
           
           <div className="bg-white p-6 rounded-xl shadow-sm border border-zinc-200">
-            <Star className="w-12 h-12 text-red-600 mx-auto mb-4" />
+            <Star className="w-12 h-12 text-brand mx-auto mb-4" />
             <h3 className="font-semibold text-zinc-950 mb-2">5-Star Support</h3>
             <p className="text-zinc-600 text-sm">Dedicated support team to help you succeed</p>
           </div>

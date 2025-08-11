@@ -22,7 +22,7 @@ export default function DashboardButton({ agentUserId }: DashboardButtonProps) {
   return (
     <Link
       href="/agent/dashboard"
-      className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+      className="flex items-center space-x-2 px-4 py-2 bg-brand text-white rounded-lg hover:bg-brand-hover transition-colors text-sm font-medium"
       title="Go to Dashboard"
     >
       <Settings className="w-4 h-4" />

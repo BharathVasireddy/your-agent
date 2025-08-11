@@ -226,7 +226,7 @@ export default function TypeformWizardClient() {
         {/* Progress */}
         <div className="mb-8">
           <div className="h-2 w-full bg-zinc-100 rounded-full overflow-hidden">
-            <div className="h-2 bg-[#F55625]" style={{ width: `${progress}%` }} />
+            <div className="h-2 bg-brand" style={{ width: `${progress}%` }} />
           </div>
           <div className="mt-2 text-sm text-zinc-600">Step {index + 1} of {TOTAL}</div>
         </div>
@@ -344,11 +344,11 @@ export default function TypeformWizardClient() {
                           store.setData({ phone: digits ? `+91${digits}` : '' });
                         }}
                         placeholder="9876543210"
-                         className="flex-1 h-11 border-0 px-2 focus:ring-2 focus:ring-[#F55625] focus:border-transparent"
+                        className="flex-1 h-11 border-0 px-2 focus:ring-2 focus:ring-brand focus:border-transparent"
                       />
                     </div>
                      {!!store.phone && !isPhoneValid(store.phone) && (
-                       <p className="mt-1 text-xs text-[#D94B20]">Enter a valid 10-digit Indian number (e.g., +919876543210)</p>
+                      <p className="mt-1 text-xs text-brand-hover">Enter a valid 10-digit Indian number (e.g., +919876543210)</p>
                     )}
                   </div>
                 </div>
@@ -405,7 +405,7 @@ export default function TypeformWizardClient() {
                         className="rounded-l-none h-11"
                       />
                     </div>
-                     {error && <p className="mt-1 text-xs text-[#D94B20]">{error}</p>}
+                    {error && <p className="mt-1 text-xs text-brand-hover">{error}</p>}
                   </div>
                 </div>
               )}
@@ -420,7 +420,7 @@ export default function TypeformWizardClient() {
                       value={store.bio}
                       onChange={(e) => store.setData({ bio: e.target.value.slice(0, 500) })}
                       placeholder="Tell clients about your background and expertise..."
-                       className="mt-2 w-full min-h-[160px] rounded-md border border-zinc-300 px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-[#F55625]"
+                      className="mt-2 w-full min_h-[160px] rounded-md border border-zinc-300 px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-brand"
                     />
                       <div className="mt-2 flex items-center justify-between">
                         <div className="text-xs text-zinc-500">{store.bio.length}/500</div>
@@ -479,7 +479,7 @@ export default function TypeformWizardClient() {
                   <ChevronLeft className="w-4 h-4" />
                   Back
                 </Button>
-                <Button type="button" onClick={next} disabled={busy} className="flex items-center gap-2 bg-[#F55625] hover:bg-[#D94B20] text-white">
+               <Button type="button" onClick={next} disabled={busy} className="flex items-center gap-2 bg-brand hover:bg-brand-hover text-white">
                   {index === TOTAL - 1 ? 'Finish' : 'Continue'}
                   <ChevronRight className="w-4 h-4" />
                 </Button>

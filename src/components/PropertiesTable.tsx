@@ -50,7 +50,7 @@ export default function PropertiesTable({ rows, total, page, pages, basePath, qu
                   {p.slug && (
                     <>
                       <Link href={`/agent/dashboard/properties/${p.slug}/edit`} className="text-blue-600 hover:text-blue-700 mr-3">Edit</Link>
-                      <Link href={`/agent/dashboard/properties/${p.slug}/delete`} className="text-red-600 hover:text-red-700">Delete</Link>
+                      <Link href={`/agent/dashboard/properties/${p.slug}/delete`} className="text-brand hover:text-brand-hover">Delete</Link>
                     </>
                   )}
                 </td>

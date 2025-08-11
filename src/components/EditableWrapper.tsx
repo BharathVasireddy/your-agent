@@ -120,7 +120,7 @@ export default function EditableWrapper({
       </div>
       <button
         onClick={() => setIsEditing(true)}
-        className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-600 hover:bg-red-700 text-white rounded-full p-1.5 shadow-lg"
+        className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-brand hover:bg-brand-hover text-white rounded-full p-1.5 shadow-lg"
         title="Edit this text"
       >
         <Edit2 className="w-3 h-3" />

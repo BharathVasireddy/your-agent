@@ -64,22 +64,22 @@ export default function DeletePropertyConfirmation({ property }: DeletePropertyC
         {/* Delete Confirmation */}
         <div className="max-w-2xl mx-auto">
           {deleteError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="bg-brand-light border border-brand-soft rounded-lg p-4 mb-6">
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p className="text-red-700 font-medium">Error</p>
+                <p className="text-brand-deep font-medium">Error</p>
               </div>
-              <p className="text-red-600 mt-1">{deleteError}</p>
+              <p className="text-brand mt-1">{deleteError}</p>
             </div>
           )}
 
           <div className="bg-white rounded-lg border border-zinc-200 p-8">
             {/* Warning Icon */}
             <div className="flex justify-center mb-6">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                <AlertTriangle className="w-8 h-8 text-red-600" />
+              <div className="w-16 h-16 bg-brand-light rounded-full flex items-center justify-center">
+                <AlertTriangle className="w-8 h-8 text-brand" />
               </div>
             </div>
 
@@ -126,12 +126,12 @@ export default function DeletePropertyConfirmation({ property }: DeletePropertyC
             </div>
 
             {/* Confirmation Checkbox */}
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="bg-brand-light border border-brand-soft rounded-lg p-4 mb-6">
               <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
-                <div className="text-sm text-red-700">
+                <AlertTriangle className="w-5 h-5 text-brand mt-0.5 flex-shrink-0" />
+                <div className="text-sm text-brand-deep">
                   <p className="font-medium mb-1">This will permanently:</p>
-                  <ul className="list-disc list-inside space-y-1 text-red-600">
+                  <ul className="list-disc list-inside space-y-1 text-brand">
                     <li>Remove the property from your listings</li>
                     <li>Delete all property photos from storage</li>
                     <li>Remove it from any public searches</li>
@@ -155,7 +155,7 @@ export default function DeletePropertyConfirmation({ property }: DeletePropertyC
               <Button
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                className="flex-1 bg-brand hover:bg-brand-hover text-white"
               >
                 {isDeleting ? 'Deleting...' : 'Delete Property'}
               </Button>

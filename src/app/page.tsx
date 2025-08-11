@@ -42,7 +42,7 @@ export default function HomePage() {
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl md:text-6xl font-bold text-zinc-950 mb-6 leading-tight">
               Your Professional Real Estate
-              <span className="text-[#F55625]"> Digital Presence</span>
+              <span className="text-brand"> Digital Presence</span>
           </h1>
             <p className="text-xl text-zinc-600 mb-8 max-w-2xl mx-auto leading-relaxed">
               Create stunning agent profiles, manage properties effortlessly, and grow your real estate business with AI-powered tools trusted by professionals across India.
@@ -52,7 +52,7 @@ export default function HomePage() {
               <LoginButton />
               <Link 
                 href="#how-it-works"
-                className="btn-lg border-2 border-[#F55625] text-[#F55625] bg-white rounded-md hover:bg-[#FFE9E1] transition-all duration-200 font-medium flex items-center gap-2"
+                className="btn-lg border-2 border-brand text-brand bg-white rounded-md hover:bg-brand-light transition-all duration-200 font-medium flex items-center gap-2"
               >
                 See How It Works
               </Link>
@@ -61,15 +61,15 @@ export default function HomePage() {
             {/* Trust Indicators */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-sm text-zinc-600">
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
+                <CheckCircle className="w-4 h-4 text-brand" />
                 <span>Free to start</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
+                <CheckCircle className="w-4 h-4 text-brand" />
                 <span>Setup in 5 minutes</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
+                <CheckCircle className="w-4 h-4 text-brand" />
                 <span>No technical knowledge required</span>
               </div>
             </div>
@@ -92,8 +92,8 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Feature 1 */}
             <div className="bg-white border border-zinc-200 rounded-xl p-8 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-[#FFDCCF] rounded-lg flex items-center justify-center mb-6">
-                <Users className="w-6 h-6 text-[#F55625]" />
+              <div className="w-12 h-12 bg-brand-muted rounded-lg flex items-center justify-center mb-6">
+                <Users className="w-6 h-6 text-brand" />
               </div>
               <h3 className="text-xl font-semibold text-zinc-950 mb-4">Professional Profiles</h3>
               <p className="text-zinc-600 leading-relaxed">
@@ -103,8 +103,8 @@ export default function HomePage() {
 
             {/* Feature 2 */}
             <div className="bg-white border border-zinc-200 rounded-xl p-8 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
-                <Home className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-light rounded-lg flex items-center justify-center mb-6">
+                <Home className="w-6 h-6 text-brand" />
               </div>
               <h3 className="text-xl font-semibold text-zinc-950 mb-4">Property Management</h3>
               <p className="text-zinc-600 leading-relaxed">
@@ -114,8 +114,8 @@ export default function HomePage() {
 
             {/* Feature 3 */}
             <div className="bg-white border border-zinc-200 rounded-xl p-8 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-6">
-                <Sparkles className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-brand-light rounded-lg flex items-center justify-center mb-6">
+                <Sparkles className="w-6 h-6 text-brand" />
               </div>
               <h3 className="text-xl font-semibold text-zinc-950 mb-4">AI-Powered Tools</h3>
               <p className="text-zinc-600 leading-relaxed">
@@ -125,8 +125,8 @@ export default function HomePage() {
 
             {/* Feature 4 */}
             <div className="bg-white border border-zinc-200 rounded-xl p-8 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-6">
-                <BarChart3 className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-light rounded-lg flex items-center justify-center mb-6">
+                <BarChart3 className="w-6 h-6 text-brand" />
               </div>
               <h3 className="text-xl font-semibold text-zinc-950 mb-4">Analytics & Insights</h3>
               <p className="text-zinc-600 leading-relaxed">
@@ -136,8 +136,8 @@ export default function HomePage() {
 
             {/* Feature 5 */}
             <div className="bg-white border border-zinc-200 rounded-xl p-8 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-6">
-                <Phone className="w-6 h-6 text-orange-600" />
+              <div className="w-12 h-12 bg-brand-light rounded-lg flex items-center justify-center mb-6">
+                <Phone className="w-6 h-6 text-brand" />
               </div>
               <h3 className="text-xl font-semibold text-zinc-950 mb-4">Lead Generation</h3>
               <p className="text-zinc-600 leading-relaxed">
@@ -147,8 +147,8 @@ export default function HomePage() {
 
             {/* Feature 6 */}
             <div className="bg-white border border-zinc-200 rounded-xl p-8 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mb-6">
-                <MapPin className="w-6 h-6 text-cyan-600" />
+              <div className="w-12 h-12 bg-brand-light rounded-lg flex items-center justify-center mb-6">
+                <MapPin className="w-6 h-6 text-brand" />
               </div>
               <h3 className="text-xl font-semibold text-zinc-950 mb-4">Local Expertise</h3>
               <p className="text-zinc-600 leading-relaxed">
@@ -174,7 +174,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Step 1 */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-[#F55625] rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-brand rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-white">1</span>
               </div>
               <h3 className="text-xl font-semibold text-zinc-950 mb-4">Sign Up with Google</h3>
@@ -185,7 +185,7 @@ export default function HomePage() {
 
             {/* Step 2 */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-[#F55625] rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-brand rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-white">2</span>
               </div>
               <h3 className="text-xl font-semibold text-zinc-950 mb-4">Complete Your Profile</h3>
@@ -196,7 +196,7 @@ export default function HomePage() {
 
             {/* Step 3 */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-[#F55625] rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-brand rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-white">3</span>
               </div>
               <h3 className="text-xl font-semibold text-zinc-950 mb-4">Start Adding Properties</h3>
@@ -225,15 +225,15 @@ export default function HomePage() {
             <div className="bg-white border border-zinc-200 rounded-xl p-8">
               <div className="flex items-center mb-4">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  <Star key={i} className="w-5 h-5 text-brand fill-current" />
                 ))}
               </div>
               <p className="text-zinc-600 mb-6 leading-relaxed">
                 &ldquo;YourAgent helped me create a professional online presence that clients trust. My lead generation has increased by 300% since I started using the platform.&rdquo;
               </p>
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-[#FFDCCF] rounded-full flex items-center justify-center mr-4">
-                  <span className="font-semibold text-[#F55625]">RK</span>
+                <div className="w-12 h-12 bg-brand-muted rounded-full flex items-center justify-center mr-4">
+                  <span className="font-semibold text-brand">RK</span>
                 </div>
                 <div>
                   <p className="font-semibold text-zinc-950">Rajesh Kumar</p>
@@ -246,7 +246,7 @@ export default function HomePage() {
             <div className="bg-white border border-zinc-200 rounded-xl p-8">
               <div className="flex items-center mb-4">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  <Star key={i} className="w-5 h-5 text-brand fill-current" />
                 ))}
               </div>
               <p className="text-zinc-600 mb-6 leading-relaxed">
@@ -267,7 +267,7 @@ export default function HomePage() {
             <div className="bg-white border border-zinc-200 rounded-xl p-8">
               <div className="flex items-center mb-4">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  <Star key={i} className="w-5 h-5 text-brand fill-current" />
                 ))}
               </div>
               <p className="text-zinc-600 mb-6 leading-relaxed">
@@ -394,19 +394,19 @@ export default function HomePage() {
               <h4 className="font-semibold mb-4">Contact</h4>
               <ul className="space-y-2 text-zinc-400">
                 <li className="flex items-center">
-                  <Mail className="w-4 h-4 mr-2" />
+                  <Mail className="w-4 h-4 mr-2 text-brand" />
                   <a href="mailto:support@youragent.in" className="hover:text-white transition-colors">
                     support@youragent.in
                   </a>
                 </li>
                 <li className="flex items-center">
-                  <Phone className="w-4 h-4 mr-2" />
+                  <Phone className="w-4 h-4 mr-2 text-brand" />
                   <a href="tel:+911234567890" className="hover:text-white transition-colors">
                     +91 12345 67890
                   </a>
                 </li>
                 <li className="flex items-center">
-                  <MapPin className="w-4 h-4 mr-2" />
+                  <MapPin className="w-4 h-4 mr-2 text-brand" />
                   <span>Hyderabad, India</span>
                 </li>
               </ul>

@@ -51,7 +51,7 @@ export default function AuthPageLayout({
           <div className="text-center">
             <p className="text-sm text-zinc-600">
               {footerText}{' '}
-              <Link href={footerLink} className="text-red-600 hover:text-red-700 font-medium">
+              <Link href={footerLink} className="text-brand hover:text-brand-hover font-medium">
                 {footerLinkText}
               </Link>
             </p>

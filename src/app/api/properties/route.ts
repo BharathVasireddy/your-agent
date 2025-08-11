@@ -56,21 +56,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Agent profile not found' }, { status: 404 });
     }
 
-    if (!agent.isSubscribed) {
+    const data: BasePropertyFormData = await request.json();
+
+    // Allow creating drafts without subscription; require subscription to publish
+    const isDraft = (data.status || '').toLowerCase() === 'draft';
+    if (!agent.isSubscribed && !isDraft) {
       return NextResponse.json({ error: 'Subscription required to create properties' }, { status: 403 });
     }
 
-    // Enforce listing limit based on plan
+    // Enforce listing limit based on plan (only for published listings)
     const plan = (agent.subscriptionPlan as Plan | null) ?? 'starter';
     const listingLimit = ENTITLEMENTS[plan].listingLimit;
-    if (Number.isFinite(listingLimit)) {
+    if (!isDraft && Number.isFinite(listingLimit)) {
       const currentCount = await prisma.property.count({ where: { agentId: agent.id } });
       if (currentCount >= (listingLimit as number)) {
         return NextResponse.json({ error: 'Listing limit reached for your plan. Upgrade to add more listings.' }, { status: 403 });
       }
     }
-
-    const data: BasePropertyFormData = await request.json();
 
     // Generate slug from title
     const slug = data.title

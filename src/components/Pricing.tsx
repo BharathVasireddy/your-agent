@@ -45,7 +45,7 @@ export default function Pricing() {
           <button
             key={i}
             onClick={() => setInterval(i)}
-            className={`px-3 py-1.5 rounded-full border text-sm capitalize transition-colors ${interval===i ? 'border-red-600 text-red-700 bg-red-50' : 'border-zinc-200 text-zinc-700 hover:bg-zinc-50'}`}
+            className={`px-3 py-1.5 rounded-full border text-sm capitalize transition-colors ${interval===i ? 'border-brand text-brand-hover bg-brand-light' : 'border-zinc-200 text-zinc-700 hover:bg-zinc-50'}`}
           >
             {i}
           </button>
@@ -70,12 +70,12 @@ export default function Pricing() {
               <ul className="space-y-2 text-sm text-zinc-700 mb-6">
                 {PLAN_FEATURES[plan].map((f, idx) => (
                   <li key={idx} className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-red-600" />
+                  <span className="mt-1 h-1.5 w-1.5 rounded-full bg-brand" />
                     <span>{f}</span>
                   </li>
                 ))}
               </ul>
-              <Link href="/subscribe" className="inline-flex items-center justify-center w-full h-11 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition-colors">
+              <Link href="/subscribe" className="inline-flex items-center justify-center w-full h-11 rounded-lg bg-brand hover:bg-brand-hover text-white font-medium transition-colors">
                 Choose {title}
               </Link>
             </div>

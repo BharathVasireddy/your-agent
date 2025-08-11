@@ -117,7 +117,7 @@ export default function ImageUploader({
       {/* Image Display */}
       {displayImageUrl ? (
         <div className="relative">
-          <div className={`overflow-hidden border-2 border-red-100 rounded-lg ${
+          <div className={`overflow-hidden border-2 border-brand-soft rounded-lg ${
             aspectRatio === 'square' ? 'aspect-square' :
             aspectRatio === 'wide' ? 'aspect-video' : ''
           }`}>
@@ -132,7 +132,7 @@ export default function ImageUploader({
           <button
             type="button"
             onClick={handleRemoveImage}
-            className="absolute -top-2 -right-2 w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 transition-colors"
+            className="absolute -top-2 -right-2 w-8 h-8 bg-brand text-white rounded-full flex items-center justify-center hover:bg-brand-hover transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -164,7 +164,7 @@ export default function ImageUploader({
           onClick={handleUploadClick}
           disabled={isUploading}
           variant="outline"
-          className="text-red-600 border-red-200 hover:bg-red-50"
+          className="text-brand border-brand-soft hover:bg-brand-light"
         >
           {isUploading ? (
             <>
@@ -180,7 +180,7 @@ export default function ImageUploader({
         </Button>
         
         {uploadError && (
-          <p className="text-sm text-red-600">{uploadError}</p>
+          <p className="text-sm text-brand">{uploadError}</p>
         )}
       </div>
     </div>

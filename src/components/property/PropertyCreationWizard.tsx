@@ -17,6 +17,8 @@ export default function PropertyCreationWizard({}: PropertyCreationWizardProps) 
   const [selectedPropertyType, setSelectedPropertyType] = useState<PropertyType | null>(null);
   const [quotaText, setQuotaText] = useState<string | null>(null);
   const [quotaPercent, setQuotaPercent] = useState<number | null>(null);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -68,6 +70,11 @@ export default function PropertyCreationWizard({}: PropertyCreationWizardProps) 
       const result = await response.json();
 
       if (!response.ok) {
+        // Subscription required - show modal instead of alert
+        if (response.status === 403 || (typeof result.error === 'string' && /subscription/i.test(result.error))) {
+          setShowSubscriptionModal(true);
+          return;
+        }
         throw new Error(result.error || 'Failed to create property');
       }
 
@@ -75,8 +82,7 @@ export default function PropertyCreationWizard({}: PropertyCreationWizardProps) 
       router.push('/agent/dashboard/properties');
     } catch (error) {
       console.error('Error creating property:', error);
-      // TODO: Show error message to user
-      alert(`Error creating property: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setSubmitError(error instanceof Error ? error.message : 'Unknown error');
     }
   };
 
@@ -86,8 +92,13 @@ export default function PropertyCreationWizard({}: PropertyCreationWizardProps) 
         <div className="mb-4">
           <div className="text-xs text-zinc-600 mb-1">{quotaText}</div>
           <div className="w-full h-2 bg-zinc-200 rounded overflow-hidden">
-            <div className="h-2 bg-red-600" style={{ width: `${quotaPercent}%` }} />
+            <div className="h-2 bg-brand" style={{ width: `${quotaPercent}%` }} />
           </div>
+        </div>
+      )}
+      {submitError && (
+        <div className="mb-4 p-3 bg-brand-light border border-brand-soft rounded">
+          <p className="text-sm text-brand-hover">{submitError}</p>
         </div>
       )}
       {currentStep === 'type-selection' && (
@@ -103,7 +114,7 @@ export default function PropertyCreationWizard({}: PropertyCreationWizardProps) 
           <div>
             <button
               onClick={handleBackToTypeSelection}
-              className="text-red-600 hover:text-red-700 text-sm font-medium"
+              className="text-brand hover:text-brand-hover text-sm font-medium"
             >
               ← Back to Type Selection
             </button>
@@ -123,6 +134,33 @@ export default function PropertyCreationWizard({}: PropertyCreationWizardProps) 
             onSubmit={handleFormSubmit}
             onCancel={handleBackToTypeSelection}
           />
+        </div>
+      )}
+      {/* Subscription required modal */}
+      {showSubscriptionModal && (
+        <div className="fixed inset-0 z-[9999] bg-black/40 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl border border-zinc-200 max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-zinc-950">Subscription Required</h3>
+            <p className="mt-2 text-sm text-zinc-600">
+              You need an active subscription to create new properties. Upgrade your plan to start adding listings.
+            </p>
+            <div className="mt-6 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowSubscriptionModal(false)}
+                className="px-4 py-2 rounded-md border border-zinc-300 text-zinc-700 hover:bg-zinc-50"
+              >
+                Not now
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push('/subscribe')}
+                className="px-4 py-2 rounded-md bg-brand text-white hover:bg-brand-hover"
+              >
+                Subscribe now
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

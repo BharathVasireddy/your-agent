@@ -153,7 +153,7 @@ export default function FaqsManager({ agent }: FaqsManagerProps) {
             <Button
               type="submit"
               disabled={isSubmittingFaq}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-brand hover:bg-brand-hover text-white"
             >
               {isSubmittingFaq ? (
                 <>
@@ -215,7 +215,7 @@ export default function FaqsManager({ agent }: FaqsManagerProps) {
                       size="sm"
                       variant="outline"
                       onClick={() => handleDeleteFaq(faq.id)}
-                      className="p-1 h-8 w-8 text-red-600 hover:text-red-700"
+                      className="p-1 h-8 w-8 text-brand hover:text-brand-hover"
                       title="Delete FAQ"
                     >
                       <Trash2 className="w-3 h-3" />

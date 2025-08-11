@@ -29,7 +29,7 @@ export default function DashboardContent({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             {/* Compact Profile Photo */}
-            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-[#FFDCCF] flex items-center justify-center">
               {agent?.profilePhotoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -38,7 +38,7 @@ export default function DashboardContent({
                   className="w-12 h-12 rounded-full object-cover"
                 />
               ) : (
-                <User className="w-6 h-6 text-red-600" />
+              <User className="w-6 h-6 text-brand" />
               )}
             </div>
             
@@ -152,10 +152,10 @@ export default function DashboardContent({
         <button
           id="add-property-button"
           onClick={() => navigateInstantly('/agent/dashboard/properties/new')}
-          className="w-full flex items-center p-4 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors group"
+          className="w-full flex items-center p-4 bg-brand-light border border-brand-soft rounded-lg hover:bg-brand-muted transition-colors group"
         >
-          <div className="flex items-center justify-center w-10 h-10 bg-red-100 rounded-lg mr-3">
-            <Plus className="w-5 h-5 text-red-600" />
+          <div className="flex items-center justify-center w-10 h-10 bg-[#FFDCCF] rounded-lg mr-3">
+            <Plus className="w-5 h-5 text-brand" />
           </div>
           <div className="flex-1">
             <p className="font-medium text-zinc-950">Add New Property</p>
@@ -186,9 +186,9 @@ export default function DashboardContent({
             <Link
               id="add-property-button"
               href="/agent/dashboard/properties/new"
-              className="flex items-center p-4 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors group"
+              className="flex items-center p-4 bg-brand-light border border-brand-soft rounded-lg hover:bg-brand-muted transition-colors group"
             >
-              <Plus className="w-6 h-6 text-red-600 mr-3" />
+              <Plus className="w-6 h-6 text-brand mr-3" />
               <div>
                 <p className="font-medium text-zinc-950">Add New Property</p>
                 <p className="text-sm text-zinc-600">Create a new property listing</p>
@@ -214,7 +214,7 @@ export default function DashboardContent({
             <h3 className="text-lg font-semibold text-zinc-950">Recent Properties</h3>
             <Link
               href="/agent/dashboard/properties"
-              className="text-sm text-red-600 hover:text-red-700"
+              className="text-sm text-brand hover:text-brand-hover"
             >
               View All
             </Link>
@@ -226,7 +226,7 @@ export default function DashboardContent({
               <p className="text-zinc-500">No properties yet</p>
               <Link
                 href="/agent/dashboard/properties/new"
-                className="inline-flex items-center text-red-600 hover:text-red-700 mt-2"
+                className="inline-flex items-center text-brand hover:text-brand-hover mt-2"
               >
                 <Plus className="w-4 h-4 mr-1" />
                 Add your first property
@@ -246,7 +246,7 @@ export default function DashboardContent({
                     property.status === 'Available' 
                       ? 'bg-green-100 text-green-800'
                       : property.status === 'Sold'
-                      ? 'bg-red-100 text-red-800'
+                     ? 'bg-brand-light text-brand-deep'
                       : 'bg-blue-100 text-blue-800'
                   }`}>
                     {property.status}
@@ -264,7 +264,7 @@ export default function DashboardContent({
           <h3 className="text-lg font-semibold text-zinc-950">Recent Properties</h3>
           <Link
             href="/agent/dashboard/properties"
-            className="text-sm text-red-600 hover:text-red-700"
+           className="text-sm text-brand hover:text-brand-hover"
           >
             View All
           </Link>
@@ -278,7 +278,7 @@ export default function DashboardContent({
             <p className="text-zinc-500 text-sm">No properties yet</p>
             <Link
               href="/agent/dashboard/properties/new"
-              className="inline-flex items-center text-red-600 hover:text-red-700 mt-2 text-sm"
+             className="inline-flex items-center text-brand hover:text-brand-hover mt-2 text-sm"
             >
               <Plus className="w-4 h-4 mr-1" />
               Add your first property
@@ -298,7 +298,7 @@ export default function DashboardContent({
                   property.status === 'Available' 
                     ? 'bg-green-100 text-green-800'
                     : property.status === 'Sold'
-                    ? 'bg-red-100 text-red-800'
+                   ? 'bg-brand-light text-brand-deep'
                     : 'bg-blue-100 text-blue-800'
                 }`}>
                   {property.status}

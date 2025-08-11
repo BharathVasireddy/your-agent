@@ -99,12 +99,12 @@ export default function OnboardingWizardClient() {
                   const isActive = id === step;
                   const isDone = id < step;
                   return (
-                    <li key={id} className={`flex items-start gap-3 rounded-lg p-3 ${isActive ? 'bg-red-50 border border-red-200' : 'bg-white'}`}>
-                      <div className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center border ${isActive ? 'border-red-500' : 'border-zinc-300'}`}>
-                        {isDone ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Circle className={`w-3.5 h-3.5 ${isActive ? 'text-red-500' : 'text-zinc-400'}`} />}
+                    <li key={id} className={`flex items-start gap-3 rounded-lg p-3 ${isActive ? 'bg-brand-light border border-brand-soft' : 'bg-white'}`}>
+                      <div className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center border ${isActive ? 'border-brand' : 'border-zinc-300'}`}>
+                        {isDone ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Circle className={`w-3.5 h-3.5 ${isActive ? 'text-brand' : 'text-zinc-400'}`} />}
                       </div>
                       <div className="flex-1">
-                        <div className={`text-sm font-medium ${isActive ? 'text-red-700' : 'text-zinc-900'}`}>{title}</div>
+                        <div className={`text-sm font-medium ${isActive ? 'text-brand' : 'text-zinc-900'}`}>{title}</div>
                         <div className="text-xs text-zinc-600">{desc}</div>
                       </div>
                     </li>
@@ -129,12 +129,12 @@ export default function OnboardingWizardClient() {
                   Back
                 </Button>
                 {step === 4 ? (
-                  <Button onClick={handleFinish} disabled={isSubmitting} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white">
+                  <Button onClick={handleFinish} disabled={isSubmitting} className="flex items-center gap-2 bg-brand hover:bg-brand-hover text-white">
                     {isSubmitting ? 'Creating Profile...' : 'Finish & Create Profile'}
                     <ChevronRight size={16} />
                   </Button>
                 ) : (
-                  <Button onClick={nextStep} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white">
+                  <Button onClick={nextStep} className="flex items-center gap-2 bg-brand hover:bg-brand-hover text-white">
                     Next
                     <ChevronRight size={16} />
                   </Button>

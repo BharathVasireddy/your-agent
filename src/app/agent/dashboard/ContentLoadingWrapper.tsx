@@ -18,7 +18,7 @@ export default function ContentLoadingWrapper({ children }: ContentLoadingWrappe
       {isContentLoading && (
         <div className="fixed top-4 right-4 z-50">
           <div className="bg-white border border-zinc-200 rounded-full px-3 py-1.5 shadow-lg flex items-center space-x-2">
-            <div className="w-3 h-3 border border-red-600 border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-3 h-3 border border-brand border-t-transparent rounded-full animate-spin" />
             <span className="text-xs text-zinc-600 font-medium">Loading</span>
           </div>
         </div>

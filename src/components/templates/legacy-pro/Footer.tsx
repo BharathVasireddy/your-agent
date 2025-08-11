@@ -22,7 +22,7 @@ export default function Footer() {
                 with a personal touch.
               </p>
               <div className="flex items-center text-sm text-zinc-400">
-                Made with <Heart className="w-4 h-4 mx-1 text-red-500" /> for real estate excellence
+                Made with <Heart className="w-4 h-4 mx-1 text-brand" /> for real estate excellence
               </div>
             </div>
 

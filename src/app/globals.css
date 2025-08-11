@@ -3,18 +3,26 @@
 @tailwind utilities;
 
 :root {
-  /* Color Palette - Action-Oriented, Confident, and Clean */
-  --primary-red: #F55625; /* brand primary */
-  --primary-red-hover: #D94B20; /* brand hover (slightly darker) */
-  --primary-red-50: #FFE9E1; /* light tint */
-  --primary-red-100: #FFDCCF;
-  --primary-red-200: #FFC4B0;
-  --primary-red-300: #FFA185;
-  --primary-red-500: #F55625;
-  --primary-red-600: #F55625;
-  --primary-red-700: #D94B20;
-  --primary-red-800: #BF3A1A;
-  --primary-red-light: #FEE2E2; /* red-100 - for subtle highlights */
+  /* Brand Palette as RGB triplets (for Tailwind rgb(var(--token) / <alpha-value>)) */
+  --brand: 245 86 37;        /* #F55625 */
+  --brand-hover: 217 75 32;  /* #D94B20 */
+  --brand-light: 255 233 225;/* #FFE9E1 */
+  --brand-soft: 255 196 176; /* #FFC4B0 */
+  --brand-muted: 255 220 207;/* #FFDCCF */
+  --brand-deep: 138 51 23;   /* #8A3317 */
+
+  /* (Legacy) Previous primary variables - kept for backward compatibility */
+  --primary-red: #F55625; /* deprecated: prefer brand tokens */
+  --primary-red-hover: #D94B20; /* deprecated */
+  --primary-red-50: #FFE9E1; /* deprecated */
+  --primary-red-100: #FFDCCF; /* deprecated */
+  --primary-red-200: #FFC4B0; /* deprecated */
+  --primary-red-300: #FFA185; /* deprecated */
+  --primary-red-500: #F55625; /* deprecated */
+  --primary-red-600: #F55625; /* deprecated */
+  --primary-red-700: #D94B20; /* deprecated */
+  --primary-red-800: #BF3A1A; /* deprecated */
+  --primary-red-light: #FEE2E2; /* deprecated */
   --secondary-blue: #3B82F6; /* blue-500 - for trust/info elements */
 
   /* Text Colors */

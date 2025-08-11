@@ -17,10 +17,10 @@ export default function TestSubscriptionPage() {
             <div className="space-y-3">
               <Link 
                 href="/subscribe" 
-                className="block p-4 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
+                className="block p-4 bg-brand-light border border-brand-soft rounded-lg hover:bg-brand-muted transition-colors"
               >
-                <div className="font-semibold text-red-800">Real Payment Flow</div>
-                <div className="text-sm text-red-600">₹499/month subscription with Razorpay</div>
+                <div className="font-semibold text-brand-deep">Real Payment Flow</div>
+                <div className="text-sm text-brand">₹499/month subscription with Razorpay</div>
               </Link>
               
               <Link 

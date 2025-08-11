@@ -159,7 +159,7 @@ export default function BulkFixUsersPage() {
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                                 agent.isSubscribed 
-                                  ? 'bg-red-100 text-red-800' 
+                                  ? 'bg-brand-light text-brand-deep' 
                                   : 'bg-yellow-100 text-yellow-800'
                               }`}>
                                 {agent.isSubscribed ? '🚨 Paid user locked out' : '⚠️ Cannot subscribe'}
@@ -181,7 +181,7 @@ export default function BulkFixUsersPage() {
                     <button
                       onClick={handleBulkCreateUsers}
                       disabled={isLoading}
-                      className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                      className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand hover:bg-brand-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand disabled:opacity-50"
                     >
                       {isLoading ? "Creating User Records..." : `Create ${auditResults.orphanedAgents.length} Missing User Records`}
                     </button>
@@ -198,12 +198,12 @@ export default function BulkFixUsersPage() {
                 ? "bg-green-50 text-green-800 border border-green-200" 
                 : message.startsWith("Found")
                 ? "bg-blue-50 text-blue-800 border border-blue-200"
-                : "bg-red-50 text-red-800 border border-red-200"
+                : "bg-brand-light text-brand-deep border border-brand-soft"
             }`}>
               {message.startsWith("Success") || message.startsWith("All Good") ? (
                 <CheckCircle size={16} className="text-green-600" />
               ) : (
-                <XCircle size={16} className="text-red-600" />
+                <XCircle size={16} className="text-brand" />
               )}
               {message}
             </div>

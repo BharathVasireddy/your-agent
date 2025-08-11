@@ -391,7 +391,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
             {/* Photo Display */}
             <div className="relative">
               {displayImageUrl ? (
-                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-red-100">
+                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-brand-light">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={displayImageUrl}
@@ -400,7 +400,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
                   />
                 </div>
               ) : (
-                <div className="w-32 h-32 rounded-full bg-zinc-100 border-4 border-red-100 flex items-center justify-center">
+                <div className="w-32 h-32 rounded-full bg-zinc-100 border-4 border-brand-light flex items-center justify-center">
                   <User className="w-16 h-16 text-zinc-400" />
                 </div>
               )}
@@ -409,7 +409,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
                 <button
                   type="button"
                   onClick={handleRemovePhoto}
-                  className="absolute -top-2 -right-2 w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 transition-colors"
+                  className="absolute -top-2 -right-2 w-8 h-8 bg-brand text-white rounded-full flex items-center justify-center hover:bg-brand-hover transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -431,7 +431,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
                 onClick={handleUploadClick}
                 disabled={isUploading}
                 variant="outline"
-                className="text-red-600 border-red-200 hover:bg-red-50"
+                className="text-brand border-brand-soft hover:bg-brand-light"
               >
                 {isUploading ? (
                   <>
@@ -447,7 +447,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
               </Button>
               
               {uploadError && (
-                <p className="text-sm text-red-600 mt-2">{uploadError}</p>
+                <p className="text-sm text-brand mt-2">{uploadError}</p>
               )}
             </div>
           </div>
@@ -495,10 +495,10 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
                 onChange={(e) => handleInputChange('phone', e.target.value)}
                 placeholder="e.g., +91 98765 43210"
                 required
-                className={phoneError ? 'border-red-300 focus:border-red-500' : ''}
+                className={phoneError ? 'border-brand-soft focus:border-brand' : ''}
               />
               {phoneError && (
-                <p className="text-sm text-red-600">{phoneError}</p>
+                <p className="text-sm text-brand">{phoneError}</p>
               )}
             </div>
 
@@ -571,7 +571,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
                     ) : slugValidation.available === true ? (
                       <Check className="w-4 h-4 text-green-600" />
                     ) : slugValidation.available === false ? (
-                      <X className="w-4 h-4 text-red-600" />
+                      <X className="w-4 h-4 text-brand" />
                     ) : null}
                   </div>
                 </div>
@@ -581,7 +581,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
                 <p className={`text-xs ${
                   slugValidation.available 
                     ? 'text-green-600' 
-                    : 'text-red-600'
+                    : 'text-brand'
                 }`}>
                   {slugValidation.message}
                 </p>
@@ -652,7 +652,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
               size="sm"
               onClick={handleGenerateBio}
               disabled={isGenerating || !formData.experience || !formData.city}
-              className="text-red-600 border-red-200 hover:bg-red-50 min-w-[180px] justify-center px-6 py-3 h-auto"
+              className="text-brand border-brand-soft hover:bg-brand-light min-w-[180px] justify-center px-6 py-3 h-auto"
             >
               {isGenerating ? (
                 <>
@@ -669,8 +669,8 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
           </div>
 
           {generationError && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg mb-4">
-              <p className="text-sm text-red-700">{generationError}</p>
+            <div className="p-3 bg-brand-light border border-brand-soft rounded-lg mb-4">
+              <p className="text-sm text-brand-hover">{generationError}</p>
             </div>
           )}
 
@@ -686,7 +686,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
             <p className="text-xs text-zinc-500">
               This will appear on your public profile
             </p>
-            <p className={`text-xs ${formData.bio.length > 450 ? 'text-red-600' : 'text-zinc-500'}`}>
+            <p className={`text-xs ${formData.bio.length > 450 ? 'text-brand' : 'text-zinc-500'}`}> 
               {formData.bio.length}/500 characters
             </p>
           </div>
@@ -706,7 +706,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
               {/* Legacy Pro */}
               <label
                 htmlFor="legacy-pro"
-                className={`flex items-center space-x-4 p-4 rounded-lg border-2 transition-all ${formData.template === 'legacy-pro' ? 'border-red-200 bg-red-50' : 'border-zinc-200 hover:bg-zinc-50'} ${allowedTemplates && !allowedTemplates.has('legacy-pro') ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                className={`flex items-center space-x-4 p-4 rounded-lg border-2 transition-all ${formData.template === 'legacy-pro' ? 'border-brand-soft bg-brand-light' : 'border-zinc-200 hover:bg-zinc-50'} ${allowedTemplates && !allowedTemplates.has('legacy-pro') ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <RadioGroupItem value="legacy-pro" id="legacy-pro" />
                 <div className="flex-1">
@@ -732,7 +732,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
               {/* Fresh Minimal */}
               <label
                 htmlFor="fresh-minimal"
-                className={`flex items-center space-x-4 p-4 rounded-lg border-2 transition-all ${formData.template === 'fresh-minimal' ? 'border-red-200 bg-red-50' : 'border-zinc-200 hover:bg-zinc-50'} ${allowedTemplates && !allowedTemplates.has('fresh-minimal') ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                className={`flex items-center space-x-4 p-4 rounded-lg border-2 transition-all ${formData.template === 'fresh-minimal' ? 'border-brand-soft bg-brand-light' : 'border-zinc-200 hover:bg-zinc-50'} ${allowedTemplates && !allowedTemplates.has('fresh-minimal') ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <RadioGroupItem value="fresh-minimal" id="fresh-minimal" />
                 <div className="flex-1">
@@ -758,7 +758,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
               {/* Mono Modern */}
               <label
                 htmlFor="mono-modern"
-                className={`flex items-center space-x-4 p-4 rounded-lg border-2 transition-all ${formData.template === 'mono-modern' ? 'border-red-200 bg-red-50' : 'border-zinc-200 hover:bg-zinc-50'} ${allowedTemplates && !allowedTemplates.has('mono-modern') ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                className={`flex items-center space-x-4 p-4 rounded-lg border-2 transition-all ${formData.template === 'mono-modern' ? 'border-brand-soft bg-brand-light' : 'border-zinc-200 hover:bg-zinc-50'} ${allowedTemplates && !allowedTemplates.has('mono-modern') ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <RadioGroupItem value="mono-modern" id="mono-modern" />
                 <div className="flex-1">
@@ -784,7 +784,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
               {/* Mono Elite */}
               <label
                 htmlFor="mono-elite"
-                className={`flex items-center space-x-4 p-4 rounded-lg border-2 transition-all cursor-pointer ${formData.template === 'mono-elite' ? 'border-red-200 bg-red-50' : 'border-zinc-200 hover:bg-zinc-50'}`}
+                className={`flex items-center space-x-4 p-4 rounded-lg border-2 transition-all cursor-pointer ${formData.template === 'mono-elite' ? 'border-brand-soft bg-brand-light' : 'border-zinc-200 hover:bg-zinc-50'}`}
               >
                 <RadioGroupItem value="mono-elite" id="mono-elite" />
                 <div className="flex-1">
@@ -817,7 +817,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
         <Button
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-full shadow-lg"
+          className="bg-brand hover:bg-brand-hover text-white px-8 py-3 rounded-full shadow-lg"
         >
           {isSubmitting ? (
             <>

@@ -491,7 +491,7 @@ export default function PropertyEditWizard({ property }: PropertyEditWizardProps
                     <button
                       type="button"
                       onClick={() => removePhoto(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute -top-2 -right-2 bg-brand hover:bg-brand-hover text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -1553,7 +1553,7 @@ export default function PropertyEditWizard({ property }: PropertyEditWizardProps
         
         <Button
           type="submit"
-          className="bg-red-600 hover:bg-red-700 text-white"
+          className="bg-brand hover:bg-brand-hover text-white"
         >
           Update Property
         </Button>

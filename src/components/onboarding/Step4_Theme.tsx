@@ -108,8 +108,8 @@ export default function Step4_Theme() {
       </div>
 
       {/* Helper Text */}
-      <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-sm text-red-800">
+      <div className="mt-6 p-4 bg-brand-light border border-brand-soft rounded-lg">
+        <p className="text-sm text-[#8A3317]">
           <strong>Tip:</strong> You can change your template later from your profile settings. 
           Choose one that aligns with your personal brand and the impression you want to make.
         </p>

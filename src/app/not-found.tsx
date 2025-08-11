@@ -1,14 +1,26 @@
+"use client";
 import Link from 'next/link';
 import { Home, Search, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import React from 'react';
 
 export default function NotFound() {
+  const router = useRouter();
+  const goBack = React.useCallback(() => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push('/');
+    }
+  }, [router]);
+
   return (
     <div className="min-h-screen bg-zinc-50 flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center space-y-8">
         {/* 404 Icon/Number */}
         <div className="space-y-4">
-          <div className="text-6xl font-bold text-red-600">404</div>
+          <div className="text-6xl font-bold text-brand">404</div>
           <h1 className="text-3xl font-bold text-zinc-950">Page Not Found</h1>
           <p className="text-zinc-600 text-lg">
             Sorry, we couldn&apos;t find the page you&apos;re looking for. It might have been moved, deleted, or you entered the wrong URL.
@@ -28,24 +40,22 @@ export default function NotFound() {
         {/* Action Buttons */}
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button asChild className="bg-red-600 hover:bg-red-700 text-white">
+            <Button asChild className="bg-brand hover:bg-brand-hover text-white">
               <Link href="/">
                 <Home className="w-4 h-4 mr-2" />
                 Go Home
               </Link>
             </Button>
             
-            <Button asChild variant="outline" className="border-zinc-300 text-zinc-700 hover:bg-zinc-50">
-              <Link href="javascript:history.back()">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Go Back
-              </Link>
+            <Button type="button" onClick={goBack} variant="outline" className="border-zinc-300 text-zinc-700 hover:bg-zinc-50">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Go Back
             </Button>
           </div>
           
           <p className="text-sm text-zinc-500">
             Or try searching for what you&apos;re looking for from our{' '}
-            <Link href="/" className="text-red-600 hover:text-red-700 font-medium">
+            <Link href="/" className="text-brand hover:text-brand-hover font-medium">
               homepage
             </Link>
           </p>

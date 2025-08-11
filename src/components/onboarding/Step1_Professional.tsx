@@ -197,8 +197,8 @@ export default function Step1_Professional() {
     <div className="max-w-4xl mx-auto">
       {/* Header Section with Better Typography */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
-          <MapPin className="w-8 h-8 text-red-600" />
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-light rounded-full mb-4">
+          <MapPin className="w-8 h-8 text-brand" />
         </div>
         <h2 className="text-3xl font-bold text-zinc-950 mb-3">
           Professional Information
@@ -214,8 +214,8 @@ export default function Step1_Professional() {
         {/* Location Card */}
         <div className="bg-white border border-zinc-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-red-100 rounded-lg">
-              <MapPin className="w-5 h-5 text-red-600" />
+            <div className="p-2 bg-brand-light rounded-lg">
+              <MapPin className="w-5 h-5 text-brand" />
             </div>
             <h3 className="text-lg font-semibold text-zinc-950">Location</h3>
           </div>
@@ -262,8 +262,8 @@ export default function Step1_Professional() {
         {/* Contact & Experience Card */}
         <div className="bg-white border border-zinc-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-red-100 rounded-lg">
-              <Phone className="w-5 h-5 text-red-600" />
+            <div className="p-2 bg-brand-light rounded-lg">
+              <Phone className="w-5 h-5 text-brand" />
             </div>
             <h3 className="text-lg font-semibold text-zinc-950">Contact & Experience</h3>
           </div>
@@ -299,13 +299,13 @@ export default function Step1_Professional() {
                     {phoneValidation.isValid ? (
                       <Check className="w-4 h-4 text-green-600" />
                     ) : (
-                      <AlertCircle className="w-4 h-4 text-red-600" />
+                      <AlertCircle className="w-4 h-4 text-brand" />
                     )}
                   </div>
                 )}
               </div>
               {phoneValidation.message && (
-                <p className={`text-xs ${phoneValidation.isValid ? 'text-green-600' : 'text-red-600'}`}>
+                <p className={`text-xs ${phoneValidation.isValid ? 'text-green-600' : 'text-brand'}`}>
                   {phoneValidation.message}
                 </p>
               )}
@@ -351,8 +351,8 @@ export default function Step1_Professional() {
       {/* Profile URL Card - Full Width */}
       <div className="bg-white border border-zinc-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow mb-8">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-red-100 rounded-lg">
-            <Link2 className="w-5 h-5 text-red-600" />
+          <div className="p-2 bg-brand-light rounded-lg">
+            <Link2 className="w-5 h-5 text-brand" />
           </div>
           <h3 className="text-lg font-semibold text-zinc-950">Profile URL</h3>
         </div>
@@ -379,7 +379,7 @@ export default function Step1_Professional() {
                 ) : slugValidation.available === true ? (
                   <Check className="w-5 h-5 text-green-600" />
                 ) : slugValidation.available === false ? (
-                  <X className="w-5 h-5 text-red-600" />
+                  <X className="w-5 h-5 text-brand" />
                 ) : null}
               </div>
             </div>
@@ -389,7 +389,7 @@ export default function Step1_Professional() {
             <p className={`text-sm ${
               slugValidation.available 
                 ? 'text-green-600' 
-                : 'text-red-600'
+                : 'text-brand'
             }`}>
               {slugValidation.message}
             </p>
@@ -401,14 +401,14 @@ export default function Step1_Professional() {
       </div>
 
       {/* Info Banner */}
-      <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-xl p-6">
+      <div className="bg-gradient-to-r from-brand-light to-orange-50 border border-brand-soft rounded-xl p-6">
         <div className="flex items-start gap-3">
-          <div className="p-2 bg-red-100 rounded-lg flex-shrink-0">
-            <AlertCircle className="w-5 h-5 text-red-600" />
+          <div className="p-2 bg-brand-light rounded-lg flex-shrink-0">
+            <AlertCircle className="w-5 h-5 text-brand" />
           </div>
           <div>
-            <h4 className="font-semibold text-red-900 mb-1">Important Information</h4>
-            <p className="text-sm text-red-800">
+            <h4 className="font-semibold text-brand-deep mb-1">Important Information</h4>
+            <p className="text-sm text-brand-deep">
               This information will be displayed on your public agent profile. Make sure all details are accurate and professional. 
               You can update these details later from your dashboard.
             </p>

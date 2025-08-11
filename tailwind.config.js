@@ -63,6 +63,15 @@ module.exports = {
         'template-text-muted': "rgb(var(--color-text-muted) / <alpha-value>)",
         'template-border': "rgb(var(--color-border) / <alpha-value>)",
         'template-border-light': "rgb(var(--color-border-light) / <alpha-value>)",
+        // Brand palette (CSS variable backed, runtime themable)
+        brand: {
+          DEFAULT: 'rgb(var(--brand) / <alpha-value>)',
+          hover: 'rgb(var(--brand-hover) / <alpha-value>)',
+          light: 'rgb(var(--brand-light) / <alpha-value>)',
+          soft: 'rgb(var(--brand-soft) / <alpha-value>)',
+          muted: 'rgb(var(--brand-muted) / <alpha-value>)',
+          deep: 'rgb(var(--brand-deep) / <alpha-value>)',
+        },
       },
       fontFamily: {
         'template-primary': "var(--font-primary)",

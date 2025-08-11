@@ -95,7 +95,7 @@ export default function FaqSection({ faqs }: FaqSectionProps) {
                       element.scrollIntoView({ behavior: 'smooth' });
                     }
                   }}
-                  className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
+                  className="w-full bg-brand hover:bg-brand-hover text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
                 >
                   Ask Me Anything
                 </button>

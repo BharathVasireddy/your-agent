@@ -580,7 +580,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
             {/* Photo Display */}
             <div className="relative">
               {displayImageUrl ? (
-                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-red-100">
+                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[#FFDCCF]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={displayImageUrl}
@@ -589,7 +589,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
                   />
                 </div>
               ) : (
-                <div className="w-32 h-32 rounded-full bg-zinc-100 border-4 border-red-100 flex items-center justify-center">
+                <div className="w-32 h-32 rounded-full bg-zinc-100 border-4 border-[#FFDCCF] flex items-center justify-center">
                   <User className="w-16 h-16 text-zinc-400" />
                 </div>
               )}
@@ -598,7 +598,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
                 <button
                   type="button"
                   onClick={handleRemovePhoto}
-                  className="absolute -top-2 -right-2 w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 transition-colors"
+                  className="absolute -top-2 -right-2 w-8 h-8 bg-brand text-white rounded-full flex items-center justify-center hover:bg-brand-hover transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -620,7 +620,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
                 onClick={handleUploadClick}
                 disabled={isUploading}
                 variant="outline"
-                className="text-red-600 border-red-200 hover:bg-red-50"
+                className="text-brand border-brand-soft hover:bg-brand-light"
               >
                 {isUploading ? (
                   <>
@@ -636,7 +636,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
               </Button>
               
               {uploadError && (
-                <p className="text-sm text-red-600 mt-2">{uploadError}</p>
+               <p className="text-sm text-brand-hover mt-2">{uploadError}</p>
               )}
             </div>
           </div>
@@ -766,10 +766,10 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
                 onChange={(e) => handleInputChange('phone', e.target.value)}
                 placeholder="e.g., +91 98765 43210"
                 required
-                className={phoneError ? 'border-red-300 focus:border-red-500' : ''}
+               className={phoneError ? 'border-brand-soft focus:border-brand' : ''}
               />
               {phoneError && (
-                <p className="text-sm text-red-600">{phoneError}</p>
+              <p className="text-sm text-brand-hover">{phoneError}</p>
               )}
             </div>
 
@@ -842,7 +842,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
                     ) : slugValidation.available === true ? (
                       <Check className="w-4 h-4 text-green-600" />
                     ) : slugValidation.available === false ? (
-                      <X className="w-4 h-4 text-red-600" />
+                      <X className="w-4 h-4 text-brand" />
                     ) : null}
                   </div>
                 </div>
@@ -852,7 +852,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
                 <p className={`text-xs ${
                   slugValidation.available 
                     ? 'text-green-600' 
-                    : 'text-red-600'
+                    : 'text-brand'
                 }`}>
                   {slugValidation.message}
                 </p>
@@ -871,7 +871,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
               size="sm"
               onClick={handleGenerateBio}
               disabled={isGenerating || !formData.experience || !formData.city}
-              className="text-red-600 border-red-200 hover:bg-red-50 min-w-[180px] justify-center px-6 py-3 h-auto"
+              className="text-brand border-brand-soft hover:bg-brand-light min-w-[180px] justify-center px-6 py-3 h-auto"
             >
               {isGenerating ? (
                 <>
@@ -888,8 +888,8 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
           </div>
 
           {generationError && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg mb-4">
-              <p className="text-sm text-red-700">{generationError}</p>
+            <div className="p-3 bg-brand-light border border-brand-soft rounded-lg mb-4">
+              <p className="text-sm text-brand-hover">{generationError}</p>
             </div>
           )}
 
@@ -905,7 +905,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
             <p className="text-xs text-zinc-500">
               This will appear on your public profile
             </p>
-            <p className={`text-xs ${formData.bio.length > 450 ? 'text-red-600' : 'text-zinc-500'}`}>
+            <p className={`text-xs ${formData.bio.length > 450 ? 'text-brand' : 'text-zinc-500'}`}> 
               {formData.bio.length}/500 characters
             </p>
           </div>
@@ -1028,7 +1028,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
                   type="button"
                   onClick={handleTestimonialSubmit}
                   disabled={isSubmittingTestimonial}
-                  className="bg-red-600 hover:bg-red-700 text-white"
+                  className="bg-brand hover:bg-brand-hover text-white"
                 >
                   {isSubmittingTestimonial ? (
                     <>
@@ -1099,7 +1099,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
                         size="sm"
                         variant="outline"
                         onClick={() => handleDeleteTestimonial(testimonial.id)}
-                        className="p-1 h-8 w-8 text-red-600 hover:text-red-700"
+                       className="p-1 h-8 w-8 text-brand hover:text-brand-hover"
                       >
                         <Trash2 className="w-3 h-3" />
                       </Button>
@@ -1150,7 +1150,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
                   type="button"
                   onClick={handleFaqSubmit}
                   disabled={isSubmittingFaq}
-                  className="bg-red-600 hover:bg-red-700 text-white"
+                  className="bg-brand hover:bg-brand-hover text-white"
                 >
                   {isSubmittingFaq ? (
                     <>
@@ -1207,7 +1207,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
                         size="sm"
                         variant="outline"
                         onClick={() => handleDeleteFaq(faq.id)}
-                        className="p-1 h-8 w-8 text-red-600 hover:text-red-700"
+                       className="p-1 h-8 w-8 text-brand hover:text-brand-hover"
                       >
                         <Trash2 className="w-3 h-3" />
                       </Button>
@@ -1225,7 +1225,7 @@ export default function ProfileEditForm({ agent }: ProfileEditFormProps) {
         <Button
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-full shadow-lg"
+          className="bg-brand hover:bg-brand-hover text-white px-8 py-3 rounded-full shadow-lg"
         >
           {isSubmitting ? (
             <>

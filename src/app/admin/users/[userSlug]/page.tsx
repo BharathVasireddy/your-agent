@@ -78,12 +78,12 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
             <p className="text-sm text-zinc-600">{user.email}</p>
       <div className="flex items-center gap-2 mt-1">
               <span className={`inline-flex px-2 py-1 text-xs rounded-full ${
-                user.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                user.isActive ? 'bg-green-100 text-green-700' : 'bg-brand-light text-brand-hover'
               }`}>
                 {user.isActive ? 'Active' : 'Suspended'}
               </span>
               {user.agentProfile && (
-            <a href={`/${user.agentProfile.slug}`} target="_blank" className="text-xs text-red-600 hover:underline">
+                <a href={`/${user.agentProfile.slug}`} target="_blank" className="text-xs text-brand hover:underline">
               Agent: {user.agentProfile.slug}
             </a>
               )}
@@ -128,7 +128,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-zinc-500">Subscription:</span>
-                  <span className={user.agentProfile.isSubscribed ? 'text-green-600' : 'text-red-600'}>
+                  <span className={user.agentProfile.isSubscribed ? 'text-green-600' : 'text-brand'}>
                     {user.agentProfile.isSubscribed ? 'Active' : 'Inactive'}
                   </span>
                 </div>
@@ -374,7 +374,7 @@ async function AgentActivitySummary({ agentId, agentSlug }: { agentId: string; a
         <div className="mt-3 pt-3 border-t border-zinc-200">
           <a 
             href={`/admin/agents/${agentSlug}`} 
-            className="text-sm text-red-600 hover:underline"
+            className="text-sm text-brand hover:underline"
           >
             View Full Agent Details →
           </a>

@@ -29,8 +29,8 @@ export default function SubscriptionManagement({ agent }: SubscriptionManagement
       <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-4">
-            <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-              <Crown className="w-6 h-6 text-red-600" />
+            <div className="w-12 h-12 bg-[#FFDCCF] rounded-lg flex items-center justify-center">
+              <Crown className="w-6 h-6 text-brand" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-zinc-950 mb-2">
@@ -61,7 +61,7 @@ export default function SubscriptionManagement({ agent }: SubscriptionManagement
           
           <div className="text-right">
             {!isActive ? (
-              <Button className="bg-red-600 hover:bg-red-700 text-white">
+              <Button className="bg-brand hover:bg-brand-hover text-white">
                 Renew Subscription
               </Button>
             ) : (

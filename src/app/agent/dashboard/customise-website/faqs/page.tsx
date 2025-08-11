@@ -28,7 +28,7 @@ export default async function FaqsPage() {
       <div className="flex items-center space-x-2 text-sm">
         <Link 
           href="/agent/dashboard/customise-website" 
-          className="text-zinc-500 hover:text-red-600 transition-colors flex items-center space-x-1"
+          className="text-zinc-500 hover:text-brand transition-colors flex items-center space-x-1"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Customise Website</span>

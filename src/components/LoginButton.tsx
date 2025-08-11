@@ -46,9 +46,9 @@ export default function LoginButton() {
         <Link
           href="/agent/dashboard"
           className="flex items-center gap-2 text-white transition-all duration-200 font-medium btn-primary btn-lg"
-          style={{ backgroundColor: "#F55625" }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#D94B20"}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#F55625"}
+        style={{ backgroundColor: "rgb(var(--brand))" }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "rgb(var(--brand-hover))"}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "rgb(var(--brand))"}
         >
           <LayoutDashboard size={16} />
           Go to Dashboard
@@ -63,9 +63,9 @@ export default function LoginButton() {
         <Link
           href="/login"
           className="flex items-center gap-2 text-white transition-all duration-200 font-medium btn-primary btn-lg"
-          style={{ backgroundColor: "#F55625" }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#D94B20"}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#F55625"}
+        style={{ backgroundColor: "rgb(var(--brand))" }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "rgb(var(--brand-hover))"}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "rgb(var(--brand))"}
         >
         <LogIn size={16} />
         Sign in

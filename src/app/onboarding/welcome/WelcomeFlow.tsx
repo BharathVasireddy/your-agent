@@ -44,7 +44,7 @@ export default function WelcomeFlow({ session, flowStatus }: WelcomeFlowProps) {
       <div className="max-w-2xl w-full space-y-8">
         {/* Header */}
         <div className="text-center">
-          <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-brand rounded-full flex items-center justify-center mx-auto mb-6">
             <Sparkles className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-4xl font-bold text-zinc-950 mb-4">Welcome to YourAgent</h1>
@@ -84,8 +84,8 @@ export default function WelcomeFlow({ session, flowStatus }: WelcomeFlowProps) {
 
             {/* Error Message */}
             {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-700 text-sm">{error}</p>
+              <div className="p-4 bg-brand-light border border-brand-soft rounded-lg">
+                <p className="text-brand-hover text-sm">{error}</p>
                 <Button
                   onClick={() => window.location.reload()}
                   variant="outline"
@@ -131,15 +131,15 @@ export default function WelcomeFlow({ session, flowStatus }: WelcomeFlowProps) {
           </div>
 
           {/* Welcome Message */}
-          <div className="mt-8 p-6 bg-red-50 border border-red-200 rounded-lg">
-            <h3 className="font-semibold text-red-900 mb-2">
+          <div className="mt-8 p-6 bg-brand-light border border-brand-soft rounded-lg">
+            <h3 className="font-semibold text-[#8A3317] mb-2">
               Hi {session.user.name}! 👋
             </h3>
-            <p className="text-red-800 text-sm mb-4">
+            <p className="text-[#8A3317] text-sm mb-4">
               We&apos;ve automatically activated your account with your Google login. 
               Now let&apos;s set up your professional profile so clients can find and connect with you.
             </p>
-            <div className="text-xs text-red-700">
+            <div className="text-xs text-[#8A3317]">
               <strong>What&apos;s next:</strong> You&apos;ll complete a quick 4-step setup to create your 
               professional profile, then get access to your dashboard with property management tools.
             </div>
@@ -150,7 +150,7 @@ export default function WelcomeFlow({ session, flowStatus }: WelcomeFlowProps) {
             <Button
               onClick={handleStartOnboarding}
               disabled={!subscriptionComplete}
-              className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-lg"
+            className="bg-brand hover:bg-brand-hover text-white px-8 py-3 text-lg"
             >
               {!subscriptionComplete ? (
                 'Activating Account...'

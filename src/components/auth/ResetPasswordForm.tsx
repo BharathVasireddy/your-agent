@@ -43,7 +43,7 @@ export default function ResetPasswordForm() {
         </p>
         <Link
           href="/login"
-          className="inline-flex items-center text-red-600 hover:text-red-700 font-medium text-sm"
+          className="inline-flex items-center text-brand hover:text-brand-hover font-medium text-sm"
         >
           <ArrowLeft className="w-4 h-4 mr-1" />
           Back to sign in
@@ -55,7 +55,7 @@ export default function ResetPasswordForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+        <div className="bg-brand-light border border-brand-soft text-brand px-4 py-3 rounded-lg text-sm">
           {error}
         </div>
       )}
@@ -80,7 +80,7 @@ export default function ResetPasswordForm() {
       <Button
         type="submit"
         disabled={isLoading}
-        className="w-full bg-red-600 hover:bg-red-700 text-white btn-lg"
+        className="w-full bg-brand hover:bg-brand-hover text-white btn-lg"
       >
         {isLoading ? 'Sending...' : 'Send Reset Instructions'}
       </Button>

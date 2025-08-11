@@ -201,7 +201,7 @@ export default function TestimonialsManager({ agent }: TestimonialsManagerProps)
             <Button
               type="submit"
               disabled={isSubmittingTestimonial}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-brand hover:bg-brand-hover text-white"
             >
               {isSubmittingTestimonial ? (
                 <>
@@ -275,7 +275,7 @@ export default function TestimonialsManager({ agent }: TestimonialsManagerProps)
                       size="sm"
                       variant="outline"
                       onClick={() => handleDeleteTestimonial(testimonial.id)}
-                      className="p-1 h-8 w-8 text-red-600 hover:text-red-700"
+                      className="p-1 h-8 w-8 text-brand hover:text-brand-hover"
                       title="Delete testimonial"
                     >
                       <Trash2 className="w-3 h-3" />

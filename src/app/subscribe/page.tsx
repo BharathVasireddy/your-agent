@@ -15,13 +15,11 @@ export default async function SubscribePage() {
   // Check user flow status
   const flowStatus = await getUserFlowStatus();
   
-  // If user is already subscribed, redirect them based on onboarding status
-  if (!flowStatus.needsSubscription) {
-    if (flowStatus.needsOnboarding) {
-      redirect('/onboarding/wizard');
-    } else {
-      redirect('/agent/dashboard');
-    }
+  // In production, if already subscribed, redirect based on onboarding status.
+  // In development, always render the page so you can test the flow.
+  if (process.env.NODE_ENV === 'production' && !flowStatus.needsSubscription) {
+    if (flowStatus.needsOnboarding) redirect('/onboarding/wizard');
+    redirect('/agent/dashboard');
   }
 
   return <SubscriptionPage session={session} flowStatus={flowStatus} />;

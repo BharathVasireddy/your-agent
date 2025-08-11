@@ -1,4 +1,5 @@
 import { notFound, redirect } from 'next/navigation';
+import Link from 'next/link';
 import { Metadata } from 'next';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
@@ -25,9 +26,8 @@ function getTemplateName(template: string): string {
 }
 
 interface AgentProfilePageProps {
-  params: Promise<{
-    agentSlug: string;
-  }>;
+  params: Promise<{ agentSlug: string }>;
+  searchParams?: Promise<Record<string, string | undefined>>;
 }
 
 async function getAgentData(agentSlug: string) {
@@ -120,9 +120,10 @@ export async function generateMetadata({ params }: AgentProfilePageProps): Promi
 // Next.js requires a primitive here; avoid TS-only expressions
 // Disable static pre-rendering to avoid build-time DB coupling
 
-export default async function AgentProfilePage({ params }: AgentProfilePageProps) {
+export default async function AgentProfilePage({ params, searchParams }: AgentProfilePageProps) {
   // Await the params in Next.js 15
   const { agentSlug } = await params;
+  const sp = (await (searchParams || Promise.resolve({}))) || {};
   
   // Find the agent by slug
   const agent = await getAgentData(agentSlug);
@@ -157,7 +158,9 @@ export default async function AgentProfilePage({ params }: AgentProfilePageProps
   
   // Check if current user owns this profile
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const isOwner = session && (session as any).user && (session as any).user.id === agent.user.id;
+  const isOwner = !!(session && (session as any).user && (session as any).user.id === agent.user.id);
+  const viewingPublic = isOwner && sp.view === 'public';
+  const isOwnerForRender = isOwner && !viewingPublic;
 
   // Get template name for rendering
   const templateName = getTemplateName(agent.template);
@@ -241,17 +244,33 @@ export default async function AgentProfilePage({ params }: AgentProfilePageProps
         />
       )}
 
-      {!isActive && !isOwner ? (
+      {/* Owner unpublished banner and view toggle */}
+      {isOwner && !isActive && !viewingPublic && (
+        <div className="bg-zinc-50 border border-zinc-200 text-zinc-800 px-4 py-3 text-sm flex items-center gap-3">
+          <span>Your profile is not published yet.</span>
+          <Link href="/agent/dashboard/subscription" className="underline hover:text-zinc-900">Publish profile</Link>
+          <span className="opacity-50">•</span>
+          <Link href={`/${agent.slug}?view=public`} className="underline hover:text-zinc-900">View as public</Link>
+        </div>
+      )}
+      {isOwner && viewingPublic && (
+        <div className="bg-zinc-50 border border-zinc-200 text-zinc-700 px-4 py-3 text-sm flex items-center justify-between">
+          <span>You are viewing your profile as the public would see it.</span>
+          <Link href={`/${agent.slug}`} className="underline hover:text-zinc-900">Exit public view</Link>
+        </div>
+      )}
+
+      {!isActive && !isOwnerForRender ? (
         <main className="min-h-[50vh] bg-white">
           <div className="max-w-3xl mx-auto px-6 py-16 text-center">
-            <h1 className="text-3xl font-bold text-zinc-950 mb-3">Profile not published</h1>
-            <p className="text-zinc-600">This agent profile is currently unpublished.</p>
+            <h1 className="text-3xl font-bold text-zinc-950 mb-3">Profile not available</h1>
+            <p className="text-zinc-600">This agent profile is currently not published.</p>
           </div>
         </main>
       ) : (
         <TemplateRenderer templateName={templateName} agentData={agent} />
       )}
-      <EditToggleButton />
+      {isOwnerForRender && <EditToggleButton />}
     </EditModeProvider>
   );
 }

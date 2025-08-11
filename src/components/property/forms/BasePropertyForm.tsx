@@ -35,7 +35,7 @@ export default function BasePropertyForm({
     location: '',
     amenities: [],
     photos: [],
-    status: 'Available',
+    status: 'Draft',
     listingType,
     propertyType
   });
@@ -279,7 +279,7 @@ export default function BasePropertyForm({
                     <button
                       type="button"
                       onClick={() => removePhoto(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute -top-2 -right-2 bg-brand hover:bg-brand-hover text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -304,12 +304,14 @@ export default function BasePropertyForm({
           Cancel
         </Button>
         
-        <Button
-          type="submit"
-          className="bg-red-600 hover:bg-red-700 text-white"
-        >
-          Create Property
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button type="submit" className="bg-brand hover:bg-brand-hover text-white">
+            Save Draft
+          </Button>
+          <Button type="button" className="bg-zinc-900 hover:bg-zinc-800 text-white" onClick={() => onSubmit({ ...formData, status: 'Available' })}>
+            Publish
+          </Button>
+        </div>
       </div>
     </form>
   );
