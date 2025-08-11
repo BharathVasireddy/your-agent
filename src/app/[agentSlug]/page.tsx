@@ -123,7 +123,8 @@ export async function generateMetadata({ params }: AgentProfilePageProps): Promi
 export default async function AgentProfilePage({ params, searchParams }: AgentProfilePageProps) {
   // Await the params in Next.js 15
   const { agentSlug } = await params;
-  const sp = (await (searchParams || Promise.resolve({}))) || {};
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve<Record<string, string | undefined>>({}));
+  const sp: Record<string, string | undefined> = resolvedSearchParams || {} as Record<string, string | undefined>;
   
   // Find the agent by slug
   const agent = await getAgentData(agentSlug);

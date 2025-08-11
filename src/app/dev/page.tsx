@@ -65,7 +65,7 @@ export default function DevPage() {
             className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white transition-colors duration-200 ${
               isLoading
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                : "bg-brand hover:bg-brand-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand"
             }`}
             style={{ 
               backgroundColor: isLoading ? undefined : "var(--primary-red)",
@@ -88,12 +88,12 @@ export default function DevPage() {
             <div className={`p-4 rounded-md flex items-center gap-2 ${
               message.startsWith("Success") 
                 ? "bg-green-50 text-green-800 border border-green-200" 
-                : "bg-red-50 text-red-800 border border-red-200"
+                 : "bg-brand-light text-brand-deep border border-brand-soft"
             }`}>
               {message.startsWith("Success") ? (
                 <CheckCircle size={16} className="text-green-600" />
               ) : (
-                <XCircle size={16} className="text-red-600" />
+                <XCircle size={16} className="text-brand" />
               )}
               {message}
             </div>

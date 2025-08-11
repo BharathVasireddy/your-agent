@@ -126,7 +126,7 @@ export default function PerformanceDashboard() {
             localStorage.setItem('performance_safe_mode', 'true');
             window.location.reload();
           }}
-          className="w-full bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs"
+          className="w-full bg-brand hover:bg-brand-hover text-white px-2 py-1 rounded text-xs"
         >
           🚨 Emergency Safe Mode
         </button>

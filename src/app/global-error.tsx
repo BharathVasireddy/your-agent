@@ -25,8 +25,8 @@ export default function GlobalError({
             {/* Error Icon */}
             <div className="space-y-4">
               <div className="flex justify-center">
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                  <AlertTriangle className="w-8 h-8 text-red-600" />
+                <div className="w-16 h-16 bg-brand-light rounded-full flex items-center justify-center">
+                  <AlertTriangle className="w-8 h-8 text-brand" />
                 </div>
               </div>
               <h1 className="text-3xl font-bold text-zinc-950">Something went wrong!</h1>
@@ -37,13 +37,13 @@ export default function GlobalError({
 
             {/* Error Details (only in development) */}
             {process.env.NODE_ENV === 'development' && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-left">
-                <h3 className="font-semibold text-red-800 mb-2">Error Details:</h3>
-                <pre className="text-xs text-red-700 overflow-x-auto">
+              <div className="bg-brand-light border border-brand-soft rounded-lg p-4 text-left">
+                <h3 className="font-semibold text-brand-deep mb-2">Error Details:</h3>
+                <pre className="text-xs text-brand-deep overflow-x-auto">
                   {error.message}
                 </pre>
                 {error.digest && (
-                  <p className="text-xs text-red-600 mt-2">
+                  <p className="text-xs text-brand mt-2">
                     Error ID: {error.digest}
                   </p>
                 )}
@@ -55,7 +55,7 @@ export default function GlobalError({
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button 
                   onClick={reset}
-                  className="bg-red-600 hover:bg-red-700 text-white"
+                  className="bg-brand hover:bg-brand-hover text-white"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Try Again

@@ -81,7 +81,7 @@ export default function PropertyTypeSelector({ onSelect, onCancel }: PropertyTyp
       {/* Step 1: Listing Type Selection */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-          <span className="bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">
+          <span className="bg-brand text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">
             1
           </span>
           Select Listing Type
@@ -92,9 +92,9 @@ export default function PropertyTypeSelector({ onSelect, onCancel }: PropertyTyp
             <button
               key={listingType}
               onClick={() => handleListingTypeSelect(listingType)}
-              className={`p-6 border-2 rounded-xl text-left transition-all duration-200 hover:border-red-300 hover:bg-red-50 ${
+              className={`p-6 border-2 rounded-xl text-left transition-all duration-200 hover:border-brand-soft hover:bg-brand-light ${
                 selectedListingType === listingType
-                  ? 'border-red-600 bg-red-50 shadow-lg'
+                  ? 'border-brand bg-brand-light shadow-lg'
                   : 'border-gray-200 bg-white'
               }`}
             >
@@ -102,7 +102,7 @@ export default function PropertyTypeSelector({ onSelect, onCancel }: PropertyTyp
                 <div className="flex items-center">
                   <div className={`p-3 rounded-full mr-4 ${
                     selectedListingType === listingType 
-                      ? 'bg-red-600 text-white' 
+                      ? 'bg-brand text-white' 
                       : 'bg-gray-100 text-gray-600'
                   }`}>
                     {listingType === LISTING_TYPES.SALE ? <Car className="w-6 h-6" /> : <Home className="w-6 h-6" />}
@@ -118,7 +118,7 @@ export default function PropertyTypeSelector({ onSelect, onCancel }: PropertyTyp
                   </div>
                 </div>
                 {selectedListingType === listingType && (
-                  <CheckCircle2 className="w-6 h-6 text-red-600" />
+                  <CheckCircle2 className="w-6 h-6 text-brand" />
                 )}
               </div>
             </button>
@@ -130,7 +130,7 @@ export default function PropertyTypeSelector({ onSelect, onCancel }: PropertyTyp
       {selectedListingType && (
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-            <span className="bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">
+            <span className="bg-brand text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">
               2
             </span>
             Select Property Type
@@ -154,9 +154,9 @@ export default function PropertyTypeSelector({ onSelect, onCancel }: PropertyTyp
                     <button
                       key={propertyType}
                       onClick={() => handlePropertyTypeSelect(propertyType)}
-                      className={`p-4 border-2 rounded-lg text-left transition-all duration-200 hover:border-red-300 hover:bg-red-50 ${
+                      className={`p-4 border-2 rounded-lg text-left transition-all duration-200 hover:border-brand-soft hover:bg-brand-light ${
                         selectedPropertyType === propertyType
-                          ? 'border-red-600 bg-red-50 shadow-md'
+                          ? 'border-brand bg-brand-light shadow-md'
                           : 'border-gray-200 bg-white'
                       }`}
                     >
@@ -164,7 +164,7 @@ export default function PropertyTypeSelector({ onSelect, onCancel }: PropertyTyp
                         <div className="flex items-center">
                           <div className={`p-2 rounded-lg mr-3 ${
                             selectedPropertyType === propertyType 
-                              ? 'bg-red-600 text-white' 
+                              ? 'bg-brand text-white' 
                               : 'bg-gray-100 text-gray-600'
                           }`}>
                             {getIconForPropertyType(propertyType)}
@@ -174,7 +174,7 @@ export default function PropertyTypeSelector({ onSelect, onCancel }: PropertyTyp
                           </div>
                         </div>
                         {selectedPropertyType === propertyType && (
-                          <CheckCircle2 className="w-5 h-5 text-red-600" />
+                          <CheckCircle2 className="w-5 h-5 text-brand" />
                         )}
                       </div>
                     </button>
@@ -207,10 +207,10 @@ export default function PropertyTypeSelector({ onSelect, onCancel }: PropertyTyp
           Cancel
         </Button>
         
-        <Button
+          <Button
           onClick={handleContinue}
           disabled={!selectedListingType || !selectedPropertyType}
-          className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 flex items-center"
+            className="bg-brand hover:bg-brand-hover text-white px-6 py-2 flex items-center"
         >
           Continue to Details
           <ChevronRight className="w-4 h-4 ml-2" />

@@ -25,6 +25,12 @@ interface Agent {
   template: string;
   profilePhotoUrl: string | null;
   dateOfBirth: Date | null;
+  websiteUrl?: string | null;
+  facebookUrl?: string | null;
+  instagramUrl?: string | null;
+  linkedinUrl?: string | null;
+  youtubeUrl?: string | null;
+  twitterUrl?: string | null;
   user: {
     id: string;
     name: string | null;
@@ -53,6 +59,12 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
     logoMaxWidth: (agent as unknown as { logoMaxWidth?: number }).logoMaxWidth || 160,
     slug: agent.slug || '',
     dateOfBirth: agent.dateOfBirth ? agent.dateOfBirth.toISOString().split('T')[0] : '',
+    websiteUrl: (agent as unknown as { websiteUrl?: string | null }).websiteUrl || '',
+    facebookUrl: (agent as unknown as { facebookUrl?: string | null }).facebookUrl || '',
+    instagramUrl: (agent as unknown as { instagramUrl?: string | null }).instagramUrl || '',
+    linkedinUrl: (agent as unknown as { linkedinUrl?: string | null }).linkedinUrl || '',
+    youtubeUrl: (agent as unknown as { youtubeUrl?: string | null }).youtubeUrl || '',
+    twitterUrl: (agent as unknown as { twitterUrl?: string | null }).twitterUrl || '',
   });
 
   // Determine plan restrictions for template selection
@@ -638,6 +650,74 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
                 </div>
               </div>
               <p className="text-xs text-zinc-500">Logos render with object-contain so they scale evenly without distortion.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Social Links */}
+        <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
+          <h3 className="text-lg font-semibold text-zinc-950 mb-4">Social & Website Links</h3>
+          <p className="text-sm text-zinc-600 mb-4">Add any links you want to display on your public profile.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="websiteUrl" className="text-zinc-600">Website</Label>
+              <Input
+                id="websiteUrl"
+                type="url"
+                placeholder="https://your-website.com"
+                value={formData.websiteUrl}
+                onChange={(e) => handleInputChange('websiteUrl', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="facebookUrl" className="text-zinc-600">Facebook</Label>
+              <Input
+                id="facebookUrl"
+                type="url"
+                placeholder="https://facebook.com/yourpage"
+                value={formData.facebookUrl}
+                onChange={(e) => handleInputChange('facebookUrl', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="instagramUrl" className="text-zinc-600">Instagram</Label>
+              <Input
+                id="instagramUrl"
+                type="url"
+                placeholder="https://instagram.com/yourhandle"
+                value={formData.instagramUrl}
+                onChange={(e) => handleInputChange('instagramUrl', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="linkedinUrl" className="text-zinc-600">LinkedIn</Label>
+              <Input
+                id="linkedinUrl"
+                type="url"
+                placeholder="https://linkedin.com/in/yourprofile"
+                value={formData.linkedinUrl}
+                onChange={(e) => handleInputChange('linkedinUrl', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="youtubeUrl" className="text-zinc-600">YouTube</Label>
+              <Input
+                id="youtubeUrl"
+                type="url"
+                placeholder="https://youtube.com/@yourchannel"
+                value={formData.youtubeUrl}
+                onChange={(e) => handleInputChange('youtubeUrl', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="twitterUrl" className="text-zinc-600">Twitter/X</Label>
+              <Input
+                id="twitterUrl"
+                type="url"
+                placeholder="https://x.com/yourhandle"
+                value={formData.twitterUrl}
+                onChange={(e) => handleInputChange('twitterUrl', e.target.value)}
+              />
             </div>
           </div>
         </div>

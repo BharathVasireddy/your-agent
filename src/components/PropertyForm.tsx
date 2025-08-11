@@ -222,8 +222,8 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
       {/* Basic Information */}
       <div className="bg-white rounded-lg border border-zinc-200 p-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-            <Home className="w-5 h-5 text-red-600" />
+          <div className="w-10 h-10 bg-brand-light rounded-lg flex items-center justify-center">
+            <Home className="w-5 h-5 text-brand" />
           </div>
           <div>
             <h2 className="text-xl font-semibold text-zinc-950">Basic Information</h2>
@@ -241,7 +241,7 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
               placeholder="e.g., 3BHK Spacious Apartment in Gachibowli"
               className={`mt-2 ${errors.title ? 'border-red-500' : ''}`}
             />
-            {errors.title && <p className="text-sm text-red-600 mt-1">{errors.title}</p>}
+            {errors.title && <p className="text-sm text-brand mt-1">{errors.title}</p>}
           </div>
 
           <div>
@@ -285,7 +285,7 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
                 className={`pl-10 ${errors.location ? 'border-red-500' : ''}`}
               />
             </div>
-            {errors.location && <p className="text-sm text-red-600 mt-1">{errors.location}</p>}
+            {errors.location && <p className="text-sm text-brand mt-1">{errors.location}</p>}
           </div>
 
           <div className="md:col-span-2">
@@ -298,7 +298,7 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
               rows={4}
               className={`mt-2 ${errors.description ? 'border-red-500' : ''}`}
             />
-            {errors.description && <p className="text-sm text-red-600 mt-1">{errors.description}</p>}
+            {errors.description && <p className="text-sm text-brand mt-1">{errors.description}</p>}
           </div>
         </div>
       </div>
@@ -329,7 +329,7 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
                 className={`pl-10 ${errors.price ? 'border-red-500' : ''}`}
               />
             </div>
-            {errors.price && <p className="text-sm text-red-600 mt-1">{errors.price}</p>}
+            {errors.price && <p className="text-sm text-brand mt-1">{errors.price}</p>}
           </div>
 
           <div>
@@ -345,7 +345,7 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
                 className={`pl-10 ${errors.area ? 'border-red-500' : ''}`}
               />
             </div>
-            {errors.area && <p className="text-sm text-red-600 mt-1">{errors.area}</p>}
+            {errors.area && <p className="text-sm text-brand mt-1">{errors.area}</p>}
           </div>
 
           <div>
@@ -401,7 +401,7 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
                 onClick={() => formData.amenities.includes(amenity) ? removeAmenity(amenity) : addAmenity(amenity)}
                 className={`p-3 text-sm rounded-lg border transition-all ${
                   formData.amenities.includes(amenity)
-                    ? 'bg-red-50 border-red-200 text-red-700'
+                    ? 'bg-brand-light border-brand-soft text-brand-deep'
                     : 'bg-white border-zinc-200 text-zinc-700 hover:border-zinc-300'
                 }`}
               >
@@ -484,7 +484,7 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
             </label>
           </div>
 
-          {errors.photos && <p className="text-sm text-red-600">{errors.photos}</p>}
+          {errors.photos && <p className="text-sm text-brand">{errors.photos}</p>}
 
           {formData.photos.length > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -500,12 +500,12 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
                   <button
                     type="button"
                     onClick={() => removePhoto(index)}
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-brand text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <X className="w-3 h-3" />
                   </button>
                   {index === 0 && (
-                    <span className="absolute bottom-1 left-1 bg-red-600 text-white text-xs px-2 py-0.5 rounded">
+                    <span className="absolute bottom-1 left-1 bg-brand text-white text-xs px-2 py-0.5 rounded">
                       Main
                     </span>
                   )}
@@ -521,7 +521,7 @@ export default function PropertyForm({ onSubmit, isSubmitting = false }: Propert
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="flex-1 bg-red-600 hover:bg-red-700 text-white h-12"
+          className="flex-1 bg-brand hover:bg-brand-hover text-white h-12"
         >
           {isSubmitting ? 'Creating Property...' : 'Create Property'}
         </Button>

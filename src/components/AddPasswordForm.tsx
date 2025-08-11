@@ -97,7 +97,7 @@ export default function AddPasswordForm({ onSuccess, onCancel }: AddPasswordForm
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+          <div className="bg-brand-light border border-brand-soft text-brand px-4 py-3 rounded-lg text-sm">
             {error}
           </div>
         )}

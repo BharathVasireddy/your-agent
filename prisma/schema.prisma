@@ -54,6 +54,13 @@ model Agent {
   logoMaxHeight         Int?
   logoMaxWidth          Int?
   template              String        @default("fresh-minimal")
+  // Social media links (all optional)
+  websiteUrl            String?
+  facebookUrl           String?
+  instagramUrl          String?
+  linkedinUrl           String?
+  youtubeUrl            String?
+  twitterUrl            String?
   user                  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   faqs                  FAQ[]
   leads                 Lead[]

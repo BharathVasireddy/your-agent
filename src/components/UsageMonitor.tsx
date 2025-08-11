@@ -89,7 +89,7 @@ export default function UsageMonitor() {
     if (percentage < 50) return 'bg-green-500';
     if (percentage < 70) return 'bg-yellow-500';
     if (percentage < 90) return 'bg-orange-500';
-    return 'bg-red-500';
+    return 'bg-brand';
   };
 
   const shouldShowAlert = (percentage: number) => {
@@ -173,7 +173,7 @@ export default function UsageMonitor() {
               // Implement emergency performance mode
               console.log('Emergency mode enabled');
             }}
-            className="w-full bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs"
+            className="w-full bg-brand hover:bg-brand-hover text-white px-2 py-1 rounded text-xs"
           >
             🚨 Emergency Mode
           </button>

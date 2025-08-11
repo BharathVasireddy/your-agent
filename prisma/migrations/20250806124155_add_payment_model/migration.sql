@@ -9,6 +9,10 @@ CREATE TABLE "public"."Payment" (
     "currency" TEXT NOT NULL DEFAULT 'INR',
     "status" TEXT NOT NULL DEFAULT 'completed',
     "type" TEXT NOT NULL DEFAULT 'subscription',
+    "plan" TEXT,
+    "interval" TEXT,
+    "periodEndsAt" TIMESTAMP(3),
+    "pricePaidPaise" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

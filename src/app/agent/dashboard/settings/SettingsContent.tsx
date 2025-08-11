@@ -158,7 +158,7 @@ export default function SettingsContent({ user, agent }: SettingsContentProps) {
             onClick={() => setActiveSection('profile')}
             className={`w-full text-left p-3 rounded-lg transition-colors ${
               activeSection === 'profile'
-                ? 'bg-red-50 text-red-600 border border-red-200'
+                ? 'bg-brand-light text-brand border border-brand-soft'
                 : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
             }`}
           >
@@ -171,7 +171,7 @@ export default function SettingsContent({ user, agent }: SettingsContentProps) {
             onClick={() => setActiveSection('account')}
             className={`w-full text-left p-3 rounded-lg transition-colors ${
               activeSection === 'account'
-                ? 'bg-red-50 text-red-600 border border-red-200'
+                ? 'bg-brand-light text-brand border border-brand-soft'
                 : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
             }`}
           >
@@ -184,7 +184,7 @@ export default function SettingsContent({ user, agent }: SettingsContentProps) {
             onClick={() => setActiveSection('privacy')}
             className={`w-full text-left p-3 rounded-lg transition-colors ${
               activeSection === 'privacy'
-                ? 'bg-red-50 text-red-600 border border-red-200'
+                ? 'bg-brand-light text-brand border border-brand-soft'
                 : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
             }`}
           >
@@ -197,7 +197,7 @@ export default function SettingsContent({ user, agent }: SettingsContentProps) {
             onClick={() => setActiveSection('notifications')}
             className={`w-full text-left p-3 rounded-lg transition-colors ${
               activeSection === 'notifications'
-                ? 'bg-red-50 text-red-600 border border-red-200'
+                ? 'bg-brand-light text-brand border border-brand-soft'
                 : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
             }`}
           >
@@ -229,7 +229,7 @@ export default function SettingsContent({ user, agent }: SettingsContentProps) {
       <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-4 md:p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <LogOut className="w-5 h-5 text-red-600 mr-3" />
+            <LogOut className="w-5 h-5 text-brand mr-3" />
             <div>
               <p className="font-medium text-zinc-950">Sign Out</p>
               <p className="text-sm text-zinc-600">Sign out from your account</p>
@@ -237,7 +237,7 @@ export default function SettingsContent({ user, agent }: SettingsContentProps) {
           </div>
           <button
             onClick={handleSignOut}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+            className="px-4 py-2 bg-brand text-white rounded-lg hover:bg-brand-hover transition-colors text-sm font-medium"
           >
             Sign Out
           </button>
@@ -265,7 +265,7 @@ function ProfileSettings({ user, agent, profileUrl, completionPercentage }: { us
         </div>
         <Link
           href="/agent/dashboard/profile"
-          className="inline-flex items-center text-red-600 hover:text-red-700 text-sm font-medium"
+          className="inline-flex items-center text-brand hover:text-brand-hover text-sm font-medium"
         >
           Complete your profile
           <ExternalLink className="w-4 h-4 ml-1" />
@@ -283,7 +283,7 @@ function ProfileSettings({ user, agent, profileUrl, completionPercentage }: { us
             </div>
             <Link
               href="/agent/dashboard/profile"
-              className="text-red-600 hover:text-red-700 text-sm font-medium"
+              className="text-brand hover:text-brand-hover text-sm font-medium"
             >
               Edit
             </Link>
@@ -304,7 +304,7 @@ function ProfileSettings({ user, agent, profileUrl, completionPercentage }: { us
             </div>
             <Link
               href="/agent/dashboard/profile"
-              className="text-red-600 hover:text-red-700 text-sm font-medium"
+              className="text-brand hover:text-brand-hover text-sm font-medium"
             >
               {agent?.phone ? 'Edit' : 'Add'}
             </Link>
@@ -319,7 +319,7 @@ function ProfileSettings({ user, agent, profileUrl, completionPercentage }: { us
             </div>
             <Link
               href="/agent/dashboard/profile"
-              className="text-red-600 hover:text-red-700 text-sm font-medium"
+              className="text-brand hover:text-brand-hover text-sm font-medium"
             >
               {agent?.city ? 'Edit' : 'Add'}
             </Link>
@@ -340,7 +340,7 @@ function ProfileSettings({ user, agent, profileUrl, completionPercentage }: { us
             </div>
             <Link
               href="/agent/dashboard/profile"
-              className="text-red-600 hover:text-red-700 text-sm font-medium"
+              className="text-brand hover:text-brand-hover text-sm font-medium"
             >
               {agent?.experience ? 'Edit' : 'Add'}
             </Link>
@@ -357,13 +357,13 @@ function ProfileSettings({ user, agent, profileUrl, completionPercentage }: { us
               <Link
                 href={profileUrl}
                 target="_blank"
-                className="text-red-600 hover:text-red-700 text-sm font-medium"
+                className="text-brand hover:text-brand-hover text-sm font-medium"
               >
                 View
               </Link>
               <Link
                 href="/agent/dashboard/profile"
-                className="text-red-600 hover:text-red-700 text-sm font-medium"
+                className="text-brand hover:text-brand-hover text-sm font-medium"
               >
                 Edit
               </Link>
@@ -383,7 +383,7 @@ function ProfileSettings({ user, agent, profileUrl, completionPercentage }: { us
             </div>
             <Link
               href="/agent/dashboard/profile"
-              className="text-red-600 hover:text-red-700 text-sm font-medium"
+              className="text-brand hover:text-brand-hover text-sm font-medium"
             >
               {agent?.phone ? 'Edit' : 'Add'}
             </Link>
@@ -418,7 +418,7 @@ function AccountSettings({ user, agent }: { user: UserData; agent: AgentData | n
             {!agent?.isSubscribed && (
               <Link
                 href="/subscribe"
-                className="px-3 py-1 bg-red-600 text-white rounded-lg text-xs font-medium hover:bg-red-700 transition-colors"
+                className="px-3 py-1 bg-brand text-white rounded-lg text-xs font-medium hover:bg-brand-hover transition-colors"
               >
                 Upgrade
               </Link>
@@ -465,7 +465,7 @@ function AccountSettings({ user, agent }: { user: UserData; agent: AgentData | n
               <p className="font-medium text-zinc-950">Password</p>
               <p className="text-sm text-zinc-600">Last updated recently</p>
             </div>
-            <button className="text-red-600 hover:text-red-700 text-sm font-medium">
+            <button className="text-brand hover:text-brand-hover text-sm font-medium">
               Change Password
             </button>
           </div>
@@ -475,7 +475,7 @@ function AccountSettings({ user, agent }: { user: UserData; agent: AgentData | n
               <p className="font-medium text-zinc-950">Two-Factor Authentication</p>
               <p className="text-sm text-zinc-600">Not enabled</p>
             </div>
-            <button className="text-red-600 hover:text-red-700 text-sm font-medium">
+            <button className="text-brand hover:text-brand-hover text-sm font-medium">
               Enable 2FA
             </button>
           </div>
@@ -499,10 +499,10 @@ function AccountSettings({ user, agent }: { user: UserData; agent: AgentData | n
           
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-zinc-950 text-red-600">Delete Account</p>
+              <p className="font-medium text-zinc-950 text-brand">Delete Account</p>
               <p className="text-sm text-zinc-600">Permanently delete your account</p>
             </div>
-            <button className="flex items-center text-red-600 hover:text-red-700 text-sm font-medium">
+            <button className="flex items-center text-brand hover:text-brand-hover text-sm font-medium">
               <Trash2 className="w-4 h-4 mr-1" />
               Delete
             </button>
@@ -553,7 +553,7 @@ function PrivacySettings({ profileUrl, showProfileUrl, setShowProfileUrl, copyPr
             </div>
             <button
               onClick={copyProfileUrl}
-              className="flex items-center text-red-600 hover:text-red-700 text-sm font-medium"
+              className="flex items-center text-brand hover:text-brand-hover text-sm font-medium"
             >
               {copied ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
               {copied ? 'Copied' : 'Copy'}
@@ -573,7 +573,7 @@ function PrivacySettings({ profileUrl, showProfileUrl, setShowProfileUrl, copyPr
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" defaultChecked />
-              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+               <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
             </label>
           </div>
           
@@ -584,7 +584,7 @@ function PrivacySettings({ profileUrl, showProfileUrl, setShowProfileUrl, copyPr
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" defaultChecked />
-              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+               <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
             </label>
           </div>
           
@@ -595,7 +595,7 @@ function PrivacySettings({ profileUrl, showProfileUrl, setShowProfileUrl, copyPr
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" />
-              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+               <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
             </label>
           </div>
         </div>
@@ -612,7 +612,7 @@ function PrivacySettings({ profileUrl, showProfileUrl, setShowProfileUrl, copyPr
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" defaultChecked />
-              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+               <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
             </label>
           </div>
           
@@ -623,7 +623,7 @@ function PrivacySettings({ profileUrl, showProfileUrl, setShowProfileUrl, copyPr
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" defaultChecked />
-              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+               <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
             </label>
           </div>
         </div>
@@ -640,7 +640,7 @@ function PrivacySettings({ profileUrl, showProfileUrl, setShowProfileUrl, copyPr
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" defaultChecked />
-              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+               <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
             </label>
           </div>
         </div>
@@ -663,7 +663,7 @@ function NotificationSettings() {
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" defaultChecked />
-              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+               <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
             </label>
           </div>
           
@@ -674,7 +674,7 @@ function NotificationSettings() {
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" defaultChecked />
-              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+               <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
             </label>
           </div>
           
@@ -685,7 +685,7 @@ function NotificationSettings() {
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" defaultChecked />
-              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
             </label>
           </div>
           
@@ -696,7 +696,7 @@ function NotificationSettings() {
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" />
-              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
             </label>
           </div>
         </div>
@@ -713,7 +713,7 @@ function NotificationSettings() {
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" defaultChecked />
-              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
             </label>
           </div>
           
@@ -724,7 +724,7 @@ function NotificationSettings() {
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" defaultChecked />
-              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
             </label>
           </div>
         </div>
@@ -741,7 +741,7 @@ function NotificationSettings() {
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" defaultChecked />
-              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
             </label>
           </div>
           
@@ -752,7 +752,7 @@ function NotificationSettings() {
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" />
-              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+              <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
             </label>
           </div>
         </div>

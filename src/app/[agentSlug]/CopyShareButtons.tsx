@@ -89,7 +89,7 @@ export default function CopyShareButtons({ agentSlug, agentName }: CopyShareButt
           <Copy className="w-4 h-4 mr-2" />
           Copy URL
         </div>
-        <div className="inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg opacity-50 w-[130px]">
+        <div className="inline-flex items-center justify-center px-4 py-2 bg-brand text-white rounded-lg opacity-50 w-[130px]">
           <Share className="w-4 h-4 mr-2" />
           Share Profile
         </div>
@@ -121,7 +121,7 @@ export default function CopyShareButtons({ agentSlug, agentName }: CopyShareButt
       {/* Share Button */}
       <button
         onClick={handleShare}
-        className="inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors w-[130px]"
+        className="inline-flex items-center justify-center px-4 py-2 bg-brand text-white rounded-lg hover:bg-brand-hover transition-colors w-[130px]"
         title="Share profile"
       >
         <Share className="w-4 h-4 mr-2" />

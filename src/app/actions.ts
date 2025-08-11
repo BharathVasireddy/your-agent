@@ -623,6 +623,12 @@ export async function verifyPayment(paymentData: {
   heroImage: z.string().optional(),
   heroTitle: z.string().max(100, "Hero title must be 100 characters or less").optional(),
   heroSubtitle: z.string().max(150, "Hero subtitle must be 150 characters or less").optional(),
+    websiteUrl: z.string().url().optional().or(z.literal('')),
+    facebookUrl: z.string().url().optional().or(z.literal('')),
+    instagramUrl: z.string().url().optional().or(z.literal('')),
+    linkedinUrl: z.string().url().optional().or(z.literal('')),
+    youtubeUrl: z.string().url().optional().or(z.literal('')),
+    twitterUrl: z.string().url().optional().or(z.literal('')),
 });
 
 export async function updateAgentProfile(data: {
@@ -645,6 +651,12 @@ export async function updateAgentProfile(data: {
   // Optionally collect and update user fields during onboarding
   name?: string;
   email?: string;
+  websiteUrl?: string;
+  facebookUrl?: string;
+  instagramUrl?: string;
+  linkedinUrl?: string;
+  youtubeUrl?: string;
+  twitterUrl?: string;
 }) {
   try {
     // Get the current user's session
@@ -699,6 +711,12 @@ export async function updateAgentProfile(data: {
           heroImage: validatedData.heroImage || null,
           heroTitle: validatedData.heroTitle || null,
           heroSubtitle: validatedData.heroSubtitle || null,
+          websiteUrl: validatedData.websiteUrl ? validatedData.websiteUrl : null,
+          facebookUrl: validatedData.facebookUrl ? validatedData.facebookUrl : null,
+          instagramUrl: validatedData.instagramUrl ? validatedData.instagramUrl : null,
+          linkedinUrl: validatedData.linkedinUrl ? validatedData.linkedinUrl : null,
+          youtubeUrl: validatedData.youtubeUrl ? validatedData.youtubeUrl : null,
+          twitterUrl: validatedData.twitterUrl ? validatedData.twitterUrl : null,
         }
       });
       revalidatePath(`/${existingAgent.slug}`);
@@ -748,6 +766,12 @@ export async function updateAgentProfile(data: {
         heroImage: validatedData.heroImage || null,
         heroTitle: validatedData.heroTitle || null,
         heroSubtitle: validatedData.heroSubtitle || null,
+        websiteUrl: validatedData.websiteUrl ? validatedData.websiteUrl : null,
+        facebookUrl: validatedData.facebookUrl ? validatedData.facebookUrl : null,
+        instagramUrl: validatedData.instagramUrl ? validatedData.instagramUrl : null,
+        linkedinUrl: validatedData.linkedinUrl ? validatedData.linkedinUrl : null,
+        youtubeUrl: validatedData.youtubeUrl ? validatedData.youtubeUrl : null,
+        twitterUrl: validatedData.twitterUrl ? validatedData.twitterUrl : null,
         updatedAt: new Date()
       }
     });

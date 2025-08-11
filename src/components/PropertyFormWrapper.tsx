@@ -67,14 +67,14 @@ export default function PropertyFormWrapper() {
   return (
     <div className="space-y-6">
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="bg-brand-light border border-brand-soft rounded-lg p-4">
           <div className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-red-700 font-medium">Error</p>
+            <p className="text-brand-deep font-medium">Error</p>
           </div>
-          <p className="text-red-600 mt-1">{error}</p>
+          <p className="text-brand mt-1">{error}</p>
         </div>
       )}
       
