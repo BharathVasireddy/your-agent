@@ -52,8 +52,8 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
       isAuthenticated: false,
       needsSubscription: false,
       needsOnboarding: false,
-      // send them to signout to clear cookie, then back to login
-      redirectTo: '/api/auth/signout?callbackUrl=/login?error=session_expired',
+      // send back to login; client/session-health will handle clearing cookie if present
+      redirectTo: '/login?error=session_expired',
       agent: null
     };
   }

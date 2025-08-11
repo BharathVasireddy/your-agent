@@ -17,8 +17,8 @@ export default async function LoginPage() {
     if (flowStatus.isAuthenticated) {
       redirect(flowStatus.redirectTo);
     }
-    // Orphaned/invalid session: force sign-out to break loops
-    redirect('/api/auth/signout?callbackUrl=/login?error=session_expired');
+    // Orphaned/invalid session: fall back to login; session-health will clear on client
+    redirect('/login?error=session_expired');
   }
 
   return (
