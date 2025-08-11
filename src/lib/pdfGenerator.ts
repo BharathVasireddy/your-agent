@@ -215,7 +215,7 @@ export async function generatePropertyBrochure(property: Property, agent: Agent)
   pdf.setTextColor(...colors.white);
   pdf.setFontSize(14);
   pdf.setFont('helvetica', 'bold');
-  pdf.text(agent.user.name || 'Your Agent', margin + 15, agentCardY + 15);
+  pdf.text(agent.user.name || 'YourAgent', margin + 15, agentCardY + 15);
 
   pdf.setFontSize(10);
   pdf.setFont('helvetica', 'normal');

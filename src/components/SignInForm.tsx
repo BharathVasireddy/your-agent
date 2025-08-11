@@ -180,7 +180,7 @@ export default function SignInForm({ onSuccess }: SignInFormProps) {
                       setWaPhone(digits);
                     }}
                     placeholder="Enter 10-digit mobile number"
-                    className="w-full border-2 rounded-lg h-12 text-base px-3 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    className="w-full border-2 rounded-lg h-12 text-base px-3 focus:outline-none focus:ring-2 focus:ring-[#F55625] focus:border-transparent"
                     style={{ borderColor: 'var(--border-color)' }}
                   />
                   <p className="mt-1 text-xs text-zinc-500">India only. We will send WhatsApp OTP to +91 {waPhone}</p>
@@ -230,7 +230,7 @@ export default function SignInForm({ onSuccess }: SignInFormProps) {
                         type="text"
                         inputMode="numeric"
                         maxLength={1}
-                        className="w-12 h-12 text-center border-2 rounded-lg text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                        className="w-12 h-12 text-center border-2 rounded-lg text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-[#F55625] focus:border-transparent transition-all duration-200"
                         style={{ 
                           borderColor: "var(--border-color)",
                           fontFamily: "Plus Jakarta Sans, sans-serif"
@@ -258,7 +258,7 @@ export default function SignInForm({ onSuccess }: SignInFormProps) {
                 {waMsg && (
                   <div className={`border px-4 py-3 rounded-lg text-sm text-center ${
                     waMsg.includes('Invalid') || waMsg.includes('Failed') || waMsg.includes('error') || waMsg.includes('Authentication failed')
-                      ? 'bg-red-50 border-red-200 text-red-700'
+                      ? 'bg-[#FFE9E1] border-[#FFC4B0] text-[#D94B20]'
                       : 'bg-blue-50 border-blue-200 text-blue-700'
                   }`}>
                     {waMsg}

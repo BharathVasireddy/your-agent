@@ -185,9 +185,8 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
               <span className="text-white text-sm font-bold">YA</span>
             </div>
           )}
-          <div>
-            <h1 className="text-lg font-bold text-zinc-950">YourAgent</h1>
-            <p className="text-xs text-zinc-500">Dashboard</p>
+          <div className="flex items-center gap-2">
+            <Image src="/images/Your-Agent-Logo.png" alt="YourAgent" width={140} height={28} className="h-7 w-auto" />
           </div>
         </div>
       </div>

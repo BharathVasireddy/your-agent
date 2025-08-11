@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Home } from 'lucide-react';
+import Image from 'next/image';
 
 interface AuthPageLayoutProps {
   children: React.ReactNode;
@@ -23,11 +23,15 @@ export default function AuthPageLayout({
       <div className="max-w-md w-full space-y-8">
         {/* Logo */}
         <div className="text-center">
-          <Link href="/" className="inline-flex items-center space-x-2 mb-6">
-            <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
-              <Home className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-zinc-950">YourAgent</span>
+          <Link href="/" className="inline-flex items-center mb-6">
+            <Image
+              src="/images/Your-Agent-Logo.png"
+              alt="YourAgent"
+              width={200}
+              height={40}
+              className="h-10 w-auto"
+              priority
+            />
           </Link>
         </div>
 

@@ -2,14 +2,15 @@ import Link from 'next/link';
 import { 
   CheckCircle, 
   Users, 
-  Home, 
   Sparkles, 
   BarChart3, 
   Star,
   Phone,
   Mail,
-  MapPin
+  MapPin,
+  Home
 } from 'lucide-react';
+import Image from 'next/image';
 // import { Button } from '@/components/ui/button';
 import LoginButton from '@/components/LoginButton';
 import { Pricing as AnimatedPricing } from '@/components/ui/pricing';
@@ -21,11 +22,8 @@ export default function HomePage() {
       <header id="header" className="border-b border-zinc-200 bg-white">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
-                <Home className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-zinc-950">YourAgent</span>
+            <div className="flex items-center">
+              <Image src="/images/Your-Agent-Logo.png" alt="YourAgent" width={160} height={32} className="h-8 w-auto" />
             </div>
             
             <nav className="hidden md:flex items-center space-x-8">
@@ -44,7 +42,7 @@ export default function HomePage() {
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl md:text-6xl font-bold text-zinc-950 mb-6 leading-tight">
               Your Professional Real Estate
-              <span className="text-red-600"> Digital Presence</span>
+              <span className="text-[#F55625]"> Digital Presence</span>
           </h1>
             <p className="text-xl text-zinc-600 mb-8 max-w-2xl mx-auto leading-relaxed">
               Create stunning agent profiles, manage properties effortlessly, and grow your real estate business with AI-powered tools trusted by professionals across India.
@@ -54,7 +52,7 @@ export default function HomePage() {
               <LoginButton />
               <Link 
                 href="#how-it-works"
-                className="btn-lg border-2 border-red-600 text-red-600 bg-white rounded-md hover:bg-red-50 transition-all duration-200 font-medium flex items-center gap-2"
+                className="btn-lg border-2 border-[#F55625] text-[#F55625] bg-white rounded-md hover:bg-[#FFE9E1] transition-all duration-200 font-medium flex items-center gap-2"
               >
                 See How It Works
               </Link>
@@ -94,8 +92,8 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Feature 1 */}
             <div className="bg-white border border-zinc-200 rounded-xl p-8 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-6">
-                <Users className="w-6 h-6 text-red-600" />
+              <div className="w-12 h-12 bg-[#FFDCCF] rounded-lg flex items-center justify-center mb-6">
+                <Users className="w-6 h-6 text-[#F55625]" />
               </div>
               <h3 className="text-xl font-semibold text-zinc-950 mb-4">Professional Profiles</h3>
               <p className="text-zinc-600 leading-relaxed">
@@ -176,7 +174,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Step 1 */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-[#F55625] rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-white">1</span>
               </div>
               <h3 className="text-xl font-semibold text-zinc-950 mb-4">Sign Up with Google</h3>
@@ -187,7 +185,7 @@ export default function HomePage() {
 
             {/* Step 2 */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-[#F55625] rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-white">2</span>
               </div>
               <h3 className="text-xl font-semibold text-zinc-950 mb-4">Complete Your Profile</h3>
@@ -198,7 +196,7 @@ export default function HomePage() {
 
             {/* Step 3 */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-[#F55625] rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-white">3</span>
               </div>
               <h3 className="text-xl font-semibold text-zinc-950 mb-4">Start Adding Properties</h3>
@@ -234,8 +232,8 @@ export default function HomePage() {
                 &ldquo;YourAgent helped me create a professional online presence that clients trust. My lead generation has increased by 300% since I started using the platform.&rdquo;
               </p>
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
-                  <span className="font-semibold text-red-600">RK</span>
+                <div className="w-12 h-12 bg-[#FFDCCF] rounded-full flex items-center justify-center mr-4">
+                  <span className="font-semibold text-[#F55625]">RK</span>
                 </div>
                 <div>
                   <p className="font-semibold text-zinc-950">Rajesh Kumar</p>
@@ -359,10 +357,7 @@ export default function HomePage() {
             {/* Company Info */}
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
-                  <Home className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold">YourAgent</span>
+              <Image src="/images/Your-Agent-Logo.png" alt="YourAgent" width={140} height={28} className="h-7 w-auto" />
               </div>
               <p className="text-zinc-400 mb-4">
                 Empowering real estate professionals with digital tools for success.
@@ -418,8 +413,11 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="border-t border-zinc-800 mt-8 pt-8 text-center text-zinc-400">
-            <p>&copy; 2025 YourAgent. All rights reserved.</p>
+          <div className="border-t border-zinc-800 mt-8 pt-8 text-zinc-400">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-2 text-sm">
+              <p>&copy; 2025 YourAgent. All rights reserved.</p>
+              <p>All trademarks are the property of their respective owners.</p>
+            </div>
           </div>
         </div>
       </footer>

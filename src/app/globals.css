@@ -4,8 +4,16 @@
 
 :root {
   /* Color Palette - Action-Oriented, Confident, and Clean */
-  --primary-red: #DC2626; /* red-600 - for buttons, icons, links */
-  --primary-red-hover: #B91C1C; /* red-700 - for hover states */
+  --primary-red: #F55625; /* brand primary */
+  --primary-red-hover: #D94B20; /* brand hover (slightly darker) */
+  --primary-red-50: #FFE9E1; /* light tint */
+  --primary-red-100: #FFDCCF;
+  --primary-red-200: #FFC4B0;
+  --primary-red-300: #FFA185;
+  --primary-red-500: #F55625;
+  --primary-red-600: #F55625;
+  --primary-red-700: #D94B20;
+  --primary-red-800: #BF3A1A;
   --primary-red-light: #FEE2E2; /* red-100 - for subtle highlights */
   --secondary-blue: #3B82F6; /* blue-500 - for trust/info elements */
 
@@ -90,7 +98,7 @@
 
   --popover-foreground: oklch(0.145 0 0);
 
-  --primary: #DC2626; /* Use our bold red */
+  --primary: #F55625; /* Use brand primary */
 
   --primary-foreground: #FFFFFF;
 
@@ -112,7 +120,7 @@
 
   --input: oklch(0.922 0 0);
 
-  --ring: #DC2626; /* Use primary red for focus rings */
+  --ring: #F55625; /* Use brand primary for focus rings */
 
   --chart-1: oklch(0.646 0.222 41.116);
 

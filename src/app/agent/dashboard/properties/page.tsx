@@ -84,7 +84,7 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
               <div className="mt-2 text-[10px] text-zinc-600">
                 <div className="w-full h-1.5 bg-zinc-200 rounded overflow-hidden">
                   <div
-                    className="h-1.5 bg-red-600"
+                  className="h-1.5 bg-[#F55625]"
                     style={{ width: `${Math.min(100, Math.round((total / limitNumber) * 100))}%` }}
                   />
                 </div>
@@ -94,7 +94,7 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
           </div>
           <Link
             href="/agent/dashboard/properties/new"
-            className="inline-flex items-center justify-center w-10 h-10 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+          className="inline-flex items-center justify-center w-10 h-10 bg-[#F55625] text-white rounded-full hover:bg-[#D94B20] transition-colors"
           >
             <Plus className="w-5 h-5" />
           </Link>
@@ -111,7 +111,7 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
               <div className="flex items-center gap-2">
                 <div className="w-40 h-2 bg-zinc-200 rounded overflow-hidden">
                   <div
-                    className="h-2 bg-red-600"
+                    className="h-2 bg-[#F55625]"
                     style={{ width: `${Math.min(100, Math.round((overallCount / limitNumber) * 100))}%` }}
                   />
                 </div>
@@ -123,7 +123,7 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
                 <div className="text-orange-600 mt-1">Approaching your plan limit. Consider upgrading.</div>
               )}
               {overallCount >= limitNumber && (
-                <div className="text-red-600 mt-1">You have reached your plan limit. Upgrade to add more listings.</div>
+                <div className="text-[#F55625] mt-1">You have reached your plan limit. Upgrade to add more listings.</div>
               )}
             </div>
           )}
@@ -132,7 +132,7 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
           <PropertiesViewToggle initial={view} />
           <Link
           href="/agent/dashboard/properties/new"
-          className={`inline-flex items-center px-4 py-2 rounded-lg transition-colors ${limitNumber !== null && overallCount >= limitNumber ? 'bg-zinc-200 text-zinc-500 cursor-not-allowed' : 'bg-red-600 text-white hover:bg-red-700'}`}
+          className={`inline-flex items-center px-4 py-2 rounded-lg transition-colors ${limitNumber !== null && overallCount >= limitNumber ? 'bg-zinc-200 text-zinc-500 cursor-not-allowed' : 'bg-[#F55625] text-white hover:bg-[#D94B20]'}`}
           aria-disabled={limitNumber !== null && overallCount >= limitNumber}
         >
           <Plus className="w-5 h-5 mr-2" />
@@ -199,7 +199,7 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
             <p className="text-zinc-600 mb-6">Start building your property portfolio by adding your first listing.</p>
             <Link
               href="/agent/dashboard/properties/new"
-              className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="inline-flex items-center px-4 py-2 bg-[#F55625] text-white rounded-lg hover:bg-[#D94B20] transition-colors"
             >
               <Plus className="w-5 h-5 mr-2" />
               Add Your First Property

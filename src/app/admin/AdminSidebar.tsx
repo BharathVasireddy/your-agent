@@ -1,6 +1,7 @@
  'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { Home, Users, UserCheck, Building, CreditCard, Settings, LogOut, Shield } from 'lucide-react';
@@ -58,13 +59,8 @@ export default function AdminSidebar({ adminEmail }: AdminSidebarProps) {
       {/* Logo/Brand Section */}
       <div className="p-6 border-b border-zinc-200">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
-            <Shield className="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-zinc-950">YourAgent</h1>
-            <p className="text-xs text-zinc-500">Admin Panel</p>
-          </div>
+          <Image src="/images/Your-Agent-Logo.png" alt="YourAgent" width={150} height={30} className="h-8 w-auto" />
+          <p className="text-xs text-zinc-500">Admin Panel</p>
         </div>
       </div>
 

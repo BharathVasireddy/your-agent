@@ -97,7 +97,7 @@ export default function SubscriptionPage({ session, flowStatus }: SubscriptionPa
         key: razorpayKey,
         amount: typeof order.amount === 'string' ? parseInt(order.amount, 10) : order.amount,
         currency: order.currency,
-        name: 'YourAgent.in',
+        name: 'YourAgent',
         description: `Subscription: ${plan.toUpperCase()} (${interval})`,
         order_id: order.id,
         prefill: {

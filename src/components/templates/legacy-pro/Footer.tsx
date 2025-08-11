@@ -16,7 +16,7 @@ export default function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Brand Section */}
             <div>
-              <h3 className="text-xl font-bold mb-4">Your Agent</h3>
+              <h3 className="text-xl font-bold mb-4">YourAgent</h3>
               <p className="text-zinc-400 leading-relaxed mb-4">
                 Connecting people with their perfect homes. Professional real estate services 
                 with a personal touch.
@@ -116,7 +116,7 @@ export default function Footer() {
           <div className="border-t border-zinc-800 mt-8 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="text-zinc-400 text-sm mb-4 md:mb-0">
-                © {currentYear} Your Agent. All rights reserved.
+                © {currentYear} YourAgent. All rights reserved.
               </div>
               
               <div className="flex items-center space-x-6">

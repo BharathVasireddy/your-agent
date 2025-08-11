@@ -88,7 +88,7 @@ export function Pricing({
                 setInterval(tab);
                 if (tab === 'yearly') celebrateAnnual();
               }}
-              className={`px-4 py-2 rounded-full text-sm font-semibold capitalize transition-colors ${interval===tab ? 'bg-red-600 text-white' : 'text-zinc-700 hover:bg-zinc-50'}`}
+              className={`px-4 py-2 rounded-full text-sm font-semibold capitalize transition-colors ${interval===tab ? 'bg-[#F55625] text-white' : 'text-zinc-700 hover:bg-zinc-50'}`}
               type="button"
             >
               {tab}
@@ -124,7 +124,7 @@ export function Pricing({
             className={cn(
               "rounded-2xl border p-6 text-center lg:flex lg:flex-col lg:justify-center relative flex flex-col shadow-sm",
               plan.isPopular
-                ? "border-red-600 bg-red-600 text-white"
+                ? "border-[#F55625] bg-[#F55625] text-white"
                 : "border-zinc-200 bg-white",
               !plan.isPopular && "mt-5",
               index === 0 || index === 2
@@ -174,7 +174,7 @@ export function Pricing({
               <ul className="mt-5 gap-2 flex flex-col">
                 {plan.features.map((feature, idx) => (
                   <li key={idx} className="flex items-start gap-2">
-                    <Check className={cn("h-4 w-4 mt-1 flex-shrink-0", plan.isPopular ? "text-white" : "text-red-600") } />
+                    <Check className={cn("h-4 w-4 mt-1 flex-shrink-0", plan.isPopular ? "text-white" : "text-[#F55625]") } />
                     <span className={cn("text-left", plan.isPopular ? "text-white" : "")}>{feature}</span>
                   </li>
                 ))}
@@ -188,7 +188,7 @@ export function Pricing({
                   buttonVariants({ variant: "outline" }),
                   "btn-lg group relative w-full gap-2 overflow-hidden text-lg font-semibold tracking-tighter transform-gpu ring-offset-current transition-all duration-300 ease-out",
                   plan.isPopular
-                    ? "bg-white text-red-600 hover:bg-red-50 hover:text-red-700 hover:ring-2 hover:ring-red-300"
+                  ? "bg-white text-[#F55625] hover:bg-[#FFE9E1] hover:text-[#D94B20] hover:ring-2 hover:ring-[#FFC4B0]"
                     : "bg-background text-foreground hover:ring-2 hover:ring-primary hover:ring-offset-1 hover:bg-primary hover:text-primary-foreground"
                 )}
               >

@@ -46,9 +46,9 @@ export default function LoginButton() {
         <Link
           href="/agent/dashboard"
           className="flex items-center gap-2 text-white transition-all duration-200 font-medium btn-primary btn-lg"
-          style={{ backgroundColor: "var(--primary-red)" }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--primary-red-hover)"}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--primary-red)"}
+          style={{ backgroundColor: "#F55625" }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#D94B20"}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#F55625"}
         >
           <LayoutDashboard size={16} />
           Go to Dashboard
@@ -60,13 +60,13 @@ export default function LoginButton() {
   // If session exists but server says invalid (orphaned), treat as logged out
   if (session && serverValid === false) {
     return (
-      <Link
-        href="/login"
-        className="flex items-center gap-2 text-white transition-all duration-200 font-medium btn-primary btn-lg"
-        style={{ backgroundColor: "var(--primary-red)" }}
-        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--primary-red-hover)"}
-        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--primary-red)"}
-      >
+        <Link
+          href="/login"
+          className="flex items-center gap-2 text-white transition-all duration-200 font-medium btn-primary btn-lg"
+          style={{ backgroundColor: "#F55625" }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#D94B20"}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#F55625"}
+        >
         <LogIn size={16} />
         Sign in
       </Link>
