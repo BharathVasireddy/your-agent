@@ -19,10 +19,10 @@ export interface UserFlowStatus {
  * Determines where a user should be redirected based on their current status
  */
 export async function getUserFlowStatus(): Promise<UserFlowStatus> {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions as unknown as { [k: string]: unknown });
 
   // Not authenticated
-  if (!session?.user) {
+  if (!(session as unknown as { user?: unknown } | null)?.user) {
     return {
       isAuthenticated: false,
       needsSubscription: false,

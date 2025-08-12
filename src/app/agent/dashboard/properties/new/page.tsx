@@ -8,9 +8,9 @@ import PropertyCreationWizard from '@/components/property/PropertyCreationWizard
 
 export default async function NewPropertyPage() {
   // Get the current user's session
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions as unknown as { [k: string]: unknown });
   
-  if (!session?.user) {
+  if (!(session as unknown as { user?: unknown } | null)?.user) {
     redirect('/login');
   }
 

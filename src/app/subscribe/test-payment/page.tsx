@@ -13,7 +13,7 @@ export default async function TestPaymentPageWrapper() {
   // Check authentication
   const session = await getServerSession(authOptions);
   
-  if (!session?.user) {
+  if (!(session as unknown as { user?: unknown } | null)?.user) {
     redirect('/login');
   }
 
@@ -29,5 +29,5 @@ export default async function TestPaymentPageWrapper() {
     }
   }
 
-  return <TestPaymentPage session={session} flowStatus={flowStatus} />;
+  return <TestPaymentPage session={session as unknown as { user: { id: string; email: string; name: string } }} flowStatus={flowStatus} />;
 }

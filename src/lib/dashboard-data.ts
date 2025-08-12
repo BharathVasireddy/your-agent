@@ -4,8 +4,9 @@ import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
 // Cache session for the entire request lifecycle
-export const getCachedSession = cache(async () => {
-  return getServerSession(authOptions);
+export const getCachedSession = cache(async (): Promise<{ user?: unknown } | null> => {
+  const session = await getServerSession(authOptions as unknown as { [k: string]: unknown });
+  return (session ?? null) as unknown as { user?: unknown } | null;
 });
 
 // Cache agent data for the entire request lifecycle

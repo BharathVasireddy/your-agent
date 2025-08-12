@@ -194,7 +194,7 @@ export default function LegacyPropertyDetail({ agent, property, similar }: { age
       </section>
 
       {/* Footer */}
-      <Footer />
+      <Footer agent={agent as unknown as { websiteUrl?: string | null; facebookUrl?: string | null; instagramUrl?: string | null; linkedinUrl?: string | null; youtubeUrl?: string | null; twitterUrl?: string | null }} />
     </main>
   );
 }

@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import crypto from 'crypto';
+import crypto, { randomInt } from 'crypto';
+import { recordAuthEvent } from '@/lib/auth-events';
 
 function generateOtp(length = 6) {
-  const digits = '0123456789';
-  let code = '';
-  for (let i = 0; i < length; i++) code += digits[Math.floor(Math.random() * 10)];
-  return code;
+  // Use crypto.randomInt for cryptographically secure OTP
+  const max = 10 ** length;
+  const num = randomInt(0, max);
+  return String(num).padStart(length, '0');
 }
 
 export async function POST(request: NextRequest) {
@@ -69,12 +70,35 @@ export async function POST(request: NextRequest) {
     if (!waRes.ok) {
       const err = await waRes.text();
       console.error('WhatsApp API error', err);
-      return NextResponse.json({ error: 'WhatsApp send failed', details: err }, { status: 502 });
+      // Audit failed OTP send
+      await recordAuthEvent({
+        request,
+        type: 'OTP_SEND_FAILED',
+        identifier: phone,
+        metadata: { provider: 'whatsapp', error: err?.slice(0, 1000) },
+      });
+      return NextResponse.json({ error: 'WhatsApp send failed' }, { status: 502 });
     }
+
+    // Audit successful OTP send
+    await recordAuthEvent({
+      request,
+      type: 'OTP_SENT',
+      identifier: phone,
+      metadata: { provider: 'whatsapp' },
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('WhatsApp send OTP error', error);
+    // Audit server error
+    try {
+      await recordAuthEvent({
+        request,
+        type: 'OTP_SEND_ERROR',
+        metadata: { provider: 'whatsapp', error: String(error).slice(0, 1000) },
+      });
+    } catch {}
     return NextResponse.json({ error: 'Failed to send OTP' }, { status: 500 });
   }
 }

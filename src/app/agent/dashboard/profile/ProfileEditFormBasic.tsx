@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { User, Upload, X, Loader2, Check, Sparkles, Save } from 'lucide-react';
 import { updateAgentProfile, generateBio } from '@/app/actions';
+import PhoneWhatsAppVerify from '@/components/PhoneWhatsAppVerify';
 import { logoFontOptions } from '@/lib/logo-fonts';
 import toast from 'react-hot-toast';
 
@@ -148,6 +149,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
 
   // Phone validation
   const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [phoneVerified, setPhoneVerified] = useState<boolean>(false);
 
   const validatePhone = (phone: string): boolean => {
     // Remove all non-digit characters for validation
@@ -165,30 +167,16 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
     return false;
   };
 
-  const formatPhone = (phone: string): string => {
-    // Remove all non-digit characters
-    const digitsOnly = phone.replace(/\D/g, '');
-    
-    // Format based on length
-    if (digitsOnly.length <= 10) {
-      // Format as XXXXX XXXXX
-      return digitsOnly.replace(/(\d{5})(\d{1,5})/, '$1 $2').trim();
-    } else if (digitsOnly.length <= 12) {
-      // Format as +XX XXXXX XXXXX
-      return digitsOnly.replace(/(\d{2})(\d{5})(\d{1,5})/, '+$1 $2 $3').trim();
-    }
-    
-    return phone; // Return as-is if too long
-  };
+  // Keep phone stored as E.164 (e.g., +919876543210). Display/validation handled by PhoneWhatsAppVerify.
 
   const handleInputChange = (field: string, value: string | number) => {
     if (field === 'phone' && typeof value === 'string') {
-      // Format phone number and validate
-      const formattedPhone = formatPhone(value);
-      const isValidPhone = validatePhone(value);
-      
-      setPhoneError(value && !isValidPhone ? 'Please enter a valid Indian mobile number' : null);
-      setFormData(prev => ({ ...prev, [field]: formattedPhone }));
+      // Store as E.164 without formatting; verification widget provides E.164
+      const newValue = value;
+      const isValidPhone = validatePhone(newValue);
+      if (newValue !== formData.phone) setPhoneVerified(false);
+      setPhoneError(newValue && !isValidPhone ? 'Please enter a valid Indian mobile number' : null);
+      setFormData(prev => ({ ...prev, [field]: newValue }));
     } else if (field === 'city' && typeof value === 'string') {
       // Reset area when city changes (unless it's Hyderabad)
       setFormData(prev => ({ 
@@ -200,6 +188,18 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
       setFormData(prev => ({ ...prev, [field]: value }));
     }
   };
+
+  // If user's cached verified phone matches current value, mark as verified on mount
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem('wa_phone_e164');
+      if (cached && cached === formData.phone) {
+        setPhoneVerified(true);
+        setPhoneError(null);
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Debounced slug validation
   useEffect(() => {
@@ -372,6 +372,11 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
       toast.error('Please enter a valid Indian mobile number.');
       return;
     }
+    // Require verification flag before saving (client-side guard)
+    if (!phoneVerified) {
+      toast.error('Please verify your phone number via WhatsApp before saving.');
+      return;
+    }
 
     try {
       setIsSubmitting(true);
@@ -497,18 +502,22 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
               />
             </div>
 
-            {/* Phone */}
+            {/* Phone with WhatsApp Verification */}
             <div className="space-y-2">
-              <Label htmlFor="phone" className="text-zinc-600">Phone Number *</Label>
-              <Input
-                id="phone"
-                type="tel"
+              <PhoneWhatsAppVerify
+                label="Phone Number"
                 value={formData.phone}
-                onChange={(e) => handleInputChange('phone', e.target.value)}
-                placeholder="e.g., +91 98765 43210"
+                onValueChange={(e164) => handleInputChange('phone', e164)}
+                onVerified={(e164) => {
+                  handleInputChange('phone', e164);
+                  setPhoneVerified(true);
+                  setPhoneError(null);
+                }}
                 required
-                className={phoneError ? 'border-brand-soft focus:border-brand' : ''}
               />
+              {!phoneVerified && (
+                <p className="text-xs text-zinc-500">Please verify your phone via WhatsApp to enable saving.</p>
+              )}
               {phoneError && (
                 <p className="text-sm text-brand">{phoneError}</p>
               )}

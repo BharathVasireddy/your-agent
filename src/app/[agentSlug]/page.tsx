@@ -14,8 +14,7 @@ export const dynamic = 'force-dynamic';
 import TemplateRenderer from '@/components/templates/TemplateRenderer';
 import { headers } from 'next/headers';
 import { getHostInfo } from '@/lib/utils';
-import { EditModeProvider } from '@/components/EditModeProvider';
-import EditToggleButton from '@/components/EditToggleButton';
+import ClientLazyEditProvider from '@/components/ClientLazyEditProvider';
 
 // Template name mapping - only support two stable templates
 function getTemplateName(template: string): string {
@@ -101,6 +100,7 @@ export async function generateMetadata({ params }: AgentProfilePageProps): Promi
   }
 
   const isActive = !!agent.subscriptionEndsAt && agent.subscriptionEndsAt > new Date();
+  const isPublished = (agent as unknown as { isPublished?: boolean }).isPublished ?? false;
   // Generate description from first 160 characters of bio
   const description = agent.bio 
     ? agent.bio.length > 160 
@@ -150,6 +150,7 @@ export default async function AgentProfilePage({ params, searchParams }: AgentPr
 
   // Determine active subscription state
   const isActive = !!agent.subscriptionEndsAt && agent.subscriptionEndsAt > new Date();
+  const isPublished = (agent as unknown as { isPublished?: boolean }).isPublished ?? false;
 
   // Only check session if user has an auth cookie to avoid extra work for anonymous users
   const cookieStore = await cookies();
@@ -177,7 +178,7 @@ export default async function AgentProfilePage({ params, searchParams }: AgentPr
     : null;
 
   return (
-    <EditModeProvider isOwner={!!isOwner}>
+    <ClientLazyEditProvider isOwner={!!isOwner}>
       {/* SEO: FAQPage schema */}
       {agent.faqs && agent.faqs.length > 0 && (
         <script
@@ -246,10 +247,14 @@ export default async function AgentProfilePage({ params, searchParams }: AgentPr
       )}
 
       {/* Owner unpublished banner and view toggle */}
-      {isOwner && !isActive && !viewingPublic && (
+      {isOwner && (!isActive || !isPublished) && !viewingPublic && (
         <div className="bg-zinc-50 border border-zinc-200 text-zinc-800 px-4 py-3 text-sm flex items-center gap-3">
           <span>Your profile is not published yet.</span>
-          <Link href="/agent/dashboard/subscription" className="underline hover:text-zinc-900">Publish profile</Link>
+          {!isActive ? (
+            <Link href="/agent/dashboard/subscription" className="underline hover:text-zinc-900">Publish profile</Link>
+          ) : (
+            <Link href="/agent/dashboard/customise-website" className="underline hover:text-zinc-900">Publish from customise website</Link>
+          )}
           <span className="opacity-50">•</span>
           <Link href={`/${agent.slug}?view=public`} className="underline hover:text-zinc-900">View as public</Link>
         </div>
@@ -261,7 +266,7 @@ export default async function AgentProfilePage({ params, searchParams }: AgentPr
         </div>
       )}
 
-      {!isActive && !isOwnerForRender ? (
+      {(!isActive || !isPublished) && !isOwnerForRender ? (
         <main className="min-h-[50vh] bg-white">
           <div className="max-w-3xl mx-auto px-6 py-16 text-center">
             <h1 className="text-3xl font-bold text-zinc-950 mb-3">Profile not available</h1>
@@ -271,7 +276,6 @@ export default async function AgentProfilePage({ params, searchParams }: AgentPr
       ) : (
         <TemplateRenderer templateName={templateName} agentData={agent} />
       )}
-      {isOwnerForRender && <EditToggleButton />}
-    </EditModeProvider>
+    </ClientLazyEditProvider>
   );
 }

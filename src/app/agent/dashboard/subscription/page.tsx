@@ -5,9 +5,9 @@ import { getCachedAgent } from '@/lib/dashboard-data';
 import SubscriptionManagement from './SubscriptionManagement';
 
 export default async function SubscriptionPage() {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions as unknown as { [k: string]: unknown });
   
-  if (!session?.user) {
+  if (!(session as unknown as { user?: unknown } | null)?.user) {
     redirect('/login');
   }
 

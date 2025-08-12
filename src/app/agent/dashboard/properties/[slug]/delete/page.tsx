@@ -13,9 +13,9 @@ interface DeletePropertyPageProps {
 export default async function DeletePropertyPage({ params }: DeletePropertyPageProps) {
   const { slug } = await params;
   // Get the current user's session
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions as unknown as { [k: string]: unknown });
   
-  if (!session?.user) {
+  if (!(session as unknown as { user?: unknown } | null)?.user) {
     redirect('/login');
   }
 

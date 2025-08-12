@@ -4,8 +4,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
-import { Home, Users, UserCheck, Building, CreditCard, Settings, LogOut, Shield } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { useMemo } from 'react';
+import { getNavItems } from '@/lib/nav';
+import { Button } from '@/components/ui/button';
 
 interface AdminSidebarProps {
   adminEmail: string;
@@ -14,38 +16,7 @@ interface AdminSidebarProps {
 export default function AdminSidebar({ adminEmail }: AdminSidebarProps) {
   const pathname = usePathname();
 
-  const navigationItems = useMemo(() => [
-    {
-      name: 'Dashboard',
-      href: '/admin/dashboard',
-      icon: Home,
-    },
-    {
-      name: 'Users',
-      href: '/admin/users',
-      icon: Users,
-    },
-    {
-      name: 'Agents',
-      href: '/admin/agents',
-      icon: UserCheck,
-    },
-    {
-      name: 'Properties',
-      href: '/admin/properties',
-      icon: Building,
-    },
-    {
-      name: 'Payments',
-      href: '/admin/payments',
-      icon: CreditCard,
-    },
-    {
-      name: 'System',
-      href: '/admin/system',
-      icon: Settings,
-    },
-  ], []);
+  const navigationItems = useMemo(() => getNavItems('admin'), []);
 
   const isActiveLink = (href: string) => {
     if (href === '/admin/dashboard') {
@@ -93,13 +64,16 @@ export default function AdminSidebar({ adminEmail }: AdminSidebarProps) {
           Admin: {adminEmail}
         </div>
         
-        <button
+        <Button
           onClick={() => signOut({ callbackUrl: '/' })}
-          className="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 hover:bg-brand-light hover:text-brand-hover transition-colors w-full text-left"
+          variant="secondary"
+          className="w-full justify-start px-4 py-3"
         >
-          <LogOut className="w-5 h-5 text-zinc-500" />
-          <span>Sign Out</span>
-        </button>
+          <span className="inline-flex items-center gap-3">
+            <LogOut className="w-5 h-5 text-zinc-600" />
+            <span>Sign Out</span>
+          </span>
+        </Button>
       </div>
     </div>
   );

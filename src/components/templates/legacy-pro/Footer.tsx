@@ -1,8 +1,18 @@
 'use client';
 
 import { Heart } from 'lucide-react';
+import { IconWebsite, IconFacebook, IconInstagram, IconLinkedIn, IconYouTube, IconTwitterX } from '@/components/icons/SocialIcons';
 
-export default function Footer() {
+type Agent = {
+  websiteUrl?: string | null;
+  facebookUrl?: string | null;
+  instagramUrl?: string | null;
+  linkedinUrl?: string | null;
+  youtubeUrl?: string | null;
+  twitterUrl?: string | null;
+};
+
+export default function Footer({ agent }: { agent: Agent }) {
   const currentYear = new Date().getFullYear();
 
   const scrollToTop = () => {
@@ -98,17 +108,29 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Services */}
+            {/* Social Links */}
             <div>
-              <h3 className="text-lg font-semibold mb-4">Services</h3>
-              <ul className="space-y-2 text-zinc-400">
-                <li>Residential Sales</li>
-                <li>Property Buying</li>
-                <li>Investment Consulting</li>
-                <li>Market Analysis</li>
-                <li>Property Valuation</li>
-                <li>First-Time Buyer Support</li>
-              </ul>
+              <h3 className="text-lg font-semibold mb-4">Connect</h3>
+              <div className="flex flex-wrap gap-4 text-zinc-300">
+                {agent.websiteUrl && (
+                  <a href={agent.websiteUrl} target="_blank" rel="noopener noreferrer" aria-label="Website"><IconWebsite className="w-5 h-5 hover:text-white" /></a>
+                )}
+                {agent.facebookUrl && (
+                  <a href={agent.facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook"><IconFacebook className="w-5 h-5 hover:text-white" /></a>
+                )}
+                {agent.instagramUrl && (
+                  <a href={agent.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><IconInstagram className="w-5 h-5 hover:text-white" /></a>
+                )}
+                {agent.linkedinUrl && (
+                  <a href={agent.linkedinUrl} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><IconLinkedIn className="w-5 h-5 hover:text-white" /></a>
+                )}
+                {agent.youtubeUrl && (
+                  <a href={agent.youtubeUrl} target="_blank" rel="noopener noreferrer" aria-label="YouTube"><IconYouTube className="w-5 h-5 hover:text-white" /></a>
+                )}
+                {agent.twitterUrl && (
+                  <a href={agent.twitterUrl} target="_blank" rel="noopener noreferrer" aria-label="Twitter/X"><IconTwitterX className="w-5 h-5 hover:text-white" /></a>
+                )}
+              </div>
             </div>
           </div>
 

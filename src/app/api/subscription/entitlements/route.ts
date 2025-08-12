@@ -17,11 +17,11 @@ function parseSelectedPlanCookie(cookieHeader?: string | null): { plan?: Plan; i
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions as unknown as { [k: string]: unknown });
     let plan: Plan = 'starter';
     let active = false;
 
-    if (session?.user) {
+    if ((session as unknown as { user?: unknown } | null)?.user) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const userId = (session as any).user.id as string;
       const agent = await prisma.agent.findUnique({ where: { userId }, select: { subscriptionPlan: true, subscriptionEndsAt: true } });

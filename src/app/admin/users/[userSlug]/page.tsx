@@ -3,8 +3,6 @@ import { requireAdmin } from '@/lib/admin';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import bcrypt from 'bcryptjs';
 import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -104,11 +102,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-zinc-500">Auth Providers:</span>
-                <span>{user.accounts.length > 0 ? user.accounts.map(a => a.provider).join(', ') : 'Email'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-zinc-500">Has Password:</span>
-                <span>{user.password ? 'Yes' : 'No'}</span>
+                <span>{user.accounts.length > 0 ? user.accounts.map(a => a.provider).join(', ') : 'None'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-zinc-500">Email Verified:</span>
@@ -142,6 +136,15 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                 </div>
               </div>
             </div>
+          )}
+
+          {/* Admin: Change Agent Template */}
+          {user.agentProfile && (
+            <AdminChangeTemplateForm 
+              agentSlug={user.agentProfile.slug} 
+              currentTemplate={user.agentProfile.template}
+              userSlug={userSlug}
+            />
           )}
         </div>
 
@@ -217,17 +220,6 @@ function AdminQuickActions({ userId, isActive, userSlug }: {
   isActive: boolean; 
   userSlug: string;
 }) {
-  async function resetPassword(formData: FormData) {
-    'use server';
-    const admin = await requireAdmin();
-    if (!admin) return;
-    const password = String(formData.get('password'));
-    if (password.length < 6) return;
-    const hashedPassword = await bcrypt.hash(password, 12);
-    await prisma.user.update({ where: { id: userId }, data: { password: hashedPassword } });
-    revalidatePath(`/admin/users/${userSlug}`);
-  }
-
   async function toggleUserStatus() {
     'use server';
     const admin = await requireAdmin();
@@ -246,10 +238,6 @@ function AdminQuickActions({ userId, isActive, userSlug }: {
 
   return (
     <div className="flex items-center gap-2">
-      <form action={resetPassword} className="flex gap-1">
-        <Input name="password" type="password" placeholder="New password" className="w-32 h-8 text-xs" />
-        <Button type="submit" variant="secondary" size="sm">Reset</Button>
-      </form>
       <form action={toggleUserStatus}>
         <Button 
           type="submit" 
@@ -278,6 +266,52 @@ function RevokeSessionButton({ sessionId }: { sessionId: string }) {
       <input type="hidden" name="sessionId" value={sessionId} />
       <Button type="submit" variant="outline" size="sm">Revoke</Button>
     </form>
+  );
+}
+
+function AdminChangeTemplateForm({ agentSlug, currentTemplate, userSlug }: { agentSlug: string; currentTemplate: string; userSlug: string }) {
+  async function updateAgentTemplate(formData: FormData) {
+    'use server';
+    const admin = await requireAdmin();
+    if (!admin) return;
+    const slug = String(formData.get('slug'));
+    const template = String(formData.get('template'));
+    await prisma.agent.update({ where: { slug }, data: { template } });
+    revalidatePath(`/admin/users/${userSlug}`);
+    revalidatePath(`/admin/users`);
+    revalidatePath(`/${slug}`);
+  }
+
+  const templates: Array<{ value: string; label: string }> = [
+    { value: 'legacy-pro', label: 'Legacy Pro' },
+    { value: 'fresh-minimal', label: 'Fresh Minimal' },
+    { value: 'mono-modern', label: 'Mono Modern' },
+    { value: 'mono-elite', label: 'Mono Elite' },
+  ];
+
+  return (
+    <div className="bg-white border border-zinc-200 rounded-lg p-4">
+      <h3 className="font-medium text-zinc-900 mb-3">Change Template (Admin)</h3>
+      <form action={updateAgentTemplate} className="flex items-end gap-3">
+        <input type="hidden" name="slug" value={agentSlug} />
+        <input type="hidden" name="userSlug" value={userSlug} />
+        <div className="flex-1">
+          <label htmlFor="template" className="block text-sm text-zinc-600 mb-1">Template</label>
+          <select
+            id="template"
+            name="template"
+            defaultValue={currentTemplate}
+            className="w-full border border-zinc-300 rounded-md px-2 py-2 text-sm bg-white"
+          >
+            {templates.map((t) => (
+              <option key={t.value} value={t.value}>{t.label}</option>
+            ))}
+          </select>
+        </div>
+        <Button type="submit" variant="secondary" size="sm">Update</Button>
+      </form>
+      <p className="mt-2 text-xs text-zinc-500">This overrides any plan restrictions. Use carefully.</p>
+    </div>
   );
 }
 

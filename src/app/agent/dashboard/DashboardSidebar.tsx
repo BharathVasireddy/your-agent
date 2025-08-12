@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, Building, User, LogOut, TrendingUp, Settings, HelpCircle, Copy, Palette, MessageSquare, ExternalLink, ChevronDown, ChevronRight, CreditCard } from 'lucide-react';
+import { LogOut, HelpCircle, Copy, ExternalLink, ChevronDown, ChevronRight } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import SignOutButton from './SignOutButton';
 import { useInstantNav } from '@/components/InstantNavProvider';
+import { getNavItems } from '@/lib/nav';
+import type { Plan } from '@/lib/subscriptions';
 
 interface DashboardSidebarProps {
   user: {
@@ -25,9 +27,10 @@ interface DashboardSidebarProps {
       image: string | null;
     };
   } | null;
+  plan?: Plan;
 }
 
-export default function DashboardSidebar({ user, agent }: DashboardSidebarProps) {
+export default function DashboardSidebar({ user, agent, plan = 'starter' }: DashboardSidebarProps) {
   const [copied, setCopied] = useState(false);
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
   const pathname = usePathname();
@@ -71,60 +74,7 @@ export default function DashboardSidebar({ user, agent }: DashboardSidebarProps)
     }
   };
 
-  const navigationItems = useMemo(() => [
-    {
-      name: 'Dashboard',
-      href: '/agent/dashboard',
-      icon: Home,
-    },
-    {
-      name: 'Properties',
-      href: '/agent/dashboard/properties',
-      icon: Building,
-    },
-    {
-      name: 'Leads',
-      href: '/agent/dashboard/leads',
-      icon: MessageSquare,
-    },
-    {
-      name: 'Profile',
-      href: '/agent/dashboard/profile',
-      icon: User,
-    },
-    {
-      name: 'Customise Website',
-      href: '/agent/dashboard/customise-website',
-      icon: Palette,
-      subItems: [
-        {
-          name: 'Testimonials',
-          href: '/agent/dashboard/customise-website/testimonials',
-          icon: MessageSquare,
-        },
-        {
-          name: 'FAQs',
-          href: '/agent/dashboard/customise-website/faqs',
-          icon: HelpCircle,
-        },
-      ]
-    },
-    {
-      name: 'Analytics',
-      href: '/agent/dashboard/analytics',
-      icon: TrendingUp,
-    },
-    {
-      name: 'Subscription',
-      href: '/agent/dashboard/subscription',
-      icon: CreditCard,
-    },
-    {
-      name: 'Settings',
-      href: '/agent/dashboard/settings',
-      icon: Settings,
-    },
-  ], []);
+  const navigationItems = useMemo(() => getNavItems('agent', { plan }), [plan]);
 
   const isActiveLink = (href: string) => {
     // Check if this is the pending navigation target (instant active state)

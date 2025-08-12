@@ -93,7 +93,11 @@ export default async function PropertyDetailPage({ params }: PageParams) {
   const { agent, property, similar } = data;
 
   // Basic owner check; not used for gating yet but available if needed
-  const isOwner = Boolean(session && 'user' in session && (session.user as { id?: string } | null)?.id === agent.user.id);
+  // Narrow session type safely without using 'in' on possibly primitive {}
+  type SessionLike = { user?: { id?: string } } | null;
+  const s = session as SessionLike;
+  const sessionUserId = s?.user?.id;
+  const isOwner = Boolean(sessionUserId && sessionUserId === agent.user.id);
 
   return (
     <LegacyPropertyDetail agent={agent as never} property={property as never} similar={similar as never} isOwner={isOwner} />

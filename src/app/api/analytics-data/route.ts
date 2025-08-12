@@ -6,9 +6,9 @@ import { getCachedAgent } from '@/lib/dashboard-data';
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions as unknown as { [k: string]: unknown });
     
-    if (!session?.user) {
+    if (!(session as unknown as { user?: unknown } | null)?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

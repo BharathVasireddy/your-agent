@@ -8,7 +8,7 @@ export default async function WelcomePage() {
   // Check authentication
   const session = await getServerSession(authOptions);
   
-  if (!session?.user) {
+  if (!(session as unknown as { user?: unknown } | null)?.user) {
     redirect('/login');
   }
 
@@ -20,5 +20,5 @@ export default async function WelcomePage() {
     redirect('/agent/dashboard');
   }
 
-  return <WelcomeFlow session={session} flowStatus={flowStatus} />;
+  return <WelcomeFlow session={session as unknown as import('@/types/dashboard').ExtendedSession} flowStatus={flowStatus} />;
 }

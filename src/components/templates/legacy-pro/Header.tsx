@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import { Menu, X, Phone, Mail, Home } from 'lucide-react';
 import { logoFontClassNameByKey } from '@/lib/logo-fonts';
 import DashboardButton from '@/components/DashboardButton';
+import { IconWebsite, IconFacebook, IconInstagram, IconLinkedIn, IconYouTube, IconTwitterX } from '@/components/icons/SocialIcons';
 
 
 // WhatsApp Icon Component
@@ -29,6 +30,12 @@ interface Agent {
   logoFont?: string | null;
   logoMaxHeight?: number | null;
   logoMaxWidth?: number | null;
+  websiteUrl?: string | null;
+  facebookUrl?: string | null;
+  instagramUrl?: string | null;
+  linkedinUrl?: string | null;
+  youtubeUrl?: string | null;
+  twitterUrl?: string | null;
   user: {
     id: string;
     name: string | null;
@@ -269,6 +276,21 @@ export default function Header({ agent }: HeaderProps) {
             <div className="pt-1">
               <DashboardButton agentUserId={agent.user.id} />
             </div>
+
+            {/* Social links */}
+            {(agent.websiteUrl || agent.facebookUrl || agent.instagramUrl || agent.linkedinUrl || agent.youtubeUrl || agent.twitterUrl) && (
+              <div className="pt-3 border-t border-zinc-200">
+                <div className="text-xs text-zinc-500 mb-2">Connect</div>
+                <div className="flex flex-wrap gap-4 text-zinc-700">
+                  {agent.websiteUrl && (<a href={agent.websiteUrl} target="_blank" rel="noopener noreferrer" aria-label="Website"><IconWebsite className="w-5 h-5 hover:text-zinc-950" /></a>)}
+                  {agent.facebookUrl && (<a href={agent.facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook"><IconFacebook className="w-5 h-5 hover:text-zinc-950" /></a>)}
+                  {agent.instagramUrl && (<a href={agent.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><IconInstagram className="w-5 h-5 hover:text-zinc-950" /></a>)}
+                  {agent.linkedinUrl && (<a href={agent.linkedinUrl} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><IconLinkedIn className="w-5 h-5 hover:text-zinc-950" /></a>)}
+                  {agent.youtubeUrl && (<a href={agent.youtubeUrl} target="_blank" rel="noopener noreferrer" aria-label="YouTube"><IconYouTube className="w-5 h-5 hover:text-zinc-950" /></a>)}
+                  {agent.twitterUrl && (<a href={agent.twitterUrl} target="_blank" rel="noopener noreferrer" aria-label="Twitter/X"><IconTwitterX className="w-5 h-5 hover:text-zinc-950" /></a>)}
+                </div>
+              </div>
+            )}
           </div>
         </nav>
       </aside>

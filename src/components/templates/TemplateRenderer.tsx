@@ -7,7 +7,7 @@ import React from 'react';
 // Dynamically import only the selected template's components
 import type { Prisma } from '@prisma/client';
 
-interface Agent {
+interface AgentDataForTemplateRenderer {
   id: string;
   slug: string;
   template: string;
@@ -61,11 +61,14 @@ interface Agent {
     question: string;
     answer: string;
   }>;
+  // Optional templateData for per-agent config
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  templateData?: any;
 }
 
 interface TemplateRendererProps {
   templateName: string;
-  agentData: Agent;
+  agentData: AgentDataForTemplateRenderer;
 }
 
 async function loadTemplateComponents(templateName: string) {
@@ -88,17 +91,31 @@ async function loadTemplateComponents(templateName: string) {
  */
 export default async function TemplateRenderer({ templateName, agentData }: TemplateRendererProps) {
   const Components = await loadTemplateComponents(templateName);
+  const visibility = (agentData as unknown as { templateData?: { visibility?: Record<string, boolean> } }).templateData?.visibility || {};
+  const show = (key: keyof typeof visibility, fallback = true) => (typeof visibility[key] === 'boolean' ? visibility[key] : fallback);
 
   return (
     <main className={`template-${templateName}`}>
       <Components.Header agent={agentData} />
-      <Components.HeroSection agent={agentData} />
-      <Components.PropertiesSection properties={agentData.properties} agent={agentData} />
-      <Components.AboutSection agent={agentData} />
-      <Components.TestimonialsSection testimonials={agentData.testimonials} />
-      <Components.FaqSection faqs={agentData.faqs} />
-      <Components.ContactSection agent={agentData} />
-      <Components.Footer />
+      {show('hero') && <Components.HeroSection agent={agentData} />}
+      {show('properties') && (
+        <Components.PropertiesSection properties={agentData.properties} agent={agentData} />
+      )}
+      {show('about') && <Components.AboutSection agent={agentData} />}
+      {show('testimonials') && <Components.TestimonialsSection testimonials={agentData.testimonials} />}
+      {show('faqs') && <Components.FaqSection faqs={agentData.faqs} />}
+      {show('contact') && <Components.ContactSection agent={agentData} />}
+      {/* Footer expects only social fields for legacy-pro; cast to a compatible shape */}
+      <Components.Footer
+        agent={agentData as unknown as {
+          websiteUrl?: string | null;
+          facebookUrl?: string | null;
+          instagramUrl?: string | null;
+          linkedinUrl?: string | null;
+          youtubeUrl?: string | null;
+          twitterUrl?: string | null;
+        }}
+      />
     </main>
   );
 }

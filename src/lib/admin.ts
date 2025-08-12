@@ -25,7 +25,8 @@ export async function getSessionOrNull() {
 
 export async function requireAdmin(): Promise<{ email: string; id: string } | null> {
   const session = await getSessionOrNull();
-  const email = session?.user?.email?.toLowerCase();
+  // Cast loosely to avoid brittle type coupling
+  const email = (session as unknown as { user?: { email?: string | null } } | null)?.user?.email?.toLowerCase();
   const id = (session as unknown as { user?: { id?: string } })?.user?.id;
 
   if (!email || !id) return null;

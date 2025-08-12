@@ -6,14 +6,13 @@ import { ArrowLeft } from 'lucide-react';
 
 export default async function FaqsPage() {
   // Use cached session
-  const session = await getCachedSession();
-  
-  if (!session?.user) {
+  const raw = await getCachedSession();
+  const session = raw as { user?: { id?: string } } | null;
+  if (!session?.user?.id) {
     redirect('/login');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const userId = (session as any).user.id as string;
+  const userId = session.user.id as string;
 
   // Use cached agent profile with relations
   const agent = await getCachedAgentProfile(userId);

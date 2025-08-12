@@ -8,19 +8,20 @@ datasource db {
 }
 
 model User {
-  id              String    @id @default(cuid())
+  id              String     @id @default(cuid())
   name            String?
-  email           String?   @unique
+  email           String?    @unique
   emailVerified   DateTime?
   image           String?
   password        String?
-  phone           String?   @unique
-  phoneVerifiedAt DateTime?
-  isActive        Boolean   @default(true)
+  isActive        Boolean    @default(true)
   suspendedAt     DateTime?
   suspendedBy     String?
+  phone           String?
+  phoneVerifiedAt DateTime?
   accounts        Account[]
   agentProfile    Agent?
+  leadNotes       LeadNote[]
   payments        Payment[]
   sessions        Session[]
 }
@@ -33,11 +34,8 @@ model Agent {
   bio                   String?
   phone                 String?
   city                  String?
-  dateOfBirth           DateTime?
   isSubscribed          Boolean       @default(false)
   subscriptionEndsAt    DateTime?
-  subscriptionPlan      String?
-  subscriptionInterval  String?
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt
   profilePhotoUrl       String?
@@ -45,22 +43,25 @@ model Agent {
   heroImage             String?
   heroSubtitle          String?
   heroTitle             String?
+  logoUrl               String?
+  template              String        @default("fresh-minimal")
+  dateOfBirth           DateTime?
+  logoFont              String?
+  logoMaxHeight         Int?
+  logoMaxWidth          Int?
   heroPrimaryCtaLabel   String?
   heroSecondaryCtaLabel String?
   heroStats             Json?
   templateData          Json?
-  logoUrl               String?
-  logoFont              String?
-  logoMaxHeight         Int?
-  logoMaxWidth          Int?
-  template              String        @default("fresh-minimal")
-  // Social media links (all optional)
+  subscriptionInterval  String?
+  subscriptionPlan      String?
   websiteUrl            String?
   facebookUrl           String?
   instagramUrl          String?
   linkedinUrl           String?
   youtubeUrl            String?
   twitterUrl            String?
+  isPublished           Boolean       @default(false)
   user                  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   faqs                  FAQ[]
   leads                 Lead[]
@@ -101,23 +102,23 @@ model Property {
 }
 
 model Payment {
-  id                String   @id @default(cuid())
+  id                String    @id @default(cuid())
   userId            String
   agentId           String?
-  razorpayOrderId   String   @unique
-  razorpayPaymentId String   @unique
+  razorpayOrderId   String    @unique
+  razorpayPaymentId String    @unique
   amount            Int
-  currency          String   @default("INR")
-  status            String   @default("completed")
-  type              String   @default("subscription")
-  plan              String?
+  currency          String    @default("INR")
+  status            String    @default("completed")
+  type              String    @default("subscription")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
   interval          String?
   periodEndsAt      DateTime?
+  plan              String?
   pricePaidPaise    Int?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  agent             Agent?   @relation(fields: [agentId], references: [id])
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  agent             Agent?    @relation(fields: [agentId], references: [id])
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([razorpayOrderId])
@@ -157,6 +158,22 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model AuthEvent {
+  id         String   @id @default(cuid())
+  type       String
+  userId     String?
+  identifier String?
+  ipAddress  String?
+  userAgent  String?
+  metadata   Json     @default("{}")
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([identifier])
+  @@index([type])
+  @@index([userId])
+}
+
 model Testimonial {
   id      String  @id @default(cuid())
   agentId String
@@ -193,15 +210,30 @@ model PageView {
 }
 
 model Lead {
-  id         String   @id @default(cuid())
-  agentId    String
-  timestamp  DateTime @default(now())
-  type       String
-  source     String?
-  propertyId String?
-  metadata   String?
-  agent      Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  id               String     @id @default(cuid())
+  agentId          String
+  timestamp        DateTime   @default(now())
+  type             String
+  source           String?
+  propertyId       String?
+  metadata         String?
+  stage            String     @default("new")
+  assignedToUserId String?
+  agent            Agent      @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  notes            LeadNote[]
 
   @@index([agentId, timestamp])
   @@index([agentId, type])
+}
+
+model LeadNote {
+  id        String   @id @default(cuid())
+  leadId    String
+  userId    String
+  text      String
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "LeadNote_lead_fk")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "LeadNote_user_fk")
+
+  @@index([leadId, createdAt], map: "LeadNote_lead_created_idx")
 }

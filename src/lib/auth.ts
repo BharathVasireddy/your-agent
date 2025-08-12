@@ -3,8 +3,13 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import prisma from "./prisma";
+import { recordAuthEvent } from '@/lib/auth-events';
 
-export const authOptions = {
+// Note: Using loose typing to maintain compatibility across NextAuth versions
+export const authOptions: {
+  // minimal shape we need; fallback to any to avoid type drift
+  [key: string]: unknown;
+} = {
   adapter: PrismaAdapter(prisma),
   pages: {
     signIn: '/login',
@@ -23,7 +28,15 @@ export const authOptions = {
     },
   },
   callbacks: {
-    async signIn() {
+    async signIn({ user, account, email, credentials }: { user?: { id?: string; email?: string | null }; account?: { provider?: string }; email?: string; credentials?: Record<string, unknown> | undefined }) {
+      try {
+        await recordAuthEvent({
+          type: 'SIGNIN_SUCCESS',
+          userId: user?.id,
+          identifier: user?.email ?? email ?? (credentials as unknown as { identifier?: string })?.identifier,
+          metadata: { provider: account?.provider },
+        });
+      } catch {}
       // Allow all sign-ins - we'll handle flow in the redirect callback
       return true;
     },
@@ -90,11 +103,14 @@ export const authOptions = {
           const user = await prisma.user.findFirst({ where: { phone: identifier } });
           if (!user) {
             console.log('WhatsApp auth: No user found with phone:', identifier);
+            try { await recordAuthEvent({ type: 'SIGNIN_FAILED', identifier, metadata: { provider: 'whatsapp', reason: 'user_not_found' } }); } catch {}
             return null;
           }
+          try { await recordAuthEvent({ type: 'SIGNIN_SUCCESS', userId: user.id, identifier, metadata: { provider: 'whatsapp' } }); } catch {}
           return { id: user.id, email: user.email, name: user.name, image: user.image };
         } catch (error) {
           console.error('WhatsApp auth provider error:', error);
+          try { await recordAuthEvent({ type: 'SIGNIN_FAILED', metadata: { provider: 'whatsapp', error: String(error).slice(0, 1000) } }); } catch {}
           return null;
         }
       },

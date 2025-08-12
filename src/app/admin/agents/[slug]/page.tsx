@@ -4,6 +4,7 @@ import { requireAdmin } from '@/lib/admin';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { Button } from '@/components/ui/button';
+import { type Plan, type Interval } from '@/lib/subscriptions';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,6 +32,13 @@ export default async function AdminAgentDetailPage({ params }: { params: Promise
       </div>
 
       <AdminAgentActions slug={agent.slug} isSubscribed={agent.isSubscribed} />
+
+      <AdminSubscriptionForm 
+        agentSlug={agent.slug} 
+        userId={agent.user?.id}
+        currentPlan={agent.subscriptionPlan}
+        currentInterval={agent.subscriptionInterval}
+      />
 
       <section className="border border-zinc-200 rounded-lg p-4">
         <h2 className="font-medium mb-2">User</h2>
@@ -101,6 +109,109 @@ async function AdminAgentActions({ slug, isSubscribed }: { slug: string; isSubsc
           </Button>
         </form>
       </div>
+    </section>
+  );
+}
+
+async function AdminSubscriptionForm({ agentSlug, userId, currentPlan, currentInterval }: { agentSlug: string; userId?: string; currentPlan?: string | null; currentInterval?: string | null }) {
+  async function setSubscription(formData: FormData) {
+    'use server';
+    const admin = await requireAdmin();
+    if (!admin) return;
+    const slug = String(formData.get('agentSlug'));
+    const plan = String(formData.get('plan')) as Plan;
+    const interval = String(formData.get('interval')) as Interval;
+    const amountPaise = parseInt(String(formData.get('amountPaise')) || '0', 10) || null;
+    const method = String(formData.get('collectionMethod') || 'manual');
+    const referenceId = String(formData.get('referenceId') || '');
+    const notes = String(formData.get('notes') || '');
+
+    const now = new Date();
+    const months = interval === 'monthly' ? 1 : interval === 'quarterly' ? 3 : 12;
+    const periodEndsAt = new Date(now);
+    periodEndsAt.setMonth(periodEndsAt.getMonth() + months);
+
+    await prisma.agent.update({
+      where: { slug },
+      data: {
+        isSubscribed: true,
+        subscriptionPlan: plan,
+        subscriptionInterval: interval,
+        subscriptionEndsAt: periodEndsAt,
+      },
+    });
+
+    // Note: Skipping creation of Payment record here since "razorpayOrderId" and "razorpayPaymentId" are required.
+    // For manual/admin grants, we only update the agent's subscription fields.
+
+    revalidatePath(`/admin/agents/${slug}`);
+    revalidatePath('/admin/agents');
+  }
+
+  async function clearSubscription(formData: FormData) {
+    'use server';
+    const admin = await requireAdmin();
+    if (!admin) return;
+    const slug = String(formData.get('agentSlug'));
+    await prisma.agent.update({
+      where: { slug },
+      data: { isSubscribed: false, subscriptionPlan: null, subscriptionInterval: null, subscriptionEndsAt: null },
+    });
+    revalidatePath(`/admin/agents/${slug}`);
+    revalidatePath('/admin/agents');
+  }
+
+  const plans: Plan[] = ['starter','growth','pro'];
+  const intervals: Interval[] = ['monthly','quarterly','yearly'];
+
+  return (
+    <section className="border border-zinc-200 rounded-lg p-4">
+      <h2 className="font-medium mb-3">Subscription</h2>
+      <form action={setSubscription} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="hidden" name="agentSlug" value={agentSlug} />
+        <div>
+          <label className="block text-xs text-zinc-600 mb-1">Plan</label>
+          <select name="plan" defaultValue={(currentPlan as Plan) ?? 'starter'} className="w-full border border-zinc-300 rounded-md px-2 py-2 text-sm bg-white">
+            {plans.map(p => (<option key={p} value={p}>{p}</option>))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs text-zinc-600 mb-1">Interval</label>
+          <select name="interval" defaultValue={(currentInterval as Interval) ?? 'monthly'} className="w-full border border-zinc-300 rounded-md px-2 py-2 text-sm bg-white">
+            {intervals.map(i => (<option key={i} value={i}>{i}</option>))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs text-zinc-600 mb-1">Amount (paise)</label>
+          <input name="amountPaise" type="number" min="0" placeholder="e.g. 29900" className="w-full border border-zinc-300 rounded-md px-2 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="block text-xs text-zinc-600 mb-1">Collection Method</label>
+          <select name="collectionMethod" defaultValue="manual" className="w-full border border-zinc-300 rounded-md px-2 py-2 text-sm bg-white">
+            <option value="manual">Manual</option>
+            <option value="upi">UPI</option>
+            <option value="cash">Cash</option>
+            <option value="bank-transfer">Bank Transfer</option>
+            <option value="razorpay">Razorpay</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-xs text-zinc-600 mb-1">Reference ID</label>
+          <input name="referenceId" type="text" placeholder="Txn ID, UTR, receipt no..." className="w-full border border-zinc-300 rounded-md px-2 py-2 text-sm" />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-xs text-zinc-600 mb-1">Notes</label>
+          <textarea name="notes" rows={3} className="w-full border border-zinc-300 rounded-md px-2 py-2 text-sm" placeholder="Any remarks about this collection" />
+        </div>
+        <div className="md:col-span-2 flex gap-2">
+          <Button type="submit">Save Subscription</Button>
+          <form action={clearSubscription}>
+            <input type="hidden" name="agentSlug" value={agentSlug} />
+            <Button type="submit" variant="outline">Clear</Button>
+          </form>
+        </div>
+      </form>
     </section>
   );
 }

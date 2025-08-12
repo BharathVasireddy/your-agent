@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getCachedSession, getAgentLeads } from '@/lib/dashboard-data';
+import LeadRowClient from './LeadRowClient';
 
 function parseLeadMetadata(metadata: string | null) {
   try {
@@ -95,8 +96,15 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
                   <div className="text-zinc-800 text-sm line-clamp-1" title={subject}>{subject || message}</div>
                 </div>
                 <div className="md:col-span-2 text-zinc-600 text-sm">{createdAt}</div>
-                {/* Full message for mobile */}
-                <div className="md:hidden col-span-12 text-zinc-700 text-sm">{message}</div>
+                {/* CRM controls */}
+                <div className="col-span-12">
+                  <LeadRowClient
+                    leadId={lead.id}
+                    initialStage={(lead as unknown as { stage?: 'new'|'contacted'|'qualified'|'won'|'lost' }).stage ?? 'new'}
+                    initialAssignee={(lead as unknown as { assignedToUserId?: string | null }).assignedToUserId ?? ''}
+                    message={message}
+                  />
+                </div>
               </div>
             );
           })}

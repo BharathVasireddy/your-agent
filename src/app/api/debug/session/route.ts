@@ -9,7 +9,7 @@ export async function GET() {
     // Get session
     const session = await getServerSession(authOptions);
     
-    if (!session?.user) {
+    if (!(session as unknown as { user?: unknown } | null)?.user) {
       return NextResponse.json({ 
         error: 'Not authenticated',
         session: null,
@@ -71,8 +71,8 @@ export async function GET() {
       session: {
         user: {
           id: userId,
-          email: session.user.email,
-          name: session.user.name
+          email: (session as unknown as { user?: { email?: string | null } }).user?.email || null,
+          name: (session as unknown as { user?: { name?: string | null } }).user?.name || null,
         }
       },
       userData,

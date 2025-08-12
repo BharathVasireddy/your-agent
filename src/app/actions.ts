@@ -8,6 +8,52 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import OpenAI from "openai";
 import { PRICE_PAISE, DURATION_MONTHS, addMonths, ENTITLEMENTS, type Plan, type Interval } from '@/lib/subscriptions';
+// Minimal CRM actions
+type SessionLike = { user?: { id?: string } } | null;
+
+export async function updateLeadStage(leadId: string, stage: 'new'|'contacted'|'qualified'|'won'|'lost') {
+  const raw = await getServerSession(authOptions);
+  const session = raw as SessionLike;
+  const userId = session?.user?.id;
+  if (!userId) throw new Error('Unauthorized');
+
+  // Ensure the lead belongs to this agent
+  const agent = await prisma.agent.findUnique({ where: { userId }, select: { id: true } });
+  if (!agent) throw new Error('Agent not found');
+  const lead = await prisma.lead.findUnique({ where: { id: leadId }, select: { agentId: true } });
+  if (!lead || lead.agentId !== agent.id) throw new Error('Not allowed');
+  await prisma.lead.update({ where: { id: leadId }, data: { stage } });
+  revalidatePath('/agent/dashboard/leads');
+  return { success: true };
+}
+
+export async function assignLead(leadId: string, assignedToUserId: string | null) {
+  const raw = await getServerSession(authOptions);
+  const session = raw as SessionLike;
+  const userId = session?.user?.id;
+  if (!userId) throw new Error('Unauthorized');
+  const agent = await prisma.agent.findUnique({ where: { userId }, select: { id: true } });
+  if (!agent) throw new Error('Agent not found');
+  const lead = await prisma.lead.findUnique({ where: { id: leadId }, select: { agentId: true } });
+  if (!lead || lead.agentId !== agent.id) throw new Error('Not allowed');
+  await prisma.lead.update({ where: { id: leadId }, data: { assignedToUserId: assignedToUserId || null } });
+  revalidatePath('/agent/dashboard/leads');
+  return { success: true };
+}
+
+export async function addLeadNote(leadId: string, text: string) {
+  const raw = await getServerSession(authOptions);
+  const session = raw as SessionLike;
+  const userId = session?.user?.id;
+  if (!userId) throw new Error('Unauthorized');
+  const agent = await prisma.agent.findUnique({ where: { userId }, select: { id: true } });
+  if (!agent) throw new Error('Agent not found');
+  const lead = await prisma.lead.findUnique({ where: { id: leadId }, select: { agentId: true } });
+  if (!lead || lead.agentId !== agent.id) throw new Error('Not allowed');
+  await prisma.leadNote.create({ data: { leadId, userId, text } });
+  revalidatePath('/agent/dashboard/leads');
+  return { success: true };
+}
 
 function generateSlug(name: string): string {
   return name
@@ -505,9 +551,9 @@ export async function subscribeAndRedirect() {
 // Razorpay payment integration
 export async function createRazorpayOrder(plan: Plan, interval: Interval) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
+    const raw = await getServerSession(authOptions);
+    const session = raw as { user?: { id?: string; email?: string } } | null;
+    if (!session?.user?.id) {
       return { success: false, error: 'Authentication required' };
     }
 
@@ -527,8 +573,8 @@ export async function createRazorpayOrder(plan: Plan, interval: Interval) {
       receipt: `subscription_${Date.now()}`,
       notes: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        userId: (session as any).user.id,
-        email: session.user.email,
+        userId: session.user.id,
+        email: session.user.email ?? null,
         type: 'subscription',
         plan,
         interval
@@ -552,9 +598,9 @@ export async function verifyPayment(paymentData: {
 }, plan: Plan, interval: Interval) {
   try {
     const crypto = await import('crypto');
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
+    const raw = await getServerSession(authOptions);
+    const session = raw as { user?: { id?: string } } | null;
+    if (!session?.user?.id) {
       return { success: false, error: 'Authentication required' };
     }
 
@@ -572,7 +618,7 @@ export async function verifyPayment(paymentData: {
     await grantSubscription({ plan, interval, endsAt, amountPaise: PRICE_PAISE[plan][interval] });
 
     // Store payment record
-    const userId = session.user?.id as string;
+    const userId = session.user.id as string;
     const agent = await prisma.agent.findUnique({
       where: { userId },
       select: { id: true }
@@ -746,7 +792,15 @@ export async function updateAgentProfile(data: {
       }
     }
 
-    // Update the agent profile
+    // Enforce server-side phone verification integrity: the submitted phone must match a verified phone for this user
+    if (validatedData.phone) {
+      const user = await prisma.user.findUnique({ where: { id: userId }, select: { phone: true, phoneVerifiedAt: true } });
+      if (!user?.phone || !user.phoneVerifiedAt || user.phone !== validatedData.phone) {
+        throw new Error('Please verify your phone number via WhatsApp before saving your profile.');
+      }
+    }
+
+    // Update the agent profile (do not auto-publish)
     const updatedAgent = await prisma.agent.update({
       where: { userId },
       data: {
@@ -798,6 +852,36 @@ export async function updateAgentProfile(data: {
     }
     
     throw new Error(error instanceof Error ? error.message : "Failed to update profile");
+  }
+}
+
+export async function setAgentPublished(isPublished: boolean) {
+  try {
+    const session = await getServerSession(authOptions);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!session || !(session as any).user || !(session as any).user.id) {
+      throw new Error("You must be signed in");
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any).user.id as string;
+
+    const agent = await prisma.agent.findUnique({ where: { userId }, select: { subscriptionEndsAt: true, slug: true } });
+    if (!agent) throw new Error('Agent profile not found');
+    if (!agent.subscriptionEndsAt || agent.subscriptionEndsAt <= new Date()) {
+      throw new Error('You need an active subscription to publish your profile');
+    }
+
+    // Use a direct SQL update to avoid schema drift/type lag issues
+    await prisma.$executeRaw`UPDATE "Agent" SET "isPublished" = ${isPublished}, "updatedAt" = NOW() WHERE "userId" = ${userId}`;
+    const refreshed = await prisma.agent.findUnique({ where: { userId }, select: { slug: true } });
+    const updatedSlug = refreshed?.slug;
+
+    if (updatedSlug) revalidatePath(`/${updatedSlug}`);
+    revalidatePath('/agent/dashboard');
+    revalidatePath('/agent/dashboard/customise-website');
+    return { success: true, isPublished } as const;
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : 'Failed to update publish status');
   }
 }
 
@@ -865,14 +949,13 @@ Do not include any special formatting, just plain text.`;
 // Testimonial Management Actions
 export async function addTestimonial(data: { text: string; author: string; role?: string | null; rating?: number | null }) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
+    const raw = await getServerSession(authOptions);
+    const session = raw as { user?: { id?: string } } | null;
+    if (!session?.user?.id) {
       throw new Error("You must be signed in to add testimonials");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userId = (session as any).user.id as string;
+    const userId = session.user.id as string;
 
     // Find the user's agent profile
     const agent = await prisma.agent.findUnique({
@@ -906,14 +989,13 @@ export async function addTestimonial(data: { text: string; author: string; role?
 
 export async function updateTestimonial(id: string, data: { text: string; author: string; role?: string | null; rating?: number | null }) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
+    const raw = await getServerSession(authOptions);
+    const session = raw as { user?: { id?: string } } | null;
+    if (!session?.user?.id) {
       throw new Error("You must be signed in to update testimonials");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userId = (session as any).user.id as string;
+    const userId = session.user.id as string;
 
     // Find the user's agent profile
     const agent = await prisma.agent.findUnique({
@@ -956,14 +1038,13 @@ export async function updateTestimonial(id: string, data: { text: string; author
 
 export async function deleteTestimonial(id: string) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
+    const raw = await getServerSession(authOptions);
+    const session = raw as { user?: { id?: string } } | null;
+    if (!session?.user?.id) {
       throw new Error("You must be signed in to delete testimonials");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userId = (session as any).user.id as string;
+    const userId = session.user.id as string;
 
     // Find the user's agent profile
     const agent = await prisma.agent.findUnique({
@@ -1001,14 +1082,13 @@ export async function deleteTestimonial(id: string) {
 // FAQ Management Actions
 export async function addFAQ(data: { question: string; answer: string }) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
+    const raw = await getServerSession(authOptions);
+    const session = raw as { user?: { id?: string } } | null;
+    if (!session?.user?.id) {
       throw new Error("You must be signed in to add FAQs");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userId = (session as any).user.id as string;
+    const userId = session.user.id as string;
 
     // Find the user's agent profile
     const agent = await prisma.agent.findUnique({
@@ -1040,14 +1120,13 @@ export async function addFAQ(data: { question: string; answer: string }) {
 
 export async function updateFAQ(id: string, data: { question: string; answer: string }) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
+    const raw = await getServerSession(authOptions);
+    const session = raw as { user?: { id?: string } } | null;
+    if (!session?.user?.id) {
       throw new Error("You must be signed in to update FAQs");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userId = (session as any).user.id as string;
+    const userId = session.user.id as string;
 
     // Find the user's agent profile
     const agent = await prisma.agent.findUnique({
@@ -1088,14 +1167,13 @@ export async function updateFAQ(id: string, data: { question: string; answer: st
 
 export async function deleteFAQ(id: string) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
+    const raw = await getServerSession(authOptions);
+    const session = raw as { user?: { id?: string } } | null;
+    if (!session?.user?.id) {
       throw new Error("You must be signed in to delete FAQs");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userId = (session as any).user.id as string;
+    const userId = session.user.id as string;
 
     // Find the user's agent profile
     const agent = await prisma.agent.findUnique({

@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { Mail, MessageSquare, BookOpen, LifeBuoy } from 'lucide-react';
 
 export default async function HelpSupportPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
+  const session = await getServerSession(authOptions as unknown as { [k: string]: unknown });
+  if (!(session as unknown as { user?: unknown } | null)?.user) {
     redirect('/login');
   }
 

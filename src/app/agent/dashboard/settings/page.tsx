@@ -18,10 +18,10 @@ export default async function SettingsPage() {
 
   const user = {
     id: userId,
-    name: session.user.name,
-    email: session.user.email,
-    image: session.user.image,
-  };
+    name: (session as unknown as { user?: { name?: string | null } }).user?.name ?? null,
+    email: (session as unknown as { user?: { email?: string | null } }).user?.email ?? null,
+    image: (session as unknown as { user?: { image?: string | null } }).user?.image ?? null,
+  } satisfies { id: string; name: string | null; email: string | null; image: string | null };
 
   if (!user) {
     redirect('/login');

@@ -6,8 +6,8 @@ import { getUserFlowStatus } from '@/lib/userFlow';
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const session = await getServerSession(authOptions as unknown as { [k: string]: unknown });
+    if (!(session as unknown as { user?: unknown } | null)?.user) {
       return NextResponse.json({ valid: false });
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

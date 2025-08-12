@@ -1,18 +1,20 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getCachedSession, getCachedAgentProfile } from '@/lib/dashboard-data';
+import { setAgentPublished } from '@/app/actions';
+import PublishButton from './PublishButton';
 import { MessageSquare, HelpCircle } from 'lucide-react';
+import SectionVisibilityToggles from './SectionVisibilityToggles';
 
 export default async function CustomiseWebsitePage() {
   // Use cached session
-  const session = await getCachedSession();
-  
-  if (!session?.user) {
+  const raw = await getCachedSession();
+  const session = raw as { user?: { id?: string } } | null;
+  if (!session?.user?.id) {
     redirect('/login');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const userId = (session as any).user.id as string;
+  const userId = session.user.id as string;
 
   // Use cached agent profile with relations
   const agent = await getCachedAgentProfile(userId);
@@ -20,6 +22,11 @@ export default async function CustomiseWebsitePage() {
   if (!agent) {
     redirect('/subscribe');
   }
+
+  const initialVisibility = ((agent as unknown as { templateData?: unknown }).templateData as
+    | { visibility?: Record<string, boolean> }
+    | null
+    | undefined)?.visibility ?? null;
 
   const sections = [
     {
@@ -40,6 +47,9 @@ export default async function CustomiseWebsitePage() {
     }
   ];
 
+  const isPublished = (agent as unknown as { isPublished?: boolean }).isPublished ?? false;
+  const hasActiveSubscription = !!agent.subscriptionEndsAt && agent.subscriptionEndsAt > new Date();
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -47,6 +57,34 @@ export default async function CustomiseWebsitePage() {
         <h1 className="text-3xl font-bold text-zinc-950">Customise Website</h1>
         <p className="text-zinc-600 mt-1">Manage the content that appears on your public profile page</p>
       </div>
+
+      {/* Publish/Unpublish */}
+      <form action={async (formData: FormData) => {
+        'use server';
+        try {
+          const publish = formData.get('publish') === 'true';
+          await setAgentPublished(publish);
+        } catch {
+          // no-op: keep page stable; UI remains unchanged if server action fails
+        }
+      }}>
+        <div className="flex items-center justify-between p-4 border rounded-lg bg-white">
+          <div>
+            <h2 className="text-lg font-semibold">Publication Status</h2>
+            <p className="text-sm text-zinc-600">Your site is currently {isPublished ? 'published' : 'unpublished'}.</p>
+          </div>
+          <input type="hidden" name="publish" value={isPublished ? 'false' : 'true'} />
+          <PublishButton
+            isPublished={isPublished}
+            disabled={!hasActiveSubscription}
+            disabledTitle={!hasActiveSubscription ? 'You need an active subscription to publish' : undefined}
+          />
+          <input type="hidden" name="_action" value="toggle_publish" />
+        </div>
+      </form>
+
+      {/* Visibility Toggles */}
+      <SectionVisibilityToggles agentSlug={agent.slug} initialVisibility={initialVisibility} />
 
       {/* Content Sections Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

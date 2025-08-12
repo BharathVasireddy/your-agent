@@ -460,24 +460,14 @@ function AccountSettings({ user, agent }: { user: UserData; agent: AgentData | n
       <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-4 md:p-6">
         <h3 className="text-lg font-semibold text-zinc-950 mb-4">Security</h3>
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium text-zinc-950">Password</p>
-              <p className="text-sm text-zinc-600">Last updated recently</p>
-            </div>
-            <button className="text-brand hover:text-brand-hover text-sm font-medium">
-              Change Password
-            </button>
-          </div>
+          {/* Password-based auth removed */}
           
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium text-zinc-950">Two-Factor Authentication</p>
-              <p className="text-sm text-zinc-600">Not enabled</p>
+              <p className="text-sm text-zinc-600">Not available yet</p>
             </div>
-            <button className="text-brand hover:text-brand-hover text-sm font-medium">
-              Enable 2FA
-            </button>
+            <span className="text-xs text-zinc-400">Coming soon</span>
           </div>
         </div>
       </div>

@@ -6,6 +6,7 @@ import { InstantNavProvider } from '@/components/InstantNavProvider';
 import ContentLoadingWrapper from './ContentLoadingWrapper';
 import { getCachedSession, getCachedAgent } from '@/lib/dashboard-data';
 import { getUserFlowStatus } from '@/lib/userFlow';
+import type { Plan } from '@/lib/subscriptions';
 
 export default async function DashboardLayout({
   children,
@@ -36,6 +37,7 @@ export default async function DashboardLayout({
   const isActiveSubscription = !!agent?.isSubscribed && !!subscriptionEndsAt && subscriptionEndsAt > new Date();
   const hasEverSubscribed = !!subscriptionEndsAt; // if we have an end date, they had a subscription at some point
   const isExpired = !!subscriptionEndsAt && subscriptionEndsAt <= new Date();
+  const plan = (agent?.subscriptionPlan as Plan) ?? 'starter';
 
   return (
     <InstantNavProvider>
@@ -43,7 +45,7 @@ export default async function DashboardLayout({
         {/* Desktop Layout with Sidebar */}
         <div className="hidden md:flex">
           {/* Left Sidebar */}
-          <DashboardSidebar user={session.user} agent={agent} />
+          <DashboardSidebar user={session.user} agent={agent} plan={plan} />
           
           {/* Main Content Area */}
           <div className="flex-1 ml-64">
@@ -95,7 +97,7 @@ export default async function DashboardLayout({
           </main>
 
           {/* Mobile Bottom Navigation */}
-          <DashboardMobileNav />
+          <DashboardMobileNav plan={plan} />
         </div>
       </div>
     </InstantNavProvider>

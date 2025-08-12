@@ -15,8 +15,8 @@ function generateSlug(input: string): string {
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const session = await getServerSession(authOptions as unknown as { [k: string]: unknown });
+    if (!(session as unknown as { user?: unknown } | null)?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

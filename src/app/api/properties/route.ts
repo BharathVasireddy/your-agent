@@ -7,8 +7,8 @@ import { type BasePropertyFormData } from '@/types/property';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const session = await getServerSession(authOptions as unknown as { [k: string]: unknown });
+    if (!(session as unknown as { user?: unknown } | null)?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -37,9 +37,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions as unknown as { [k: string]: unknown });
     
-    if (!session?.user) {
+    if (!(session as unknown as { user?: unknown } | null)?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

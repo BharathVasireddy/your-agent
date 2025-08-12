@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Check, X, Loader2, MapPin, Phone, Calendar, Link2, AlertCircle } from "lucide-react";
+import PhoneWhatsAppVerify from '@/components/PhoneWhatsAppVerify';
 
 export default function Step1_Professional() {
   const { data: session } = useSession();
@@ -270,46 +271,16 @@ export default function Step1_Professional() {
           
           <div className="space-y-4">
              {/* Phone Number with Validation - fixed +91 prefix, no overlap */}
-            <div className="space-y-2">
-              <Label htmlFor="phone" className="text-sm font-medium text-zinc-700">Phone Number *</Label>
-              <div className="relative flex items-center border border-zinc-300 rounded-md overflow-hidden">
-                <span className="pl-3 pr-2 text-sm text-zinc-700 font-medium select-none">+91</span>
-                <Input
-                  id="phone"
-                  type="tel"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  maxLength={10}
-                  value={(phone || '').replace(/^\+91/, '')}
-                  onChange={(e) => {
-                    const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
-                    const e164 = digits ? `+91${digits}` : '';
-                    handleInputChange('phone', e164);
-                  }}
-                  placeholder="9876543210"
-                  className={`flex-1 h-11 border-0 px-2 focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                    phoneValidation.message && !phoneValidation.isValid
-                      ? 'ring-red-500'
-                      : ''
-                  }`}
-                />
-                {/* Phone Validation Icon */}
-                {phone && (
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    {phoneValidation.isValid ? (
-                      <Check className="w-4 h-4 text-green-600" />
-                    ) : (
-                      <AlertCircle className="w-4 h-4 text-brand" />
-                    )}
-                  </div>
-                )}
-              </div>
-              {phoneValidation.message && (
-                <p className={`text-xs ${phoneValidation.isValid ? 'text-green-600' : 'text-brand'}`}>
-                  {phoneValidation.message}
-                </p>
-              )}
-            </div>
+            <PhoneWhatsAppVerify
+              label="Phone Number"
+              value={phone}
+              onValueChange={(e164) => handleInputChange('phone', e164)}
+              onVerified={(e164) => {
+                handleInputChange('phone', e164);
+                setPhoneValidation({ isValid: true, message: 'Verified phone number' });
+              }}
+              required
+            />
 
             {/* Date of Birth */}
             <div className="space-y-2">

@@ -1,64 +1,29 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, Building, User, TrendingUp, Palette, MessageSquare } from 'lucide-react';
 import { useInstantNav } from '@/components/InstantNavProvider';
 import { useEffect } from 'react';
+import { getNavItems } from '@/lib/nav';
+import type { Plan } from '@/lib/subscriptions';
 
-export default function DashboardMobileNav() {
+export default function DashboardMobileNav({ plan = 'starter' }: { plan?: Plan }) {
   const pathname = usePathname();
   const router = useRouter();
   const { pendingPath, navigateInstantly } = useInstantNav();
 
   // Prefetch all dashboard routes for instant mobile navigation
-  useEffect(() => {
-    const routes = [
-      '/agent/dashboard',
-      '/agent/dashboard/properties', 
-      '/agent/dashboard/leads',
-      '/agent/dashboard/profile',
-      '/agent/dashboard/customise-website',
-      '/agent/dashboard/analytics',
-      '/agent/dashboard/settings'
-    ];
-    
-    routes.forEach(route => {
-      router.prefetch(route);
-    });
-  }, [router]);
+  const items = getNavItems('agent', { plan });
 
-  const navigationItems = [
-    {
-      name: 'Home',
-      href: '/agent/dashboard',
-      icon: Home,
-    },
-    {
-      name: 'Properties',
-      href: '/agent/dashboard/properties',
-      icon: Building,
-    },
-    {
-      name: 'Leads',
-      href: '/agent/dashboard/leads',
-      icon: MessageSquare,
-    },
-    {
-      name: 'Website',
-      href: '/agent/dashboard/customise-website',
-      icon: Palette,
-    },
-    {
-      name: 'Analytics',
-      href: '/agent/dashboard/analytics',
-      icon: TrendingUp,
-    },
-    {
-      name: 'Profile',
-      href: '/agent/dashboard/profile',
-      icon: User,
-    },
-  ];
+  useEffect(() => {
+    items.forEach((item) => {
+      try { router.prefetch(item.href); } catch {}
+      item.subItems?.forEach((sub) => {
+        try { router.prefetch(sub.href); } catch {}
+      });
+    });
+  }, [router, items]);
+
+  const navigationItems = items.filter((i) => !i.subItems);
 
   const isActiveLink = (href: string) => {
     // Check if this is the pending navigation target (instant active state)
@@ -76,9 +41,10 @@ export default function DashboardMobileNav() {
     return pathname.startsWith(href);
   };
 
+  const columnCount = Math.max(1, navigationItems.length);
   return (
     <nav id="bottom-nav" className="fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-200">
-      <div className="grid grid-cols-6 h-16">
+      <div className="h-16" style={{ display: 'grid', gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
         {navigationItems.map((item) => {
           const Icon = item.icon;
           const isActive = isActiveLink(item.href);

@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     // Check authentication
     const session = await getServerSession(authOptions);
     
-    if (!session?.user) {
+    if (!(session as unknown as { user?: unknown } | null)?.user) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
 

@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { requireAdmin } from '@/lib/admin';
+import prisma from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
+import { Button } from '@/components/ui/button';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,6 +45,7 @@ export default async function AdminAgentsPage() {
               <th className="px-3 py-2 text-left">Subscribed</th>
               <th className="px-3 py-2 text-left">Properties</th>
               <th className="px-3 py-2 text-left">Leads</th>
+              <th className="px-3 py-2 text-left">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -56,6 +60,27 @@ export default async function AdminAgentsPage() {
                 <td className="px-3 py-2">{a.isSubscribed ? 'Yes' : 'No'}</td>
                 <td className="px-3 py-2">{a._count.properties}</td>
                 <td className="px-3 py-2">{a._count.leads}</td>
+                <td className="px-3 py-2">
+                  <div className="flex flex-wrap gap-2">
+                    <Link href={`/admin/agents/${a.slug}`}>
+                      <Button variant="outline" size="sm">View</Button>
+                    </Link>
+                    <Link href={`/${a.slug}`} target="_blank" rel="noopener noreferrer">
+                      <Button variant="outline" size="sm">Public</Button>
+                    </Link>
+                    <form action={toggleAgentSubscription}>
+                      <input type="hidden" name="slug" value={a.slug} />
+                      <input type="hidden" name="desired" value={(!!(!a.isSubscribed)).toString()} />
+                      <Button type="submit" variant="secondary" size="sm">
+                        {a.isSubscribed ? 'Disable Sub' : 'Enable Sub'}
+                      </Button>
+                    </form>
+                    <form action={deleteAgent}>
+                      <input type="hidden" name="slug" value={a.slug} />
+                      <Button type="submit" variant="destructive" size="sm">Delete</Button>
+                    </form>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -63,6 +88,25 @@ export default async function AdminAgentsPage() {
       </div>
     </div>
   );
+}
+
+async function toggleAgentSubscription(formData: FormData) {
+  'use server';
+  const admin = await requireAdmin();
+  if (!admin) return;
+  const slug = String(formData.get('slug'));
+  const desired = String(formData.get('desired')) === 'true';
+  await prisma.agent.update({ where: { slug }, data: { isSubscribed: desired } });
+  revalidatePath('/admin/agents');
+}
+
+async function deleteAgent(formData: FormData) {
+  'use server';
+  const admin = await requireAdmin();
+  if (!admin) return;
+  const slug = String(formData.get('slug'));
+  await prisma.agent.delete({ where: { slug } });
+  revalidatePath('/admin/agents');
 }
 
 

@@ -8,7 +8,7 @@ export default async function SubscribePage() {
   // Check authentication
   const session = await getServerSession(authOptions);
   
-  if (!session?.user) {
+  if (!(session as unknown as { user?: unknown } | null)?.user) {
     redirect('/login');
   }
 
@@ -22,5 +22,5 @@ export default async function SubscribePage() {
     redirect('/agent/dashboard');
   }
 
-  return <SubscriptionPage session={session} flowStatus={flowStatus} />;
+  return <SubscriptionPage session={session as unknown as { user: { id: string; email: string; name: string } }} flowStatus={flowStatus} />;
 }
