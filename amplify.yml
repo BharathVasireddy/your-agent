@@ -1,0 +1,25 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        # Echo environment variables to .env file for AWS Amplify
+        - echo "NODE_ENV=production" >> .env
+        - echo "NEXTAUTH_URL=$NEXTAUTH_URL" >> .env
+        - echo "AUTH_SECRET=$AUTH_SECRET" >> .env
+        - echo "AUTH_GOOGLE_ID=$AUTH_GOOGLE_ID" >> .env
+        - echo "AUTH_GOOGLE_SECRET=$AUTH_GOOGLE_SECRET" >> .env
+        - echo "DATABASE_URL=$DATABASE_URL" >> .env
+        - echo "PRIMARY_DOMAIN=$PRIMARY_DOMAIN" >> .env
+        - npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+      - .next/cache/**/*
