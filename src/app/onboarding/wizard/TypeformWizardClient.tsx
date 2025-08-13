@@ -74,20 +74,7 @@ export default function TypeformWizardClient() {
   const availableCities = Object.keys(citiesWithAreas);
   const availableAreas = store.city ? citiesWithAreas[store.city as keyof typeof citiesWithAreas] || [] : [];
 
-  // Prefill phone from WhatsApp (run once on mount)
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (!store.phone) {
-      const local = localStorage.getItem('wa_phone_local');
-      const e164 = localStorage.getItem('wa_phone_e164');
-      if (local && /^\d{10}$/.test(local)) {
-        store.setData({ phone: `+91${local}` });
-      } else if (e164 && /^\+91[6-9]\d{9}$/.test(e164)) {
-        store.setData({ phone: e164 });
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Do not prefill phone from local storage. Let users enter explicitly for privacy.
 
   // Prefill email/name/slug from session with equality guards
   useEffect(() => {
