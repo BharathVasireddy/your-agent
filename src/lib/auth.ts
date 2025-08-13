@@ -22,8 +22,8 @@ export const authOptions: {
         sameSite: 'lax',
         path: '/',
         secure: process.env.NODE_ENV === 'production',
-        // Don't set domain for single domain deployment
-        domain: undefined,
+        // Share session across subdomains in production only
+        domain: process.env.NODE_ENV === 'production' && process.env.PRIMARY_DOMAIN ? `.${process.env.PRIMARY_DOMAIN}` : undefined,
       },
     },
   },

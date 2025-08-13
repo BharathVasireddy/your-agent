@@ -22,7 +22,7 @@ export function withCloudinaryTransforms(url: string, transforms: string) {
 }
 
 export function getHostInfo(host?: string | null) {
-  const primaryDomain = process.env.PRIMARY_DOMAIN || 'youragent.in'
+  const primaryDomain = process.env.PRIMARY_DOMAIN || 'youragent.cloud9digital.in'
   const hostname = (host || '').split(':')[0]
   const isPrimary = hostname === primaryDomain || hostname.endsWith(`.${primaryDomain}`)
   const parts = isPrimary ? hostname.replace(`.${primaryDomain}`, '').split('.') : hostname.split('.')

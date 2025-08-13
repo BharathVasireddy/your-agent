@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 // Wildcard subdomain support: rewrite slug.youragent.in/* -> /[agentSlug]/*
 export function middleware(req: NextRequest) {
-  const primaryDomain = process.env.PRIMARY_DOMAIN || 'youragent.in';
+  const primaryDomain = process.env.PRIMARY_DOMAIN || 'youragent.cloud9digital.in';
   const host = req.headers.get('host') || '';
   const hostname = host.split(':')[0];
 
