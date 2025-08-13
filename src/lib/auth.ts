@@ -10,6 +10,7 @@ export const authOptions: {
   // minimal shape we need; fallback to any to avoid type drift
   [key: string]: unknown;
 } = {
+  debug: process.env.NODE_ENV === 'development',
   adapter: PrismaAdapter(prisma),
   pages: {
     signIn: '/login',
