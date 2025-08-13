@@ -23,6 +23,12 @@ export default async function DashboardLayout({
   // Check user flow status to ensure they should be on dashboard
   const flowStatus = await getUserFlowStatus();
 
+  // If session cookie exists but underlying DB user is missing or invalid,
+  // the flow will report not authenticated. Redirect to login in that case.
+  if (!flowStatus.isAuthenticated) {
+    redirect('/login');
+  }
+
   // If user needs onboarding, redirect them
   if (flowStatus.needsOnboarding) {
     redirect('/onboarding/wizard');

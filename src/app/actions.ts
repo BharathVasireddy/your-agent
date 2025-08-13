@@ -23,23 +23,13 @@ export async function updateLeadStage(leadId: string, stage: 'new'|'contacted'|'
   const lead = await prisma.lead.findUnique({ where: { id: leadId }, select: { agentId: true } });
   if (!lead || lead.agentId !== agent.id) throw new Error('Not allowed');
   await prisma.lead.update({ where: { id: leadId }, data: { stage } });
+  // Log activity
+  await prisma.leadActivity.create({ data: { leadId, userId, type: 'stage-changed', data: { to: stage } as unknown as import('@prisma/client').Prisma.JsonObject } });
   revalidatePath('/agent/dashboard/leads');
   return { success: true };
 }
 
-export async function assignLead(leadId: string, assignedToUserId: string | null) {
-  const raw = await getServerSession(authOptions);
-  const session = raw as SessionLike;
-  const userId = session?.user?.id;
-  if (!userId) throw new Error('Unauthorized');
-  const agent = await prisma.agent.findUnique({ where: { userId }, select: { id: true } });
-  if (!agent) throw new Error('Agent not found');
-  const lead = await prisma.lead.findUnique({ where: { id: leadId }, select: { agentId: true } });
-  if (!lead || lead.agentId !== agent.id) throw new Error('Not allowed');
-  await prisma.lead.update({ where: { id: leadId }, data: { assignedToUserId: assignedToUserId || null } });
-  revalidatePath('/agent/dashboard/leads');
-  return { success: true };
-}
+// Single-user CRM: no assignment API
 
 export async function addLeadNote(leadId: string, text: string) {
   const raw = await getServerSession(authOptions);
@@ -50,7 +40,88 @@ export async function addLeadNote(leadId: string, text: string) {
   if (!agent) throw new Error('Agent not found');
   const lead = await prisma.lead.findUnique({ where: { id: leadId }, select: { agentId: true } });
   if (!lead || lead.agentId !== agent.id) throw new Error('Not allowed');
-  await prisma.leadNote.create({ data: { leadId, userId, text } });
+  const created = await prisma.leadNote.create({
+    data: { leadId, userId, text },
+    select: {
+      id: true,
+      text: true,
+      createdAt: true,
+      user: { select: { name: true, email: true } }
+    }
+  });
+  await prisma.leadActivity.create({ data: { leadId, userId, type: 'note-added', data: { id: created.id } as unknown as import('@prisma/client').Prisma.JsonObject } });
+  revalidatePath('/agent/dashboard/leads');
+  return {
+    success: true,
+    note: {
+      id: created.id,
+      text: created.text,
+      createdAt: created.createdAt,
+      author: created.user?.name || created.user?.email || 'You'
+    }
+  } as const;
+}
+
+// Schedule a follow-up reminder (email) at a specific ISO datetime (UTC)
+export async function scheduleFollowupEmail(leadId: string, isoDateTime: string) {
+  const raw = await getServerSession(authOptions);
+  const session = raw as SessionLike;
+  const userId = session?.user?.id;
+  if (!userId) throw new Error('Unauthorized');
+  const agent = await prisma.agent.findUnique({ where: { userId }, select: { id: true, user: { select: { email: true, name: true } } } });
+  if (!agent) throw new Error('Agent not found');
+  const lead = await prisma.lead.findUnique({ where: { id: leadId }, select: { agentId: true, metadata: true } });
+  if (!lead || lead.agentId !== agent.id) throw new Error('Not allowed');
+
+  // Persist a basic reminder in Lead.metadata (append-only array) for now
+  let meta: Record<string, unknown> = {};
+  try { meta = lead.metadata ? JSON.parse(lead.metadata) as Record<string, unknown> : {}; } catch {}
+  const reminders = Array.isArray((meta as { reminders?: unknown }).reminders) ? (meta as { reminders: unknown[] }).reminders : [];
+  reminders.push({ type: 'follow-up', at: isoDateTime });
+  await prisma.lead.update({ where: { id: leadId }, data: { metadata: JSON.stringify({ ...meta, reminders }) } });
+  await prisma.leadActivity.create({ data: { leadId, userId: userId || null, type: 'followup-scheduled', data: { at: isoDateTime } as unknown as import('@prisma/client').Prisma.JsonObject } });
+
+  // Fire-and-forget scheduling using setTimeout in server runtime (best-effort in dev); in prod replace with a cron/queue
+  const delayMs = Math.max(0, Date.parse(isoDateTime) - Date.now());
+  setTimeout(async () => {
+    try {
+      const { sendEmail } = await import('@/lib/email');
+      const to = agent.user?.email ? { email: agent.user.email, name: agent.user.name || undefined } : undefined;
+      if (!to) return;
+      await sendEmail({
+        to,
+        subject: 'Follow-up reminder',
+        text: `Reminder to follow up with the lead. Scheduled at ${new Date(isoDateTime).toLocaleString()}.`,
+        tags: ['lead', 'follow-up']
+      });
+    } catch (e) {
+      console.error('Follow-up send failed', e);
+    }
+  }, delayMs);
+
+  return { success: true } as const;
+}
+
+export async function bulkUpdateLeadStage(leadIds: string[], stage: 'new'|'contacted'|'qualified'|'won'|'lost') {
+  const raw = await getServerSession(authOptions);
+  const session = raw as SessionLike;
+  const userId = session?.user?.id;
+  if (!userId) throw new Error('Unauthorized');
+  const agent = await prisma.agent.findUnique({ where: { userId }, select: { id: true } });
+  if (!agent) throw new Error('Agent not found');
+  await prisma.lead.updateMany({ where: { id: { in: leadIds }, agentId: agent.id }, data: { stage } });
+  revalidatePath('/agent/dashboard/leads');
+  return { success: true };
+}
+
+export async function bulkSoftDeleteLeads(leadIds: string[]) {
+  const raw = await getServerSession(authOptions);
+  const session = raw as SessionLike;
+  const userId = session?.user?.id;
+  if (!userId) throw new Error('Unauthorized');
+  const agent = await prisma.agent.findUnique({ where: { userId }, select: { id: true } });
+  if (!agent) throw new Error('Agent not found');
+  await prisma.lead.updateMany({ where: { id: { in: leadIds }, agentId: agent.id }, data: { deletedAt: new Date() } });
   revalidatePath('/agent/dashboard/leads');
   return { success: true };
 }
@@ -461,9 +532,9 @@ export async function grantSubscription(opts?: { plan?: Plan; interval?: Interva
     if (!agent) {
       // Create new agent profile
       // Generate a unique slug based on user name or email
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- adapter token typing varies by NextAuth version
       const baseSlug = (session as any).user.name 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- session.user typing varies across adapters
         ? generateSlug((session as any).user.name)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         : (session as any).user.email?.split('@')[0] 

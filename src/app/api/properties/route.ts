@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 
     const url = new URL(request.url);
     const countOnly = url.searchParams.get('count') === '1';
-    const count = await prisma.property.count({ where: { agentId: agent.id } });
+    const count = await prisma.property.count({ where: { agentId: agent.id, sourceDealId: null } });
     if (countOnly) {
       const plan: Plan = (agent.subscriptionPlan as Plan | null) ?? 'starter';
       const limit = ENTITLEMENTS[plan].listingLimit;
@@ -68,7 +68,8 @@ export async function POST(request: NextRequest) {
     const plan = (agent.subscriptionPlan as Plan | null) ?? 'starter';
     const listingLimit = ENTITLEMENTS[plan].listingLimit;
     if (!isDraft && Number.isFinite(listingLimit)) {
-      const currentCount = await prisma.property.count({ where: { agentId: agent.id } });
+      // Exclude deal-adopted properties from plan counts
+      const currentCount = await prisma.property.count({ where: { agentId: agent.id, sourceDealId: null } });
       if (currentCount >= (listingLimit as number)) {
         return NextResponse.json({ error: 'Listing limit reached for your plan. Upgrade to add more listings.' }, { status: 403 });
       }

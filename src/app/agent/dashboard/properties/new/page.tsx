@@ -26,7 +26,7 @@ export default async function NewPropertyPage() {
 
   // If user hit the limit, redirect back to properties with an info query param
   if (Number.isFinite(limit)) {
-    const currentCount = await prisma.property.count({ where: { agentId: agent.id } });
+    const currentCount = await prisma.property.count({ where: { agentId: agent.id, sourceDealId: null } });
     if (currentCount >= (limit as number)) {
       redirect('/agent/dashboard/properties?limit=reached');
     }

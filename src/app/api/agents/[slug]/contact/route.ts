@@ -17,7 +17,7 @@ export async function POST(
   context: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = await context.params;
+    const { slug: agentSlug } = await context.params;
     const body = (await request.json()) as Partial<ContactPayload>;
 
     if (!body || typeof body !== 'object') {
@@ -37,7 +37,7 @@ export async function POST(
     }
 
     const agent = await prisma.agent.findUnique({
-      where: { slug },
+      where: { slug: agentSlug },
       select: {
         id: true,
         slug: true,
@@ -90,6 +90,22 @@ export async function POST(
         request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || null,
     } as const;
 
+    // Generate a simple, human-friendly slug for the lead: from name + timestamp
+    const baseSlug = `${name}`
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 60);
+    const uniqueSlug = baseSlug || `lead-${Date.now()}`;
+
+    // Ensure uniqueness per agent by adding a suffix if needed
+    let leadSlug = uniqueSlug;
+    let counter = 1;
+    while (await prisma.lead.findFirst({ where: { agentId: agent.id, slug: leadSlug } })) {
+      leadSlug = `${uniqueSlug}-${counter}`;
+      counter++;
+    }
+
     await prisma.lead.create({
       data: {
         agentId: agent.id,
@@ -97,6 +113,7 @@ export async function POST(
         source,
         propertyId: propertyId || null,
         metadata: JSON.stringify(metadata),
+        slug: leadSlug,
       },
     });
 
@@ -143,7 +160,7 @@ export async function POST(
         html,
         text: `New inquiry from ${name}\nSubject: ${subject}\nMessage: ${message}\nEmail: ${email}${phone ? `\nPhone: ${phone}` : ''}${propertyDetails?.title ? `\nProperty: ${propertyDetails.title} (${propertyDetails.url})` : propertySlug ? `\nProperty: ${propertySlug}` : ''}\nSource: ${source}`,
         replyTo: { email, name },
-        tags: ['lead', 'contact-form', slug],
+        tags: ['lead', 'contact-form', leadSlug],
       }).catch((err) => console.error('Agent notify email failed', err));
     }
 
@@ -187,7 +204,7 @@ export async function POST(
         subject: `Thanks for your inquiry${propertyDetails?.title ? ` about ${propertyDetails.title}` : ''}`,
         html: ackHtml,
         text: `Hi ${name},\n\nThank you for contacting ${shownAgentName}. We received your message and will get back to you soon.\n${propertyDetails?.title ? `Property: ${propertyDetails.title} (${propertyDetails.url})\n` : ''}\n— ${shownAgentName}\n${phoneDisplay ? `Phone: ${phoneDisplay}\n` : ''}Profile: ${profileUrl}`,
-        tags: ['lead-ack', 'contact-form', slug],
+        tags: ['lead-ack', 'contact-form', leadSlug],
       }).catch((err) => console.error('Lead ack email failed', err));
     }
 

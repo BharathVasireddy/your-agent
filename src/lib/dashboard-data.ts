@@ -98,6 +98,7 @@ export const getAgentLeads = cache(async (
     q?: string;
     type?: string;
     source?: string;
+    stage?: string;
     startDate?: string; // ISO yyyy-mm-dd
     endDate?: string;   // ISO yyyy-mm-dd
   } = {}
@@ -128,8 +129,10 @@ export const getAgentLeads = cache(async (
 
   const where = {
     agentId: agent.id,
+    deletedAt: null as unknown as undefined,
     ...(opts.type ? { type: opts.type } : {}),
     ...(opts.source ? { source: { equals: opts.source, mode: 'insensitive' as const } } : {}),
+    ...(opts.stage ? { stage: opts.stage } : {}),
     ...(dateFilter ? { timestamp: dateFilter } : {}),
     ...(opts.q
       ? {
@@ -152,9 +155,12 @@ export const getAgentLeads = cache(async (
         type: true,
         source: true,
         timestamp: true,
+        updatedAt: true,
         propertyId: true,
         metadata: true,
         agentId: true,
+        stage: true,
+        slug: true,
       },
     }),
     prisma.lead.count({ where }),
@@ -182,6 +188,7 @@ export const getFilteredAgentProperties = cache(async (
 
   const where = {
     agent: { userId },
+    // Include hidden items too so agents can toggle visibility
     ...(opts.listingType ? { listingType: opts.listingType } : {}),
     ...(opts.propertyType ? { propertyType: opts.propertyType } : {}),
     ...(opts.status ? { status: opts.status } : {}),
@@ -214,6 +221,8 @@ export const getFilteredAgentProperties = cache(async (
         status: true,
         createdAt: true,
         photos: true,
+        sourceDealId: true,
+        isHiddenByAgent: true,
       },
     }),
     prisma.property.count({ where }),

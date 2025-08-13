@@ -1,14 +1,9 @@
 import { redirect } from 'next/navigation';
-import { getCachedSession, getAgentLeads } from '@/lib/dashboard-data';
-import LeadRowClient from './LeadRowClient';
+import { getCachedSession, getAgentLeads, getCachedAgent } from '@/lib/dashboard-data';
+import LeadsDataTable from './LeadsDataTable';
+import TopFiltersClient from './TopFiltersClient';
 
-function parseLeadMetadata(metadata: string | null) {
-  try {
-    return metadata ? JSON.parse(metadata) as Record<string, unknown> : {};
-  } catch {
-    return {} as Record<string, unknown>;
-  }
-}
+// removed unused helper
 
 export default async function LeadsPage({ searchParams }: { searchParams: Promise<Record<string, string>> }) {
   const session = await getCachedSession();
@@ -20,12 +15,18 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
 
   const params = await searchParams;
   const page = params.page ? Math.max(1, parseInt(params.page)) : 1;
-  const q = params.q || undefined;
-  const source = params.source || undefined;
-  const startDate = params.startDate || undefined;
-  const endDate = params.endDate || undefined;
+  const q = params.q || '';
+  const stage = params.stage || '';
+  const source = params.source || '';
 
-  const { items, total, pages } = await getAgentLeads(userId, { page, take: 20, q, source, startDate, endDate });
+  const { items, total, pages } = await getAgentLeads(userId, { page, take: 20, q: q || undefined, stage: stage || undefined, source: source || undefined });
+  const agent = await getCachedAgent(userId);
+  const slug = agent?.slug as string | undefined;
+  const search = new URLSearchParams();
+  if (q) search.set('q', q);
+  if (stage) search.set('stage', stage);
+  if (source) search.set('source', source);
+  const baseExportUrl = slug ? `/api/agents/${slug}/leads/export` : '#';
 
   return (
     <div className="space-y-6">
@@ -36,87 +37,31 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white border border-zinc-200 rounded-lg p-4 md:p-5">
-        <form className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
-          <input
-            name="q"
-            defaultValue={q}
-            placeholder="Search..."
-            className="md:col-span-4 w-full border border-zinc-300 rounded-md px-3 py-2 text-sm"
-          />
-          <select name="source" defaultValue={source} className="md:col-span-3 w-full border border-zinc-300 rounded-md px-3 py-2 text-sm">
-            <option value="">All sources</option>
-            <option value="contact-form">Contact form</option>
-            <option value="property">Property</option>
-          </select>
-          <input type="date" name="startDate" defaultValue={startDate} className="md:col-span-2 w-full border border-zinc-300 rounded-md px-3 py-2 text-sm" />
-          <input type="date" name="endDate" defaultValue={endDate} className="md:col-span-2 w-full border border-zinc-300 rounded-md px-3 py-2 text-sm" />
-          <div className="md:col-span-1 flex gap-2">
-            <button className="flex-1 bg-zinc-900 text-white rounded-md px-3 py-2 text-sm" formAction="?" formMethod="get">Apply</button>
-          </div>
-        </form>
+      {/* Top bar: search + export with auto-submit on filter change */}
+      <TopFiltersClient initial={{ q, stage, source }} exportUrl={baseExportUrl} />
+
+      {/* Table - shadcn data table style */}
+      <div className="bg-white border border-zinc-200 rounded-lg mt-0">
+        {items.length === 0 ? (
+          <div className="p-8 text-center text-zinc-600">No leads yet. Share your website to start receiving inquiries.</div>
+        ) : (
+          <LeadsDataTable rows={(items as Array<{ id: string; source: string | null; metadata: unknown; stage?: 'new'|'contacted'|'qualified'|'won'|'lost'; slug?: string | null; timestamp: string | Date; }>).map(l => {
+            let data: { name?: string; phone?: string } = {};
+            try { data = typeof l.metadata === 'string' ? JSON.parse(l.metadata as string) : (l.metadata as Record<string, unknown>) || {}; } catch { data = {}; }
+            return {
+              id: l.id,
+              name: (data.name as string) || 'Unknown',
+              phone: (data.phone as string) || '',
+              source: l.source || null,
+              stage: (l.stage || 'new') as 'new'|'contacted'|'qualified'|'won'|'lost',
+              slug: l.slug || null,
+              timestamp: (typeof l.timestamp === 'string' ? l.timestamp : l.timestamp.toISOString()),
+            };
+          })} />
+        )}
       </div>
 
-      {/* Table */}
-      <div className="bg-white border border-zinc-200 rounded-lg mt-4">
-        {/* Header */}
-        <div className="hidden md:grid grid-cols-12 gap-4 px-4 py-3 border-b border-zinc-200 text-sm font-semibold text-zinc-700">
-          <div className="col-span-1">
-            <input type="checkbox" aria-label="Select all" />
-          </div>
-          <div className="col-span-3">Name & Email</div>
-          <div className="col-span-2">Phone</div>
-          <div className="col-span-4">Subject</div>
-          <div className="col-span-2">Received</div>
-        </div>
-        <div className="divide-y divide-zinc-200">
-          {items.length === 0 && (
-            <div className="p-8 text-center text-zinc-600">No leads yet. Share your website to start receiving inquiries.</div>
-          )}
-          {items.map((lead) => {
-            const data = parseLeadMetadata(lead.metadata as unknown as string);
-            const name = (data.name as string) || 'Unknown';
-            const email = (data.email as string) || '';
-            const phone = (data.phone as string) || '';
-            const subject = (data.subject as string) || '';
-            const message = (data.message as string) || '';
-            const createdAt = new Date(lead.timestamp).toLocaleString();
-            return (
-              <div key={lead.id} className="grid grid-cols-1 md:grid-cols-12 gap-3 px-4 py-4 items-center">
-                <div className="md:col-span-1">
-                  <input type="checkbox" aria-label={`Select ${name}`} />
-                </div>
-                <div className="md:col-span-3">
-                  <div className="font-medium text-zinc-900">{name}</div>
-                  {email && <div className="text-sm text-zinc-600">{email}</div>}
-                </div>
-                <div className="md:col-span-2 text-zinc-700">{phone || '-'}</div>
-                <div className="md:col-span-4">
-                  <div className="text-zinc-800 text-sm line-clamp-1" title={subject}>{subject || message}</div>
-                </div>
-                <div className="md:col-span-2 text-zinc-600 text-sm">{createdAt}</div>
-                {/* CRM controls */}
-                <div className="col-span-12">
-                  <LeadRowClient
-                    leadId={lead.id}
-                    initialStage={(lead as unknown as { stage?: 'new'|'contacted'|'qualified'|'won'|'lost' }).stage ?? 'new'}
-                    initialAssignee={(lead as unknown as { assignedToUserId?: string | null }).assignedToUserId ?? ''}
-                    message={message}
-                  />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Bulk actions (non-functional placeholders for now) */}
-      <div className="flex items-center gap-2 text-sm text-zinc-700">
-        <button className="px-3 py-2 rounded-md border border-zinc-300 hover:bg-zinc-50">Delete selected</button>
-        <button className="px-3 py-2 rounded-md border border-zinc-300 hover:bg-zinc-50">Mark as contacted</button>
-        <button className="px-3 py-2 rounded-md border border-zinc-300 hover:bg-zinc-50">Export CSV</button>
-      </div>
+      {/* Removed sidebar and extra controls per minimal spec */}
 
       {/* Simple pagination summary */}
       {pages > 1 && (

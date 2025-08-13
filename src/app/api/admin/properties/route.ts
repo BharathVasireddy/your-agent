@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
       : {}),
     ...(status ? { status } : {}),
     ...(listingType ? { listingType } : {}),
+    // Exclude deal-adopted properties here? Keep all for admin visibility
   };
 
   const [total, properties] = await Promise.all([

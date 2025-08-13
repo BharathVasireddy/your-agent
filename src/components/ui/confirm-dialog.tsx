@@ -12,6 +12,7 @@ type ConfirmDialogProps = {
   onConfirm: () => void;
   onCancel: () => void;
   destructive?: boolean;
+  confirmDisabled?: boolean;
 };
 
 export default function ConfirmDialog({
@@ -23,6 +24,7 @@ export default function ConfirmDialog({
   onConfirm,
   onCancel,
   destructive,
+  confirmDisabled,
 }: ConfirmDialogProps) {
   if (!open) return null;
 
@@ -53,6 +55,7 @@ export default function ConfirmDialog({
               onClick={onConfirm}
               className="min-w-[120px]"
               variant={destructive ? "destructive" : "default"}
+              disabled={!!confirmDisabled}
             >
               {confirmLabel}
             </Button>

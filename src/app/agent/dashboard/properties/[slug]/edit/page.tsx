@@ -52,6 +52,11 @@ export default async function EditPropertyPage({ params }: EditPropertyPageProps
     notFound();
   }
 
+  // Disallow editing deal-adopted properties; redirect to properties with a notice
+  if (property?.sourceDealId) {
+    redirect('/agent/dashboard/properties?notice=deal-edit-disabled');
+  }
+
   // Transform the property data to match our interface
   const propertyData = {
     id: property.id,

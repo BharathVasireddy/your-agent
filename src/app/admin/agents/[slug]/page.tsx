@@ -35,7 +35,6 @@ export default async function AdminAgentDetailPage({ params }: { params: Promise
 
       <AdminSubscriptionForm 
         agentSlug={agent.slug} 
-        userId={agent.user?.id}
         currentPlan={agent.subscriptionPlan}
         currentInterval={agent.subscriptionInterval}
       />
@@ -113,7 +112,7 @@ async function AdminAgentActions({ slug, isSubscribed }: { slug: string; isSubsc
   );
 }
 
-async function AdminSubscriptionForm({ agentSlug, userId, currentPlan, currentInterval }: { agentSlug: string; userId?: string; currentPlan?: string | null; currentInterval?: string | null }) {
+async function AdminSubscriptionForm({ agentSlug, currentPlan, currentInterval }: { agentSlug: string; currentPlan?: string | null; currentInterval?: string | null }) {
   async function setSubscription(formData: FormData) {
     'use server';
     const admin = await requireAdmin();
@@ -121,10 +120,11 @@ async function AdminSubscriptionForm({ agentSlug, userId, currentPlan, currentIn
     const slug = String(formData.get('agentSlug'));
     const plan = String(formData.get('plan')) as Plan;
     const interval = String(formData.get('interval')) as Interval;
-    const amountPaise = parseInt(String(formData.get('amountPaise')) || '0', 10) || null;
-    const method = String(formData.get('collectionMethod') || 'manual');
-    const referenceId = String(formData.get('referenceId') || '');
-    const notes = String(formData.get('notes') || '');
+    // Optional fields captured but not persisted in current flow
+    const _amountPaise = parseInt(String(formData.get('amountPaise')) || '0', 10) || null;
+    const _method = String(formData.get('collectionMethod') || 'manual');
+    const _referenceId = String(formData.get('referenceId') || '');
+    const _notes = String(formData.get('notes') || '');
 
     const now = new Date();
     const months = interval === 'monthly' ? 1 : interval === 'quarterly' ? 3 : 12;
@@ -206,10 +206,8 @@ async function AdminSubscriptionForm({ agentSlug, userId, currentPlan, currentIn
         </div>
         <div className="md:col-span-2 flex gap-2">
           <Button type="submit">Save Subscription</Button>
-          <form action={clearSubscription}>
-            <input type="hidden" name="agentSlug" value={agentSlug} />
-            <Button type="submit" variant="outline">Clear</Button>
-          </form>
+          <input type="hidden" name="agentSlug" value={agentSlug} />
+          <Button formAction={clearSubscription} variant="outline">Clear</Button>
         </div>
       </form>
     </section>

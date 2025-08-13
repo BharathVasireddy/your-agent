@@ -11,6 +11,8 @@ interface Row {
   propertyType: string;
   status: string;
   createdAt: string;
+  sourceDealId?: string | null;
+  isHiddenByAgent?: boolean;
 }
 
 export default function PropertiesTable({ rows, total, page, pages, basePath, query }: { rows: Row[]; total: number; page: number; pages: number; basePath: string; query: Record<string, string | undefined>; }) {
@@ -49,7 +51,13 @@ export default function PropertiesTable({ rows, total, page, pages, basePath, qu
                 <td className="px-3 py-2 text-right whitespace-nowrap">
                   {p.slug && (
                     <>
-                      <Link href={`/agent/dashboard/properties/${p.slug}/edit`} className="text-blue-600 hover:text-blue-700 mr-3">Edit</Link>
+                      {p.sourceDealId ? (
+                        <Link href={`/agent/dashboard/properties/${p.slug}/toggle`} className="text-zinc-700 hover:text-zinc-900 mr-3">
+                          {p.isHiddenByAgent ? 'Show' : 'Hide'}
+                        </Link>
+                      ) : (
+                        <Link href={`/agent/dashboard/properties/${p.slug}/edit`} className="text-blue-600 hover:text-blue-700 mr-3">Edit</Link>
+                      )}
                       <Link href={`/agent/dashboard/properties/${p.slug}/delete`} className="text-brand hover:text-brand-hover">Delete</Link>
                     </>
                   )}

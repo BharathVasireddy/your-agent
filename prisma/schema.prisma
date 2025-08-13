@@ -22,6 +22,7 @@ model User {
   accounts        Account[]
   agentProfile    Agent?
   leadNotes       LeadNote[]
+  leadActivities  LeadActivity[]
   payments        Payment[]
   sessions        Session[]
 }
@@ -95,10 +96,54 @@ model Property {
   propertyData Json?
   agent        Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
+  // Property Deals linkage
+  sourceDealId     String?
+  sourceDeal       Deal?     @relation(fields: [sourceDealId], references: [id])
+  isHiddenByAgent  Boolean   @default(false)
+  adoptedAt        DateTime?
+
   @@index([agentId, slug])
   @@index([agentId, createdAt])
   @@index([agentId, listingType])
   @@index([agentId, status])
+}
+
+/// Admin-defined Property Deals that agents can adopt
+model Deal {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String
+  price       Int
+  agentEarningAmount Int // Fixed commission amount agents can earn
+  listingType String
+  propertyType String
+  location    String
+  amenities   String[]
+  photos      String[]
+  brochureUrl String?
+  propertyData Json?
+
+  // Lifecycle/status: Active | Sold | Inactive | Deleted
+  status      String   @default("Active")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  // Targeting rules
+  minPageViewsLast30d    Int?
+  minProfileViewsLast30d Int?
+  allowedCities          String[]
+  allowedAreas           String[]
+  allowedAgentSlugs      String[]
+  excludedCities         String[]
+  excludedAreas          String[]
+  excludedAgentSlugs     String[]
+
+  // Reverse relation: adopted properties
+  adoptedProperties Property[]
+
+  @@index([status])
 }
 
 model Payment {
@@ -213,17 +258,21 @@ model Lead {
   id               String     @id @default(cuid())
   agentId          String
   timestamp        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
   type             String
   source           String?
   propertyId       String?
   metadata         String?
   stage            String     @default("new")
-  assignedToUserId String?
+  deletedAt        DateTime?
+  slug             String?
   agent            Agent      @relation(fields: [agentId], references: [id], onDelete: Cascade)
   notes            LeadNote[]
+  activities       LeadActivity[]
 
   @@index([agentId, timestamp])
   @@index([agentId, type])
+  @@unique([agentId, slug])
 }
 
 model LeadNote {
@@ -236,4 +285,18 @@ model LeadNote {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "LeadNote_user_fk")
 
   @@index([leadId, createdAt], map: "LeadNote_lead_created_idx")
+}
+
+/// Append-only activity log per lead
+model LeadActivity {
+  id        String   @id @default(cuid())
+  leadId    String
+  userId    String?
+  type      String   // e.g., lead-created, stage-changed, note-added, followup-scheduled
+  data      Json     @default("{}")
+  createdAt DateTime @default(now())
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([leadId, createdAt])
 }

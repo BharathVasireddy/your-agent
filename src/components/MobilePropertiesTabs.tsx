@@ -21,6 +21,8 @@ interface Property {
   status: string;
   listingType: string;
   propertyType: string;
+  sourceDealId?: string | null;
+  isHiddenByAgent?: boolean;
 }
 
 interface MobilePropertiesTabsProps {
@@ -83,13 +85,22 @@ function PropertyCard({ property }: { property: Property }) {
 
         {/* Action Buttons */}
         <div className="flex gap-2">
-          <Link
-            href={`/agent/dashboard/properties/${property.slug}/edit`}
-            className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-zinc-100 text-zinc-700 rounded-lg hover:bg-zinc-200 transition-colors text-xs font-medium"
-          >
-            <Edit className="w-3 h-3 mr-1" />
-            Edit
-          </Link>
+          {property.sourceDealId ? (
+            <Link
+              href={`/agent/dashboard/properties/${property.slug}/toggle`}
+              className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-zinc-100 text-zinc-700 rounded-lg hover:bg-zinc-200 transition-colors text-xs font-medium"
+            >
+              {property.isHiddenByAgent ? 'Show' : 'Hide'}
+            </Link>
+          ) : (
+            <Link
+              href={`/agent/dashboard/properties/${property.slug}/edit`}
+              className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-zinc-100 text-zinc-700 rounded-lg hover:bg-zinc-200 transition-colors text-xs font-medium"
+            >
+              <Edit className="w-3 h-3 mr-1" />
+              Edit
+            </Link>
+          )}
           <Link
             href={`/agent/dashboard/properties/${property.slug}/delete`}
             className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-brand-light text-brand-deep rounded-lg hover:bg-brand-muted transition-colors text-xs font-medium"

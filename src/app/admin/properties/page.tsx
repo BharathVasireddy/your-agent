@@ -46,6 +46,7 @@ export default async function AdminPropertiesPage() {
               <th className="px-3 py-2 text-left">Status</th>
               <th className="px-3 py-2 text-left">Type</th>
               <th className="px-3 py-2 text-left">Location</th>
+              <th className="px-3 py-2 text-left">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -64,6 +65,26 @@ export default async function AdminPropertiesPage() {
                 <td className="px-3 py-2">{p.status}</td>
                 <td className="px-3 py-2">{p.listingType}</td>
                 <td className="px-3 py-2">{p.location}</td>
+                <td className="px-3 py-2">
+                  <div className="flex flex-wrap gap-2">
+                    <form action={updatePropertyStatus}>
+                      <input type="hidden" name="id" value={p.id} />
+                      <input type="hidden" name="status" value="Inactive" />
+                      <Button type="submit" variant="destructive" disabled={p.status === 'Inactive'}>
+                        Take down
+                      </Button>
+                    </form>
+                    {p.status !== 'Available' && (
+                      <form action={updatePropertyStatus}>
+                        <input type="hidden" name="id" value={p.id} />
+                        <input type="hidden" name="status" value="Available" />
+                        <Button type="submit" variant="secondary">
+                          Mark Available
+                        </Button>
+                      </form>
+                    )}
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -71,6 +92,16 @@ export default async function AdminPropertiesPage() {
       </div>
     </div>
   );
+}
+
+async function updatePropertyStatus(formData: FormData) {
+  'use server';
+  const admin = await requireAdmin();
+  if (!admin) return;
+  const id = String(formData.get('id'));
+  const status = String(formData.get('status'));
+  await prisma.property.update({ where: { id }, data: { status } });
+  revalidatePath('/admin/properties');
 }
 
 async function BulkPropertyActions() {

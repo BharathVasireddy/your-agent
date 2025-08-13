@@ -64,10 +64,14 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
   const plan: Plan = (agent?.subscriptionPlan as Plan | null) ?? 'starter';
   const limit = ENTITLEMENTS[plan].listingLimit;
   const limitNumber = Number.isFinite(limit) ? (limit as number) : null;
-  const overallCount = await prisma.property.count({ where: { agent: { userId } } });
+  // Exclude deal-adopted items from plan counts
+  const overallCount = await prisma.property.count({ where: { agent: { userId }, sourceDealId: null } });
 
   const saleProperties = items.filter(p => p.listingType === 'Sale') as unknown as Property[];
   const rentProperties = items.filter(p => p.listingType === 'Rent') as unknown as Property[];
+
+  // Notice: show if any adopted deals were removed (Sold/Inactive)
+  const removedDealsCount = await prisma.property.count({ where: { agent: { userId }, sourceDealId: { not: null }, status: { in: ['Sold','Inactive'] } } });
 
   return (
     <div className="h-full">
@@ -106,6 +110,11 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
         <div>
           <h1 className="text-3xl font-bold text-zinc-950">Properties</h1>
           <p className="text-zinc-600 mt-1">Manage your property listings</p>
+          {removedDealsCount > 0 && (
+            <div className="mt-2 rounded-lg border border-amber-300 bg-amber-50 text-amber-900 px-3 py-2 text-sm">
+              Some Property Deals you adopted were sold or deactivated by admin and have been removed from your public profile.
+            </div>
+          )}
           {limitNumber !== null && (
             <div className="mt-2 text-xs text-zinc-600">
               <div className="flex items-center gap-2">
@@ -167,6 +176,8 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
               propertyType: p.propertyType,
               status: p.status,
               createdAt: p.createdAt.toISOString(),
+              sourceDealId: (p as unknown as { sourceDealId?: string | null }).sourceDealId ?? null,
+              isHiddenByAgent: (p as unknown as { isHiddenByAgent?: boolean }).isHiddenByAgent ?? false,
             }))}
             total={total}
             page={page}

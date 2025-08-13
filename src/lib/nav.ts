@@ -35,12 +35,14 @@ const adminNav: NavItem[] = [
   { name: 'Users', href: '/admin/users', icon: Users },
   { name: 'Agents', href: '/admin/agents', icon: UserCheck },
   { name: 'Properties', href: '/admin/properties', icon: Building },
+  { name: 'Deals', href: '/admin/deals', icon: TrendingUp },
   { name: 'Payments', href: '/admin/payments', icon: CreditCard },
   { name: 'System', href: '/admin/system', icon: Settings },
 ];
 
 const agentNav: NavItem[] = [
   { name: 'Dashboard', href: '/agent/dashboard', icon: Home },
+  { name: 'Property Deals', href: '/agent/dashboard/deals', icon: TrendingUp },
   { name: 'Properties', href: '/agent/dashboard/properties', icon: Building },
   { name: 'Leads', href: '/agent/dashboard/leads', icon: MessageSquare },
   { name: 'Profile', href: '/agent/dashboard/profile', icon: UserIcon },

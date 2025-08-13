@@ -84,12 +84,12 @@ export default function SectionVisibilityToggles({
   }
 
   return (
-    <div className="bg-white rounded-lg border border-zinc-200 shadow-sm">
+    <div className="bg-white rounded-lg border border-zinc-200 shadow-sm h-[480px] overflow-hidden">
       <div className="p-6 border-b border-zinc-200">
         <h2 className="text-xl font-semibold text-zinc-950">Section visibility</h2>
         <p className="text-sm text-zinc-600 mt-1">Turn sections on or off on your public website.</p>
       </div>
-      <div className="p-4 md:p-6">
+      <div className="p-4 md:p-6 h-[calc(480px-96px)] overflow-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {items.map(({ key, title, description, Icon }) => (
             <div key={key} className="flex items-center justify-between bg-white border border-zinc-200 rounded-lg p-4">

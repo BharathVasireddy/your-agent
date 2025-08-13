@@ -45,6 +45,10 @@ async function getAgentData(agentSlug: string) {
       },
       properties: {
         take: 8, // Only load first 8 properties for performance
+        where: {
+          isHiddenByAgent: false,
+          status: { notIn: ['Inactive', 'Sold'] },
+        },
         select: {
           id: true,
           title: true,
@@ -100,7 +104,6 @@ export async function generateMetadata({ params }: AgentProfilePageProps): Promi
   }
 
   const isActive = !!agent.subscriptionEndsAt && agent.subscriptionEndsAt > new Date();
-  const isPublished = (agent as unknown as { isPublished?: boolean }).isPublished ?? false;
   // Generate description from first 160 characters of bio
   const description = agent.bio 
     ? agent.bio.length > 160 
