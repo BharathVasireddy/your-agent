@@ -3,14 +3,6 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import prisma from "./prisma";
-
-// Debug environment variables
-console.log('Auth config - Environment variables check:', {
-  DATABASE_URL: !!process.env.DATABASE_URL,
-  NEXTAUTH_URL: !!process.env.NEXTAUTH_URL,
-  NEXTAUTH_SECRET: !!process.env.NEXTAUTH_SECRET,
-  NODE_ENV: process.env.NODE_ENV
-});
 import { recordAuthEvent } from '@/lib/auth-events';
 
 // Note: Using loose typing to maintain compatibility across NextAuth versions
@@ -30,8 +22,8 @@ export const authOptions: {
         sameSite: 'lax',
         path: '/',
         secure: process.env.NODE_ENV === 'production',
-        // Share session across subdomains in production only
-        domain: process.env.NODE_ENV === 'production' && process.env.PRIMARY_DOMAIN ? `.${process.env.PRIMARY_DOMAIN}` : undefined,
+        // Don't set domain for single domain deployment
+        domain: undefined,
       },
     },
   },
