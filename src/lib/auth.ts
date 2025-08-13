@@ -22,8 +22,8 @@ export const authOptions: {
         sameSite: 'lax',
         path: '/',
         secure: process.env.NODE_ENV === 'production',
-        // Share session across subdomains in production only
-        domain: process.env.NODE_ENV === 'production' && process.env.PRIMARY_DOMAIN ? `.${process.env.PRIMARY_DOMAIN}` : undefined,
+        // Temporarily disable subdomain cookies to fix auth
+        domain: undefined,
       },
     },
   },
