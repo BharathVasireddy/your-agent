@@ -44,8 +44,8 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
   const name = (data.name as string) || 'Unknown';
   const email = (data.email as string) || '';
   const phone = (data.phone as string) || '';
-  const _subject = (data.subject as string) || '';
-  const _message = (data.message as string) || '';
+  // const _subject = (data.subject as string) || '';
+  // const _message = (data.message as string) || '';
 
   return (
     <div className="space-y-6">

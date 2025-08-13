@@ -643,7 +643,7 @@ export async function createRazorpayOrder(plan: Plan, interval: Interval) {
       currency,
       receipt: `subscription_${Date.now()}`,
       notes: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // store IDs in notes; NextAuth types vary by adapter
         userId: session.user.id,
         email: session.user.email ?? null,
         type: 'subscription',
@@ -1014,6 +1014,157 @@ Do not include any special formatting, just plain text.`;
     }
     
     throw new Error(error instanceof Error ? error.message : "Failed to generate bio");
+  }
+}
+
+// Generate SEO meta title and description for agent profile
+export async function generateSeoMeta(agentSlug: string): Promise<{ success: true; metaTitle: string; metaDescription: string } | { success: false; error: string } > {
+  try {
+    const session = await getServerSession(authOptions);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any)?.user?.id as string | undefined;
+    if (!userId) return { success: false, error: 'You must be signed in' };
+
+    // Ensure ownership of the agent profile
+    const agent = await prisma.agent.findFirst({
+      where: { slug: agentSlug, userId },
+      select: { slug: true, user: { select: { name: true } }, city: true, area: true, experience: true, bio: true }
+    });
+    if (!agent) return { success: false, error: 'Agent not found or not permitted' };
+
+    if (!process.env.OPENAI_API_KEY) {
+      return { success: false, error: 'OpenAI API key not configured' };
+    }
+
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    const prompt = `Generate SEO metadata for a real estate agent profile.
+Name: ${agent.user?.name || ''}
+City: ${agent.city || ''}
+Area: ${agent.area || ''}
+Experience: ${typeof agent.experience === 'number' ? agent.experience : ''} years
+Bio (optional): ${agent.bio || ''}
+
+Requirements:
+- Meta Title: <= 60 characters, compelling, include name and city if possible.
+- Meta Description: <= 160 characters, persuasive, include service and city/area, avoid emojis.
+- Output JSON only with keys: metaTitle, metaDescription.`;
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 200,
+      temperature: 0.6,
+    });
+
+    const content = completion.choices[0]?.message?.content || '';
+    let parsed: { metaTitle?: string; metaDescription?: string } = {};
+    try { parsed = JSON.parse(content) as { metaTitle?: string; metaDescription?: string }; } catch {
+      // Fallback: try to split lines
+      const lines = content.split('\n').map((l) => l.trim());
+      const t = lines.find((l) => l.toLowerCase().startsWith('meta title'))?.split(':').slice(1).join(':').trim();
+      const d = lines.find((l) => l.toLowerCase().startsWith('meta description'))?.split(':').slice(1).join(':').trim();
+      parsed = { metaTitle: t, metaDescription: d };
+    }
+
+    const metaTitle = (parsed.metaTitle || `${agent.user?.name || 'Agent'} - Real Estate Agent in ${agent.city || ''}`).slice(0, 60);
+    const metaDescription = (parsed.metaDescription || `Real estate agent in ${agent.city || ''}${agent.area ? ' - ' + agent.area : ''}. Trusted service.`).slice(0, 160);
+
+    return { success: true, metaTitle, metaDescription };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to generate SEO' };
+  }
+}
+
+function trimToWholeWord(text: string, max: number): string {
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const trimmed = cut.replace(/\s+\S*$/, '').trim();
+  return trimmed.length > 0 ? trimmed : cut;
+}
+
+// Generate only SEO meta title (<=60 chars, do not cut mid-word)
+export async function generateSeoTitle(agentSlug: string): Promise<{ success: true; metaTitle: string } | { success: false; error: string }> {
+  try {
+    const session = await getServerSession(authOptions);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any)?.user?.id as string | undefined;
+    if (!userId) return { success: false, error: 'You must be signed in' };
+
+    const agent = await prisma.agent.findFirst({
+      where: { slug: agentSlug, userId },
+      select: { user: { select: { name: true } }, city: true, area: true }
+    });
+    if (!agent) return { success: false, error: 'Agent not found or not permitted' };
+
+    if (!process.env.OPENAI_API_KEY) return { success: false, error: 'OpenAI API key not configured' };
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    const prompt = `Write an SEO meta title for a real estate agent profile.\n` +
+      `Constraints:\n` +
+      `- Length: maximum 60 characters.\n` +
+      `- Include the agent's name and city if possible.\n` +
+      `- Compelling but professional; no emojis.\n` +
+      `- Do NOT end in the middle of a word; end on a full word.\n` +
+      `Agent details:\n` +
+      `Name: ${agent.user?.name || ''}\nCity: ${agent.city || ''}\nArea: ${agent.area || ''}\n` +
+      `Return ONLY the title (no quotes, no label).`;
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 80,
+      temperature: 0.6,
+    });
+
+    const raw = (completion.choices[0]?.message?.content || '').trim();
+    const metaTitle = trimToWholeWord(raw.replace(/^\"|\"$/g, ''), 60);
+    return { success: true, metaTitle };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to generate title' };
+  }
+}
+
+// Generate only SEO meta description (<=160 chars, do not cut mid-word)
+export async function generateSeoDescription(agentSlug: string): Promise<{ success: true; metaDescription: string } | { success: false; error: string }> {
+  try {
+    const session = await getServerSession(authOptions);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userId = (session as any)?.user?.id as string | undefined;
+    if (!userId) return { success: false, error: 'You must be signed in' };
+
+    const agent = await prisma.agent.findFirst({
+      where: { slug: agentSlug, userId },
+      select: { city: true, area: true, bio: true, experience: true }
+    });
+    if (!agent) return { success: false, error: 'Agent not found or not permitted' };
+
+    if (!process.env.OPENAI_API_KEY) return { success: false, error: 'OpenAI API key not configured' };
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    const prompt = `Write an SEO meta description for a real estate agent profile.\n` +
+      `Constraints:\n` +
+      `- Length: maximum 160 characters.\n` +
+      `- Include service and the city/area.\n` +
+      `- Persuasive, trustworthy, no emojis.\n` +
+      `- Do NOT end in the middle of a word; end on a full word.\n` +
+      `Agent details:\n` +
+      `City: ${agent.city || ''}\nArea: ${agent.area || ''}\nExperience: ${typeof agent.experience === 'number' ? agent.experience : ''} years\n` +
+      `Bio (optional): ${agent.bio || ''}\n` +
+      `Return ONLY the description (no quotes, no label).`;
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 120,
+      temperature: 0.6,
+    });
+
+    const raw = (completion.choices[0]?.message?.content || '').trim();
+    const metaDescription = trimToWholeWord(raw.replace(/^\"|\"$/g, ''), 160);
+    return { success: true, metaDescription };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to generate description' };
   }
 }
 

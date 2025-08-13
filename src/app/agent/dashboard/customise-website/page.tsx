@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { getCachedSession, getCachedAgentProfile } from '@/lib/dashboard-data';
 import { setAgentPublished } from '@/app/actions';
 import PublishButton from './PublishButton';
-import { MessageSquare, HelpCircle } from 'lucide-react';
+import { MessageSquare, HelpCircle, Search } from 'lucide-react';
 import SectionVisibilityToggles from './SectionVisibilityToggles';
 
 export default async function CustomiseWebsitePage() {
@@ -44,6 +44,14 @@ export default async function CustomiseWebsitePage() {
       icon: HelpCircle,
       count: agent.faqs?.length || 0,
       countLabel: 'questions'
+    },
+    {
+      title: 'SEO Settings',
+      description: 'Set your meta title and description for better search visibility',
+      href: '/agent/dashboard/customise-website/seo',
+      icon: Search,
+      count: 0,
+      countLabel: 'settings'
     }
   ];
 

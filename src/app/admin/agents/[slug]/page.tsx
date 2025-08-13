@@ -121,10 +121,10 @@ async function AdminSubscriptionForm({ agentSlug, currentPlan, currentInterval }
     const plan = String(formData.get('plan')) as Plan;
     const interval = String(formData.get('interval')) as Interval;
     // Optional fields captured but not persisted in current flow
-    const _amountPaise = parseInt(String(formData.get('amountPaise')) || '0', 10) || null;
-    const _method = String(formData.get('collectionMethod') || 'manual');
-    const _referenceId = String(formData.get('referenceId') || '');
-    const _notes = String(formData.get('notes') || '');
+    // const _amountPaise = parseInt(String(formData.get('amountPaise')) || '0', 10) || null;
+    // const _method = String(formData.get('collectionMethod') || 'manual');
+    // const _referenceId = String(formData.get('referenceId') || '');
+    // const _notes = String(formData.get('notes') || '');
 
     const now = new Date();
     const months = interval === 'monthly' ? 1 : interval === 'quarterly' ? 3 : 12;

@@ -28,7 +28,7 @@ export default function LeadsTableClient({ items }: { items: Array<{ id: string;
         <button onClick={onBulkDelete} className="px-3 py-2 rounded-md border border-zinc-300 hover:bg-zinc-50 disabled:opacity-50" disabled={isPending || ids.length === 0}>Delete selected</button>
         <div className="flex items-center gap-2">
           <span className="text-zinc-600">Mark as</span>
-          <select onChange={(e)=>{ const v = e.target.value as Stage; if (v) { onBulkStage(v); } e.currentTarget.selectedIndex = 0; }} className="border border-zinc-300 rounded px-2 py-1">
+          <select onChange={(e)=>{ const v = e.target.value as Stage; if (v) { onBulkStage(v); } e.currentTarget.selectedIndex = 0; return undefined; }} className="border border-zinc-300 rounded px-2 py-1">
             <option value="">Select stage…</option>
             <option value="new">New</option>
             <option value="contacted">Contacted</option>

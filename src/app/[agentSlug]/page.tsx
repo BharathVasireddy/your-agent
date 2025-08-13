@@ -104,15 +104,20 @@ export async function generateMetadata({ params }: AgentProfilePageProps): Promi
   }
 
   const isActive = !!agent.subscriptionEndsAt && agent.subscriptionEndsAt > new Date();
-  // Generate description from first 160 characters of bio
-  const description = agent.bio 
-    ? agent.bio.length > 160 
-      ? agent.bio.substring(0, 160) + '...'
-      : agent.bio
-    : `Experienced real estate agent serving ${agent.city}${agent.area ? ` - ${agent.area}` : ''}`;
+  const tpl = (agent as unknown as { templateData?: unknown }).templateData as { seo?: { metaTitle?: string; metaDescription?: string } } | undefined;
+  const seoTitle = tpl?.seo?.metaTitle?.trim();
+  const seoDesc = tpl?.seo?.metaDescription?.trim();
+  // Generate description from saved SEO meta or fallback to bio snippet
+  const description = seoDesc && seoDesc.length > 0
+    ? seoDesc.slice(0, 160)
+    : agent.bio 
+      ? agent.bio.length > 160 
+        ? agent.bio.substring(0, 160) + '...'
+        : agent.bio
+      : `Experienced real estate agent serving ${agent.city}${agent.area ? ` - ${agent.area}` : ''}`;
 
   return {
-    title: `${agent.user.name} - Real Estate Agent in ${agent.city}`,
+    title: seoTitle && seoTitle.length > 0 ? seoTitle : `${agent.user.name} - Real Estate Agent in ${agent.city}`,
     description,
     robots: isActive ? undefined : { index: false, follow: false },
   };
