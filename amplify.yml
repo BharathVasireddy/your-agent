@@ -11,7 +11,8 @@ frontend:
         - echo "AUTH_GOOGLE_SECRET=$AUTH_GOOGLE_SECRET" >> .env
         - echo "DATABASE_URL=$DATABASE_URL" >> .env
         - echo "PRIMARY_DOMAIN=$PRIMARY_DOMAIN" >> .env
-        - npm ci
+        # Install all dependencies including devDependencies for TypeScript
+        - npm install
     build:
       commands:
         - npm run build
