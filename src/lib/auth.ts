@@ -3,6 +3,14 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import prisma from "./prisma";
+
+// Debug environment variables
+console.log('Auth config - Environment variables check:', {
+  DATABASE_URL: !!process.env.DATABASE_URL,
+  NEXTAUTH_URL: !!process.env.NEXTAUTH_URL,
+  NEXTAUTH_SECRET: !!process.env.NEXTAUTH_SECRET,
+  NODE_ENV: process.env.NODE_ENV
+});
 import { recordAuthEvent } from '@/lib/auth-events';
 
 // Note: Using loose typing to maintain compatibility across NextAuth versions
