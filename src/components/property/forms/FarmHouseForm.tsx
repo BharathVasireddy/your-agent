@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Image from 'next/image';
 import BasePropertyForm from './BasePropertyForm';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -54,6 +55,43 @@ export default function FarmHouseForm({
   const updateFarmData = (updates: Partial<FarmHouseData>) => {
     setFarmData(prev => ({ ...prev, ...updates }));
   };
+
+  async function uploadImages(files: File[], folder: string): Promise<string[]> {
+    const uploads = files.map(async (file) => {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('folder', folder);
+      const res = await fetch('/api/upload-image', { method: 'POST', body: fd });
+      const json = await res.json();
+      if (!res.ok || !json?.success || !json?.url) throw new Error(json?.error || 'Upload failed');
+      return json.url as string;
+    });
+    return Promise.all(uploads);
+  }
+
+  async function handleInteriorUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    const urls = await uploadImages(files, 'property-farmhouse/interior');
+    updateFarmData({ interiorPhotosUrls: [...(farmData.interiorPhotosUrls || []), ...urls] });
+    e.currentTarget.value = '';
+  }
+
+  async function handleExteriorUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    const urls = await uploadImages(files, 'property-farmhouse/exterior');
+    updateFarmData({ exteriorPhotosUrls: [...(farmData.exteriorPhotosUrls || []), ...urls] });
+    e.currentTarget.value = '';
+  }
+
+  async function handleDroneUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    const urls = await uploadImages(files, 'property-farmhouse/drone');
+    updateFarmData({ droneFootageUrls: [...(farmData.droneFootageUrls || []), ...urls] });
+    e.currentTarget.value = '';
+  }
 
   const handleSubmit = (baseData: BasePropertyFormData) => {
     if ((baseData.status || '').toLowerCase() === 'available') {
@@ -337,46 +375,52 @@ export default function FarmHouseForm({
         <h3 className="text-lg font-semibold text-zinc-900 mb-4">Media</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <Label htmlFor="interior">Interior Photos (URLs, comma separated)</Label>
-            <Input
-              id="interior"
-              value={(farmData.interiorPhotosUrls || []).join(', ')}
-              onChange={(e) => updateFarmData({ interiorPhotosUrls: e.target.value.split(',').map((s) => s.trim()).filter(Boolean) })}
-              placeholder="Add links"
-              className="mt-2"
-            />
+            <Label>Interior Photos</Label>
+            <input type="file" accept="image/*" multiple onChange={handleInteriorUpload} className="mt-2" />
+            {(farmData.interiorPhotosUrls || []).length > 0 && (
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {(farmData.interiorPhotosUrls || []).map((u, i) => (
+                  <div key={u + i} className="relative">
+                    <Image src={u} alt="interior" width={160} height={120} className="w-full h-24 object-cover rounded" />
+                    <button type="button" className="absolute top-1 right-1 text-xs bg-zinc-900 text-white px-2 py-0.5 rounded" onClick={() => updateFarmData({ interiorPhotosUrls: (farmData.interiorPhotosUrls || []).filter((_, idx) => idx !== i) })}>Remove</button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div>
-            <Label htmlFor="exterior">Exterior Photos (URLs, comma separated)</Label>
-            <Input
-              id="exterior"
-              value={(farmData.exteriorPhotosUrls || []).join(', ')}
-              onChange={(e) => updateFarmData({ exteriorPhotosUrls: e.target.value.split(',').map((s) => s.trim()).filter(Boolean) })}
-              placeholder="Add links"
-              className="mt-2"
-            />
+            <Label>Exterior Photos</Label>
+            <input type="file" accept="image/*" multiple onChange={handleExteriorUpload} className="mt-2" />
+            {(farmData.exteriorPhotosUrls || []).length > 0 && (
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {(farmData.exteriorPhotosUrls || []).map((u, i) => (
+                  <div key={u + i} className="relative">
+                    <Image src={u} alt="exterior" width={160} height={120} className="w-full h-24 object-cover rounded" />
+                    <button type="button" className="absolute top-1 right-1 text-xs bg-zinc-900 text-white px-2 py-0.5 rounded" onClick={() => updateFarmData({ exteriorPhotosUrls: (farmData.exteriorPhotosUrls || []).filter((_, idx) => idx !== i) })}>Remove</button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div>
-            <Label htmlFor="drone">Drone Footage (URLs, comma separated)</Label>
-            <Input
-              id="drone"
-              value={(farmData.droneFootageUrls || []).join(', ')}
-              onChange={(e) => updateFarmData({ droneFootageUrls: e.target.value.split(',').map((s) => s.trim()).filter(Boolean) })}
-              placeholder="Add links"
-              className="mt-2"
-            />
+            <Label>Drone Photos</Label>
+            <input type="file" accept="image/*" multiple onChange={handleDroneUpload} className="mt-2" />
+            {(farmData.droneFootageUrls || []).length > 0 && (
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {(farmData.droneFootageUrls || []).map((u, i) => (
+                  <div key={u + i} className="relative">
+                    <Image src={u} alt="drone" width={160} height={120} className="w-full h-24 object-cover rounded" />
+                    <button type="button" className="absolute top-1 right-1 text-xs bg-zinc-900 text-white px-2 py-0.5 rounded" onClick={() => updateFarmData({ droneFootageUrls: (farmData.droneFootageUrls || []).filter((_, idx) => idx !== i) })}>Remove</button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
           <div>
             <Label htmlFor="mapUrl">Location Map URL</Label>
-            <Input
-              id="mapUrl"
-              value={farmData.locationMapUrl || ''}
-              onChange={(e) => updateFarmData({ locationMapUrl: e.target.value || null })}
-              placeholder="Google Maps link"
-              className="mt-2"
-            />
+            <Input id="mapUrl" value={farmData.locationMapUrl || ''} onChange={(e) => updateFarmData({ locationMapUrl: e.target.value || null })} placeholder="Google Maps link" className="mt-2" />
           </div>
         </div>
       </div>

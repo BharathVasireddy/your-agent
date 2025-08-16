@@ -6,7 +6,7 @@ import { useWizardStore } from "@/store/wizard-store";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Check, X, Loader2, MapPin, Phone, Calendar, Link2, AlertCircle } from "lucide-react";
+import { Check, X, Loader2, MapPin, Phone, Link2, AlertCircle } from "lucide-react";
 import PhoneWhatsAppVerify from '@/components/PhoneWhatsAppVerify';
 
 export default function Step1_Professional() {
@@ -14,10 +14,8 @@ export default function Step1_Professional() {
   const { 
     experience, 
     city, 
-    area,
     phone, 
     slug,
-    dateOfBirth,
     setData 
   } = useWizardStore();
 
@@ -43,11 +41,6 @@ export default function Step1_Professional() {
 
   const handleInputChange = (field: string, value: string | number) => {
     setData({ [field]: value });
-    
-    // Clear area when city changes
-    if (field === 'city') {
-      setData({ area: '' });
-    }
   };
 
   // Phone validation function
@@ -147,52 +140,8 @@ export default function Step1_Professional() {
     }
   }, [phone]);
 
-  // Cities and their areas - this would ideally come from an API managed by admin
-  const citiesWithAreas = {
-    'Hyderabad': [
-      { label: "Madhapur", value: "Madhapur" },
-      { label: "Gachibowli", value: "Gachibowli" },
-      { label: "Kondapur", value: "Kondapur" },
-      { label: "HITEC City", value: "HITEC City" },
-      { label: "Financial District", value: "Financial District" },
-      { label: "Kokapet", value: "Kokapet" },
-      { label: "Banjara Hills", value: "Banjara Hills" },
-      { label: "Jubilee Hills", value: "Jubilee Hills" },
-      { label: "Punjagutta", value: "Punjagutta" },
-      { label: "Ameerpet", value: "Ameerpet" },
-      { label: "Secunderabad", value: "Secunderabad" },
-      { label: "Kukatpally", value: "Kukatpally" },
-      { label: "Miyapur", value: "Miyapur" },
-      { label: "Uppal", value: "Uppal" },
-      { label: "LB Nagar", value: "LB Nagar" },
-      { label: "Dilsukhnagar", value: "Dilsukhnagar" },
-      { label: "Charminar", value: "Charminar" },
-      { label: "Abids", value: "Abids" },
-    ],
-    'Bangalore': [
-      { label: "Koramangala", value: "Koramangala" },
-      { label: "Indiranagar", value: "Indiranagar" },
-      { label: "Whitefield", value: "Whitefield" },
-      { label: "Electronic City", value: "Electronic City" },
-      { label: "HSR Layout", value: "HSR Layout" },
-      { label: "BTM Layout", value: "BTM Layout" },
-      { label: "Marathahalli", value: "Marathahalli" },
-      { label: "Sarjapur Road", value: "Sarjapur Road" },
-    ],
-    'Mumbai': [
-      { label: "Bandra", value: "Bandra" },
-      { label: "Andheri", value: "Andheri" },
-      { label: "Powai", value: "Powai" },
-      { label: "Lower Parel", value: "Lower Parel" },
-      { label: "Worli", value: "Worli" },
-      { label: "Malad", value: "Malad" },
-      { label: "Thane", value: "Thane" },
-      { label: "Navi Mumbai", value: "Navi Mumbai" },
-    ]
-  } as const;
-
-  const availableCities = Object.keys(citiesWithAreas);
-  const availableAreas = city ? citiesWithAreas[city as keyof typeof citiesWithAreas] || [] : [];
+  // Cities data - this would ideally come from an API managed by admin
+  const availableCities = ['Hyderabad', 'Bangalore', 'Mumbai'];
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -239,24 +188,7 @@ export default function Step1_Professional() {
               </Select>
             </div>
 
-            {/* Area Selection - Only show if city is selected */}
-            {city && (
-              <div className="space-y-2">
-                <Label htmlFor="area" className="text-sm font-medium text-zinc-700">Primary Area *</Label>
-                <Select value={area} onValueChange={(value) => handleInputChange('area', value)}>
-                  <SelectTrigger className="w-full h-11">
-                    <SelectValue placeholder={`Select area in ${city}`} />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-[200px]">
-                    {availableAreas.map((areaItem) => (
-                      <SelectItem key={areaItem.value} value={areaItem.value}>
-                        {areaItem.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
+
           </div>
         </div>
 
@@ -282,27 +214,12 @@ export default function Step1_Professional() {
               required
             />
 
-            {/* Date of Birth */}
-            <div className="space-y-2">
-              <Label htmlFor="dateOfBirth" className="text-sm font-medium text-zinc-700">Date of Birth *</Label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                <Input
-                  id="dateOfBirth"
-                  type="date"
-                  value={dateOfBirth}
-                  onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-                  max={new Date().toISOString().split('T')[0]} // Prevent future dates
-                  className="pl-10 h-11"
-                />
-              </div>
-            </div>
+
 
             {/* Experience */}
             <div className="space-y-2">
               <Label htmlFor="experience" className="text-sm font-medium text-zinc-700">Years of Experience *</Label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-zinc-400" />
                 <Input
                   id="experience"
                   type="number"
@@ -311,7 +228,7 @@ export default function Step1_Professional() {
                   placeholder="5"
                   min="0"
                   max="50"
-                  className="pl-10 h-11"
+                  className="h-11"
                 />
               </div>
             </div>

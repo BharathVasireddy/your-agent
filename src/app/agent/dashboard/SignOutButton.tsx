@@ -123,7 +123,7 @@ export default function SignOutButton({ className, children }: SignOutButtonProp
               <Button
                 onClick={handleConfirmSignOut}
                 disabled={isSigningOut}
-            className="flex-1 bg-brand hover:bg-brand-hover text-white"
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white"
               >
                 {isSigningOut ? 'Signing Out...' : 'Sign Out'}
               </Button>

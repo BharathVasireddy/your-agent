@@ -16,7 +16,7 @@ export default async function AuthTestPage() {
             <div className="space-y-2">
               <p><strong>Name:</strong> {session.user?.name}</p>
               <p><strong>Email:</strong> {session.user?.email}</p>
-              <p><strong>User ID:</strong> {(session.user as any)?.id}</p>
+              <p><strong>User ID:</strong> {(session.user as unknown as { id?: string })?.id}</p>
             </div>
             <div className="text-center">
               <Link href="/api/auth/signout" className="text-red-600 hover:underline">

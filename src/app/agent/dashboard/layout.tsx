@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import DashboardSidebar from './DashboardSidebar';
-import DashboardMobileNav from './DashboardMobileNav';
+import ModernDashboardSidebar from './ModernDashboardSidebar';
+import ModernDashboardMobileNav from './ModernDashboardMobileNav';
 import { InstantNavProvider } from '@/components/InstantNavProvider';
 import ContentLoadingWrapper from './ContentLoadingWrapper';
 import { getCachedSession, getCachedAgent } from '@/lib/dashboard-data';
@@ -51,24 +51,41 @@ export default async function DashboardLayout({
         {/* Desktop Layout with Sidebar */}
         <div className="hidden md:flex">
           {/* Left Sidebar */}
-          <DashboardSidebar user={session.user} agent={agent} plan={plan} />
+          <ModernDashboardSidebar user={session.user} agent={agent} plan={plan} />
           
           {/* Main Content Area */}
           <div className="flex-1 ml-64">
             <main className="p-6 max-w-7xl mx-auto">
               {!isActiveSubscription && (
-                <div className="mb-4 rounded-lg border border-yellow-300 bg-yellow-50 p-4 text-sm text-yellow-900">
-                  {isExpired && hasEverSubscribed ? (
-                    <>
-                      Your subscription expired on {subscriptionEndsAt?.toLocaleDateString('en-IN')}. Renew to restore publishing and all features.
-                      <Link href="/agent/dashboard/subscription" className="ml-2 underline text-yellow-900 hover:text-yellow-800">Renew now</Link>
-                    </>
-                  ) : (
-                    <>
-                      You’re not subscribed. Subscribe to publish your profile and unlock all features.
-                      <Link href="/agent/dashboard/subscription" className="ml-2 underline text-yellow-900 hover:text-yellow-800">Subscribe now</Link>
-                    </>
-                  )}
+                <div className="mb-4 rounded-xl border border-orange-200 bg-orange-50 p-4 shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <span className="text-xl">🚀</span>
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-base font-semibold text-orange-900 mb-1">
+                        {isExpired && hasEverSubscribed ? 'Subscription Expired' : 'Unlock Your Full Potential! ✨'}
+                      </h3>
+                      <p className="text-sm text-orange-800">
+                        {isExpired && hasEverSubscribed ? (
+                          <>Your subscription expired on {subscriptionEndsAt?.toLocaleDateString('en-IN')}. Renew to restore publishing and access all premium features.</>
+                        ) : (
+                          <>Get access to advanced analytics, priority support, and publish your profile to attract more clients.</>
+                        )}
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <Link
+                        href="/agent/dashboard/subscription"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-brand hover:bg-brand-hover text-white font-medium rounded-lg transition-colors"
+                      >
+                        <span>{isExpired && hasEverSubscribed ? 'Renew Now' : 'Subscribe Now'}</span>
+                        <span>→</span>
+                      </Link>
+                    </div>
+                  </div>
                 </div>
               )}
               <ContentLoadingWrapper>
@@ -83,18 +100,33 @@ export default async function DashboardLayout({
           {/* Mobile Main Content */}
           <main className="p-4">
             {!isActiveSubscription && (
-              <div className="mb-4 rounded-lg border border-yellow-300 bg-yellow-50 p-3 text-xs text-yellow-900">
-                {isExpired && hasEverSubscribed ? (
-                  <>
-                    Subscription expired on {subscriptionEndsAt?.toLocaleDateString('en-IN')}. 
-                    <Link href="/agent/dashboard/subscription" className="ml-1 underline text-yellow-900 hover:text-yellow-800">Renew</Link>
-                  </>
-                ) : (
-                  <>
-                    You’re not subscribed. 
-                    <Link href="/agent/dashboard/subscription" className="ml-1 underline text-yellow-900 hover:text-yellow-800">Subscribe</Link>
-                  </>
-                )}
+              <div className="mb-4 rounded-xl border border-orange-200 bg-orange-50 p-4 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                      <span className="text-lg">🚀</span>
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-semibold text-orange-900 mb-1">
+                      {isExpired && hasEverSubscribed ? 'Subscription Expired' : 'Unlock Premium Features! ✨'}
+                    </h3>
+                    <p className="text-xs text-orange-800 mb-3 leading-relaxed">
+                      {isExpired && hasEverSubscribed ? (
+                        <>Expired on {subscriptionEndsAt?.toLocaleDateString('en-IN')}. Renew to restore all features.</>
+                      ) : (
+                        <>Get analytics, priority support, and publish your profile.</>
+                      )}
+                    </p>
+                    <Link
+                      href="/agent/dashboard/subscription"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-brand hover:bg-brand-hover text-white text-xs font-semibold rounded-lg transition-colors shadow-md"
+                    >
+                      <span>{isExpired && hasEverSubscribed ? 'Renew Now' : 'Subscribe Now'}</span>
+                      <span>→</span>
+                    </Link>
+                  </div>
+                </div>
               </div>
             )}
             <ContentLoadingWrapper>
@@ -103,7 +135,7 @@ export default async function DashboardLayout({
           </main>
 
           {/* Mobile Bottom Navigation */}
-          <DashboardMobileNav plan={plan} />
+          <ModernDashboardMobileNav plan={plan} />
         </div>
       </div>
     </InstantNavProvider>

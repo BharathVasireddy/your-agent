@@ -1,10 +1,12 @@
 'use client';
 
-import { Heart } from 'lucide-react';
+import { Heart, MapPin } from 'lucide-react';
 import { IconWebsite, IconFacebook, IconInstagram, IconLinkedIn, IconYouTube, IconTwitterX } from '@/components/icons/SocialIcons';
 
 type Agent = {
   websiteUrl?: string | null;
+  officeAddress?: string | null;
+  officeMapUrl?: string | null;
   facebookUrl?: string | null;
   instagramUrl?: string | null;
   linkedinUrl?: string | null;
@@ -131,6 +133,21 @@ export default function Footer({ agent }: { agent: Agent }) {
                   <a href={agent.twitterUrl} target="_blank" rel="noopener noreferrer" aria-label="Twitter/X"><IconTwitterX className="w-5 h-5 hover:text-white" /></a>
                 )}
               </div>
+              {(agent.officeAddress || agent.officeMapUrl) && (
+                <div className="mt-4 flex items-start gap-2 text-zinc-300 text-sm">
+                  <MapPin className="w-5 h-5 mt-0.5" />
+                  <div>
+                    {agent.officeAddress && (
+                      <p className="whitespace-pre-line">{agent.officeAddress}</p>
+                    )}
+                    {agent.officeMapUrl && (
+                      <p className="mt-1">
+                        <a href={agent.officeMapUrl} target="_blank" rel="noopener noreferrer" className="text-brand hover:underline">View on Map</a>
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

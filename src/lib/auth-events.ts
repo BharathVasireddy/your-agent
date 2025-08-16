@@ -4,13 +4,15 @@ import type { NextRequest } from 'next/server';
 type AuthEventType =
   | 'OTP_SENT'
   | 'OTP_SEND_FAILED'
+  | 'OTP_SEND_CONFLICT'
   | 'OTP_SEND_ERROR'
   | 'OTP_VERIFIED'
   | 'OTP_VERIFY_FAILED'
   | 'OTP_VERIFY_CONFLICT'
   | 'OTP_VERIFY_ERROR'
   | 'SIGNIN_SUCCESS'
-  | 'SIGNIN_FAILED';
+  | 'SIGNIN_FAILED'
+  | 'USER_CREATED';
 
 interface RecordAuthEventInput {
   request?: NextRequest;

@@ -13,7 +13,7 @@ export const getCachedSession = cache(async (): Promise<{ user?: unknown } | nul
 export const getCachedAgent = cache(async (userId: string) => {
   return prisma.agent.findUnique({
     where: { userId },
-    include: { user: true }
+    include: { user: true, awards: true, galleryImages: true, builders: true }
   });
 });
 
@@ -23,6 +23,9 @@ export const getCachedAgentProfile = cache(async (userId: string) => {
     where: { userId },
     include: { 
       user: true,
+      state: true,
+      district: true,
+      cityRelation: true,
       testimonials: true,
       faqs: true,
       awards: { orderBy: { createdAt: 'desc' } },

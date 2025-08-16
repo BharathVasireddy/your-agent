@@ -43,6 +43,9 @@ export default function LeadsFiltersClient({ initial }: { initial: { q?: string;
     router.push(`${pathname}`);
   };
 
+  // avoid unused-expression lints for JSX-only file
+  void q; void source; void stage; void startDate; void endDate;
+
   return (
     <div className="space-y-4">
       <div className="space-y-1.5">

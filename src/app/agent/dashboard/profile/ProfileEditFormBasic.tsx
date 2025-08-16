@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import LocationSelector from '@/components/common/LocationSelector';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { User, Upload, X, Loader2, Check, Sparkles, Save } from 'lucide-react';
 import { updateAgentProfile, generateBio } from '@/app/actions';
@@ -55,6 +56,9 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
     phone: agent.phone || '',
     city: agent.city || '',
     area: agent.area || '',
+    stateId: (agent as unknown as { stateId?: string | null }).stateId || '',
+    districtId: (agent as unknown as { districtId?: string | null }).districtId || '',
+    cityId: (agent as unknown as { cityId?: string | null }).cityId || '',
     template: agent.template || 'legacy-pro',
     profilePhotoUrl: agent.profilePhotoUrl || '',
     logoFont: (agent as unknown as { logoFont?: string }).logoFont || 'sans',
@@ -98,7 +102,8 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
     cleanSlug: ''
   });
 
-  // Indian cities
+  // Indian cities (legacy list, currently unused)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const indianCities = [
     { label: "Hyderabad", value: "Hyderabad" },
     { label: "Mumbai", value: "Mumbai" },
@@ -122,7 +127,8 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
     { label: "Ludhiana", value: "Ludhiana" }
   ];
 
-  // Hyderabad areas
+  // Hyderabad areas (legacy list, currently unused)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const hyderabadAreas = [
     { label: "Madhapur", value: "Madhapur" },
     { label: "Gachibowli", value: "Gachibowli" },
@@ -478,7 +484,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
         <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6">
           <h3 className="text-lg font-semibold text-zinc-950 mb-4">Professional Details</h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Experience */}
             <div className="space-y-2">
               <Label htmlFor="experience" className="text-zinc-600">Years of Experience *</Label>
@@ -527,50 +533,26 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
               )}
             </div>
 
-            {/* City */}
-            <div className="space-y-2">
-              <Label htmlFor="city" className="text-zinc-600">City *</Label>
-              <Select value={formData.city} onValueChange={(value) => handleInputChange('city', value)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select your city" />
-                </SelectTrigger>
-                <SelectContent className="max-h-[300px] w-full">
-                  {indianCities.map((city) => (
-                    <SelectItem key={city.value} value={city.value}>
-                      {city.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Area */}
-            <div className="space-y-2">
-              <Label htmlFor="area" className="text-zinc-600">
-                Area {formData.city === 'Hyderabad' ? '*' : '(Optional)'}
-              </Label>
-              {formData.city === 'Hyderabad' ? (
-                <Select value={formData.area} onValueChange={(value) => handleInputChange('area', value)}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select your area in Hyderabad" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-[300px] w-full">
-                    {hyderabadAreas.map((area) => (
-                      <SelectItem key={area.value} value={area.value}>
-                        {area.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Input
-                  id="area"
-                  type="text"
-                  value={formData.area}
-                  onChange={(e) => handleInputChange('area', e.target.value)}
-                  placeholder="Enter your area/locality"
-                />
-              )}
+            {/* Location Hierarchy */}
+            <div className="space-y-2 md:col-span-3">
+              <Label className="text-zinc-600">Location *</Label>
+              <LocationSelector
+                stateId={formData.stateId}
+                districtId={formData.districtId}
+                cityId={formData.cityId}
+                onStateChange={(v)=>setFormData(prev=>({ ...prev, stateId: v, districtId: '', cityId: '' }))}
+                onDistrictChange={(v)=>setFormData(prev=>({ ...prev, districtId: v, cityId: '' }))}
+                onCityChange={async (v)=>{
+                  setFormData(prev=>({ ...prev, cityId: v }));
+                  try{
+                    const res = await fetch(`/api/locations?districtId=${formData.districtId}`);
+                    const data = await res.json();
+                    const found = Array.isArray(data.cities) ? data.cities.find((c: { id: string; name: string })=>c.id===v) : null;
+                    if(found){ setFormData(prev=>({ ...prev, city: found.name })); }
+                  }catch{}
+                }}
+                required
+              />
             </div>
 
             {/* Custom Profile URL */}
@@ -673,7 +655,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
           <p className="text-sm text-zinc-600 mb-4">Add any links you want to display on your public profile.</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="websiteUrl" className="text-zinc-600">Website</Label>
+              <Label htmlFor="websiteUrl" className="text-zinc-600 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 2c1.76 0 3.37.57 4.68 1.53L5.53 16.68A7.97 7.97 0 014 12c0-4.42 3.58-8 8-8zm0 16a7.97 7.97 0 01-4.68-1.53L18.47 7.32A7.97 7.97 0 0120 12c0 4.42-3.58 8-8 8z"/></svg>Website</Label>
               <Input
                 id="websiteUrl"
                 type="url"
@@ -683,7 +665,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="facebookUrl" className="text-zinc-600">Facebook</Label>
+              <Label htmlFor="facebookUrl" className="text-zinc-600 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor"><path d="M22 12a10 10 0 10-11.5 9.95v-7.04H7.9V12h2.6V9.8c0-2.57 1.53-3.99 3.87-3.99 1.12 0 2.29.2 2.29.2v2.52h-1.29c-1.27 0-1.67.79-1.67 1.6V12h2.84l-.45 2.91h-2.39v7.04A10 10 0 0022 12z"/></svg>Facebook</Label>
               <Input
                 id="facebookUrl"
                 type="url"
@@ -693,7 +675,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="instagramUrl" className="text-zinc-600">Instagram</Label>
+              <Label htmlFor="instagramUrl" className="text-zinc-600 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor"><path d="M7 2C4.24 2 2 4.24 2 7v10c0 2.76 2.24 5 5 5h10c2.76 0 5-2.24 5-5V7c0-2.76-2.24-5-5-5H7zm10 2c1.65 0 3 1.35 3 3v10c0 1.65-1.35 3-3 3H7c-1.65 0-3-1.35-3-3V7c0-1.65 1.35-3 3-3h10zm-5 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm4.75-2.75a1 1 0 100 2 1 1 0 000-2z"/></svg>Instagram</Label>
               <Input
                 id="instagramUrl"
                 type="url"
@@ -703,7 +685,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="linkedinUrl" className="text-zinc-600">LinkedIn</Label>
+              <Label htmlFor="linkedinUrl" className="text-zinc-600 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor"><path d="M19 3A2.94 2.94 0 0122 6v12a2.94 2.94 0 01-3 3H5a2.94 2.94 0 01-3-3V6a2.94 2.94 0 013-3h14zM8.34 18v-7H5.67v7h2.67zM7 9.75a1.55 1.55 0 110-3.1 1.55 1.55 0 010 3.1zM18.33 18v-3.78c0-2.02-1.08-2.96-2.53-2.96a2.19 2.19 0 00-2 1.1h-.05V11h-2.67v7h2.67v-3.64c0-.96.17-1.9 1.38-1.9s1.33 1.13 1.33 1.97V18h2.67z"/></svg>LinkedIn</Label>
               <Input
                 id="linkedinUrl"
                 type="url"
@@ -713,7 +695,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="youtubeUrl" className="text-zinc-600">YouTube</Label>
+              <Label htmlFor="youtubeUrl" className="text-zinc-600 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31 31 0 000 12a31 31 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31 31 0 0024 12a31 31 0 00-.5-5.8zM9.75 15.02v-6l6 3-6 3z"/></svg>YouTube</Label>
               <Input
                 id="youtubeUrl"
                 type="url"
@@ -723,7 +705,7 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="twitterUrl" className="text-zinc-600">Twitter/X</Label>
+              <Label htmlFor="twitterUrl" className="text-zinc-600 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor"><path d="M18.244 2H21l-6.564 7.5L22 22h-6.844l-4.39-5.747L5.6 22H3l7.036-8.045L2 2h6.922l3.993 5.332L18.244 2zm-2.4 18h1.481L8.274 4H6.706l9.138 16z"/></svg>Twitter / X</Label>
               <Input
                 id="twitterUrl"
                 type="url"

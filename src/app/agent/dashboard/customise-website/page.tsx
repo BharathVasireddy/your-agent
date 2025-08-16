@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { getCachedSession, getCachedAgentProfile } from '@/lib/dashboard-data';
 import { setAgentPublished } from '@/app/actions';
 import PublishButton from './PublishButton';
-import { MessageSquare, HelpCircle, Search } from 'lucide-react';
+import { MessageSquare, HelpCircle, Search, Award, Images, Building2 } from 'lucide-react';
 import SectionVisibilityToggles from './SectionVisibilityToggles';
 
 export default async function CustomiseWebsitePage() {
@@ -54,6 +54,33 @@ export default async function CustomiseWebsitePage() {
       countLabel: 'settings'
     }
   ];
+  // Extend sections with new items
+  sections.push(
+    {
+      title: 'Awards',
+      description: 'Showcase your awards and recognitions',
+      href: '/agent/dashboard/customise-website/awards',
+      icon: Award,
+      count: (agent as unknown as { awards?: unknown[] }).awards?.length || 0,
+      countLabel: 'awards',
+    },
+    {
+      title: 'Gallery',
+      description: 'Upload photos to your gallery',
+      href: '/agent/dashboard/customise-website/gallery',
+      icon: Images,
+      count: (agent as unknown as { galleryImages?: unknown[] }).galleryImages?.length || 0,
+      countLabel: 'photos',
+    },
+    {
+      title: 'Builders',
+      description: 'Show builders you have worked with',
+      href: '/agent/dashboard/customise-website/builders',
+      icon: Building2,
+      count: (agent as unknown as { builders?: unknown[] }).builders?.length || 0,
+      countLabel: 'builders',
+    }
+  );
 
   const isPublished = (agent as unknown as { isPublished?: boolean }).isPublished ?? false;
   const hasActiveSubscription = !!agent.subscriptionEndsAt && agent.subscriptionEndsAt > new Date();
@@ -92,7 +119,17 @@ export default async function CustomiseWebsitePage() {
       </form>
 
       {/* Visibility Toggles */}
-      <SectionVisibilityToggles agentSlug={agent.slug} initialVisibility={initialVisibility} />
+      <SectionVisibilityToggles
+        agentSlug={agent.slug}
+        initialVisibility={initialVisibility}
+        counts={{
+          faqs: agent.faqs?.length || 0,
+          testimonials: agent.testimonials?.length || 0,
+          awards: (agent as unknown as { awards?: unknown[] }).awards?.length || 0,
+          gallery: (agent as unknown as { galleryImages?: unknown[] }).galleryImages?.length || 0,
+          builders: (agent as unknown as { builders?: unknown[] }).builders?.length || 0,
+        }}
+      />
 
       {/* Content Sections Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -28,7 +28,7 @@ async function getData(agentSlug: string, propertySlug: string) {
   if (!agent) return null;
 
   const property = await prisma.property.findFirst({
-    where: { slug: propertySlug, agentId: agent.id, isHiddenByAgent: false, status: { notIn: ['Inactive', 'Sold'] } },
+    where: { slug: propertySlug, agentId: agent.id, isHiddenByAgent: false, status: { notIn: ['Inactive', 'Sold', 'Draft'] } },
   });
 
   if (!property) return null;

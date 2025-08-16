@@ -526,7 +526,7 @@ export default function VisitingCardGenerator({ agent }: { agent: Agent }) {
       };
       img.onerror = () => setIsRendering(false);
       img.src = agent.profilePhotoUrl || '/images/Your-Agent-Logo.png';
-    } else if (template === 'figma3') {
+    } else if ((template as string) === 'figma3') {
       const usedRaster = await tryDrawFigmaBackground();
       if (usedRaster) {
         // Overlay agent details on the Figma 3 background image
@@ -614,8 +614,9 @@ export default function VisitingCardGenerator({ agent }: { agent: Agent }) {
         ctx.fillRect(0, 0, width, height);
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 48px Inter, ui-sans-serif, system-ui';
-        const websiteWidth = ctx.measureText(website).width;
-        ctx.fillText(website, (width - websiteWidth) / 2, height * 0.5);
+        const fallbackText = website || 'youragent.in';
+        const websiteWidth = ctx.measureText(fallbackText).width;
+        ctx.fillText(fallbackText, (width - websiteWidth) / 2, height * 0.5);
         setIsRendering(false);
       } else if (template === 'figma2') {
         const usedRaster = await tryDrawFigmaBackground();

@@ -47,7 +47,9 @@ async function getAgentData(agentSlug: string) {
         take: 8, // Only load first 8 properties for performance
         where: {
           isHiddenByAgent: false,
-          status: { notIn: ['Inactive', 'Sold'] },
+          // Show only published listings; drafts typically either have null slug or status 'Draft'
+          slug: { not: null },
+          status: { notIn: ['Inactive', 'Sold', 'Draft'] },
         },
         select: {
           id: true,

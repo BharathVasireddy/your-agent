@@ -9,6 +9,7 @@ export interface AgentProfile {
   city: string | null;
   area: string | null;
   bio: string | null;
+  phone: string | null;
   user: {
     id: string;
     name: string | null;

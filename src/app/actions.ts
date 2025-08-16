@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import OpenAI from "openai";
 import { PRICE_PAISE, DURATION_MONTHS, addMonths, ENTITLEMENTS, type Plan, type Interval } from '@/lib/subscriptions';
+import { requireAdmin } from '@/lib/admin';
 // Minimal CRM actions
 type SessionLike = { user?: { id?: string } } | null;
 
@@ -258,7 +259,6 @@ export async function createPropertyAction(formData: FormData) {
     const property = await prisma.property.create({
       data: {
         agentId: agent.id,
-        slug: uniqueSlug,
         title,
         description,
         price,
@@ -270,9 +270,22 @@ export async function createPropertyAction(formData: FormData) {
         photos: photoUrls,
         listingType,
         propertyType,
-        status: 'Available'
-      }
+        slug: uniqueSlug,
+      },
     });
+
+    try {
+      await prisma.moderationItem.create({
+        data: {
+          agentId: agent.id,
+          type: 'property',
+          entityId: property.id,
+          action: 'created',
+          status: 'pending',
+          snapshot: { title: property.title, listingType: property.listingType, propertyType: property.propertyType, location: property.location } as unknown as import('@prisma/client').Prisma.InputJsonValue,
+        },
+      });
+    } catch {}
 
     // Revalidate the properties page
     revalidatePath('/agent/dashboard/properties');
@@ -417,6 +430,19 @@ export async function updatePropertyAction(propertySlug: string, formData: FormD
       where: { id: existingProperty.id },
       data: updateData
     });
+
+    try {
+      await prisma.moderationItem.create({
+        data: {
+          agentId: agent.id,
+          type: 'property',
+          entityId: property.id,
+          action: 'updated',
+          status: 'pending',
+          snapshot: { title: property.title, listingType: property.listingType, propertyType: property.propertyType, location: property.location } as unknown as import('@prisma/client').Prisma.InputJsonValue,
+        },
+      });
+    } catch {}
 
     // Revalidate the properties page
     revalidatePath('/agent/dashboard');
@@ -723,16 +749,21 @@ export async function verifyPayment(paymentData: {
 }
 
 // Validation schema for agent profile data
-  const agentProfileSchema = z.object({
+const agentProfileSchema = z.object({
   experience: z.number().min(0).max(50),
   bio: z.string().max(500, "Bio must be 500 characters or less"),
-  phone: z.string().min(1, "Phone number is required"),
-  city: z.string().min(1, "City is required"),
+  phone: z.string().optional(),
+  // Back-compat strings
+  city: z.string().optional(),
   area: z.string().optional(),
-    template: z.string().min(1, "Template is required"),
+  // New hierarchy ids
+  stateId: z.string().optional(),
+  districtId: z.string().optional(),
+  cityId: z.string().optional(),
+  template: z.string().min(1, "Template is required"),
   profilePhotoUrl: z.string().optional(),
   slug: z.string().min(3, "Profile URL must be at least 3 characters").max(50, "Profile URL must be less than 50 characters"),
-  dateOfBirth: z.string().min(1, "Date of birth is required"),
+  dateOfBirth: z.string().optional(),
   logoUrl: z.string().optional(),
   logoFont: z.string().optional(),
   logoMaxHeight: z.number().optional(),
@@ -740,26 +771,29 @@ export async function verifyPayment(paymentData: {
   heroImage: z.string().optional(),
   heroTitle: z.string().max(100, "Hero title must be 100 characters or less").optional(),
   heroSubtitle: z.string().max(150, "Hero subtitle must be 150 characters or less").optional(),
-    websiteUrl: z.string().url().optional().or(z.literal('')),
-    facebookUrl: z.string().url().optional().or(z.literal('')),
-    instagramUrl: z.string().url().optional().or(z.literal('')),
-    linkedinUrl: z.string().url().optional().or(z.literal('')),
-    youtubeUrl: z.string().url().optional().or(z.literal('')),
-    twitterUrl: z.string().url().optional().or(z.literal('')),
-    officeAddress: z.string().max(200).optional().or(z.literal('')),
-    officeMapUrl: z.string().url().optional().or(z.literal('')),
+  websiteUrl: z.string().url().optional().or(z.literal('')),
+  facebookUrl: z.string().url().optional().or(z.literal('')),
+  instagramUrl: z.string().url().optional().or(z.literal('')),
+  linkedinUrl: z.string().url().optional().or(z.literal('')),
+  youtubeUrl: z.string().url().optional().or(z.literal('')),
+  twitterUrl: z.string().url().optional().or(z.literal('')),
+  officeAddress: z.string().max(200).optional().or(z.literal('')),
+  officeMapUrl: z.string().url().optional().or(z.literal('')),
 });
 
 export async function updateAgentProfile(data: {
   experience: number;
   bio: string;
-  phone: string;
-  city: string;
-  area: string;
+  phone?: string; // Also make phone optional since we allow skipping phone verification
+  city?: string;
+  area?: string;
   template: string;
   profilePhotoUrl: string;
   slug: string;
-  dateOfBirth: string;
+  dateOfBirth?: string; // Make optional since we removed from onboarding
+  stateId?: string;
+  districtId?: string;
+  cityId?: string;
   logoUrl?: string;
   logoFont?: string;
   logoMaxHeight?: number;
@@ -820,8 +854,11 @@ export async function updateAgentProfile(data: {
           experience: validatedData.experience,
           bio: validatedData.bio,
           phone: validatedData.phone,
-          city: validatedData.city,
+          city: validatedData.city || null,
           area: validatedData.area || null,
+          stateId: validatedData.stateId || null,
+          districtId: validatedData.districtId || null,
+          cityId: validatedData.cityId || null,
           template: validatedData.template,
           profilePhotoUrl: validatedData.profilePhotoUrl || null,
           dateOfBirth: validatedData.dateOfBirth ? new Date(validatedData.dateOfBirth) : null,
@@ -884,8 +921,11 @@ export async function updateAgentProfile(data: {
         experience: validatedData.experience,
         bio: validatedData.bio,
         phone: validatedData.phone,
-        city: validatedData.city,
+        city: validatedData.city || null,
         area: validatedData.area || null,
+        stateId: validatedData.stateId || null,
+        districtId: validatedData.districtId || null,
+        cityId: validatedData.cityId || null,
         template: validatedData.template,
         profilePhotoUrl: validatedData.profilePhotoUrl || null,
         slug: validatedData.slug,
@@ -898,8 +938,6 @@ export async function updateAgentProfile(data: {
         heroTitle: validatedData.heroTitle || null,
         heroSubtitle: validatedData.heroSubtitle || null,
         websiteUrl: validatedData.websiteUrl ? validatedData.websiteUrl : null,
-        officeAddress: validatedData.officeAddress ? validatedData.officeAddress : null,
-        officeMapUrl: validatedData.officeMapUrl ? validatedData.officeMapUrl : null,
         facebookUrl: validatedData.facebookUrl ? validatedData.facebookUrl : null,
         instagramUrl: validatedData.instagramUrl ? validatedData.instagramUrl : null,
         linkedinUrl: validatedData.linkedinUrl ? validatedData.linkedinUrl : null,
@@ -909,10 +947,25 @@ export async function updateAgentProfile(data: {
       }
     });
 
-      // Revalidate the agent's public profile page and dashboard
+    try {
+      await prisma.moderationItem.create({
+        data: {
+          agentId: updatedAgent.id,
+          type: 'agent_profile',
+          entityId: updatedAgent.id,
+          action: 'updated',
+          status: 'pending',
+          snapshot: { bio: updatedAgent.bio, city: updatedAgent.city, area: updatedAgent.area, profilePhotoUrl: updatedAgent.profilePhotoUrl, logoUrl: updatedAgent.logoUrl } as unknown as import('@prisma/client').Prisma.InputJsonValue,
+        },
+      });
+    } catch {}
+
+    // Revalidate the agent's public profile page and dashboard
     revalidatePath(`/${updatedAgent.slug}`);
     revalidatePath('/agent/dashboard');
     revalidatePath('/agent/dashboard/profile');
+    // Also revalidate the onboarding wizard to prevent redirect loops
+    revalidatePath('/onboarding/wizard');
     
     return { success: true, agent: updatedAgent };
 
@@ -1208,6 +1261,20 @@ export async function addTestimonial(data: { text: string; author: string; role?
       }
     });
 
+    // Queue for moderation (non-blocking)
+    try {
+      await prisma.moderationItem.create({
+        data: {
+          agentId: agent.id,
+          type: 'testimonial',
+          entityId: testimonial.id,
+          action: 'created',
+          status: 'pending',
+          snapshot: { text: testimonial.text, author: testimonial.author, role: testimonial.role, rating: testimonial.rating } as unknown as import('@prisma/client').Prisma.InputJsonValue,
+        },
+      });
+    } catch {}
+
     revalidatePath('/agent/dashboard/profile');
     
     return { success: true, testimonial };
@@ -1256,6 +1323,20 @@ export async function updateTestimonial(id: string, data: { text: string; author
         rating: data.rating || null
       }
     });
+
+    // Queue for moderation (non-blocking)
+    try {
+      await prisma.moderationItem.create({
+        data: {
+          agentId: agent.id,
+          type: 'testimonial',
+          entityId: testimonial.id,
+          action: 'updated',
+          status: 'pending',
+          snapshot: { text: testimonial.text, author: testimonial.author, role: testimonial.role, rating: testimonial.rating } as unknown as import('@prisma/client').Prisma.InputJsonValue,
+        },
+      });
+    } catch {}
 
     revalidatePath('/agent/dashboard/profile');
     
@@ -1339,12 +1420,416 @@ export async function addFAQ(data: { question: string; answer: string }) {
       }
     });
 
+    try {
+      await prisma.moderationItem.create({
+        data: {
+          agentId: agent.id,
+          type: 'faq',
+          entityId: faq.id,
+          action: 'created',
+          status: 'pending',
+          snapshot: { question: faq.question, answer: faq.answer } as unknown as import('@prisma/client').Prisma.InputJsonValue,
+        },
+      });
+    } catch {}
+
     revalidatePath('/agent/dashboard/profile');
     
     return { success: true, faq };
   } catch (error) {
     console.error("Error adding FAQ:", error);
     throw new Error(error instanceof Error ? error.message : "Failed to add FAQ");
+  }
+}
+
+// Awards Management Actions
+export async function addAward(data: { title: string; issuedBy?: string | null; year?: number | null; description?: string | null; imageUrl?: string | null }) {
+  try {
+    const raw = await getServerSession(authOptions);
+    const session = raw as { user?: { id?: string } } | null;
+    if (!session?.user?.id) {
+      throw new Error('You must be signed in to add awards');
+    }
+
+    const userId = session.user.id as string;
+    const agent = await prisma.agent.findUnique({ where: { userId }, select: { id: true, slug: true } });
+    if (!agent) throw new Error('Agent profile not found');
+
+    const award = await prisma.agentAward.create({
+      data: {
+        agentId: agent.id,
+        title: data.title.trim(),
+        issuedBy: (data.issuedBy || null)?.trim?.() || null,
+        year: typeof data.year === 'number' ? data.year : null,
+        description: (data.description || null)?.trim?.() || null,
+        imageUrl: data.imageUrl || null,
+      },
+    });
+
+    try {
+      await prisma.moderationItem.create({
+        data: {
+          agentId: agent.id,
+          type: 'award',
+          entityId: award.id,
+          action: 'created',
+          status: 'pending',
+          snapshot: { title: award.title, issuedBy: award.issuedBy, year: award.year, description: award.description, imageUrl: award.imageUrl } as unknown as import('@prisma/client').Prisma.InputJsonValue,
+        },
+      });
+    } catch {}
+
+    revalidatePath(`/agent/dashboard/customise-website/awards`);
+    revalidatePath(`/${agent.slug}`);
+    return { success: true, award };
+  } catch (error) {
+    console.error('Error adding award:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to add award');
+  }
+}
+
+export async function updateAward(id: string, data: { title: string; issuedBy?: string | null; year?: number | null; description?: string | null; imageUrl?: string | null }) {
+  try {
+    const raw = await getServerSession(authOptions);
+    const session = raw as { user?: { id?: string } } | null;
+    if (!session?.user?.id) {
+      throw new Error('You must be signed in to update awards');
+    }
+
+    const userId = session.user.id as string;
+    const agent = await prisma.agent.findUnique({ where: { userId }, select: { id: true, slug: true } });
+    if (!agent) throw new Error('Agent profile not found');
+
+    const existing = await prisma.agentAward.findFirst({ where: { id, agentId: agent.id } });
+    if (!existing) throw new Error("Award not found or you don't have permission to edit it");
+
+    const award = await prisma.agentAward.update({
+      where: { id },
+      data: {
+        title: data.title.trim(),
+        issuedBy: (data.issuedBy || null)?.trim?.() || null,
+        year: typeof data.year === 'number' ? data.year : null,
+        description: (data.description || null)?.trim?.() || null,
+        imageUrl: data.imageUrl || null,
+      },
+    });
+
+    try {
+      await prisma.moderationItem.create({
+        data: {
+          agentId: agent.id,
+          type: 'award',
+          entityId: award.id,
+          action: 'updated',
+          status: 'pending',
+          snapshot: { title: award.title, issuedBy: award.issuedBy, year: award.year, description: award.description, imageUrl: award.imageUrl } as unknown as import('@prisma/client').Prisma.InputJsonValue,
+        },
+      });
+    } catch {}
+
+    revalidatePath(`/agent/dashboard/customise-website/awards`);
+    revalidatePath(`/${agent.slug}`);
+    return { success: true, award };
+  } catch (error) {
+    console.error('Error updating award:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to update award');
+  }
+}
+
+export async function deleteAward(id: string) {
+  try {
+    const raw = await getServerSession(authOptions);
+    const session = raw as { user?: { id?: string } } | null;
+    if (!session?.user?.id) {
+      throw new Error('You must be signed in to delete awards');
+    }
+
+    const userId = session.user.id as string;
+    const agent = await prisma.agent.findUnique({ where: { userId }, select: { id: true, slug: true } });
+    if (!agent) throw new Error('Agent profile not found');
+
+    const existing = await prisma.agentAward.findFirst({ where: { id, agentId: agent.id } });
+    if (!existing) throw new Error("Award not found or you don't have permission to delete it");
+
+    await prisma.agentAward.delete({ where: { id } });
+    revalidatePath(`/agent/dashboard/customise-website/awards`);
+    revalidatePath(`/${agent.slug}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting award:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to delete award');
+  }
+}
+
+// Gallery Management Actions
+export async function addGalleryImage(data: { imageUrl: string; caption?: string | null }) {
+  try {
+    const raw = await getServerSession(authOptions);
+    const session = raw as { user?: { id?: string } } | null;
+    if (!session?.user?.id) {
+      throw new Error('You must be signed in to add gallery images');
+    }
+    const userId = session.user.id as string;
+    const agent = await prisma.agent.findUnique({ where: { userId }, select: { id: true, slug: true } });
+    if (!agent) throw new Error('Agent profile not found');
+
+    const image = await prisma.agentGalleryImage.create({
+      data: {
+        agentId: agent.id,
+        imageUrl: data.imageUrl,
+        caption: (data.caption || null)?.trim?.() || null,
+      },
+    });
+
+    try {
+      await prisma.moderationItem.create({
+        data: {
+          agentId: agent.id,
+          type: 'gallery_image',
+          entityId: image.id,
+          action: 'created',
+          status: 'pending',
+          snapshot: { imageUrl: image.imageUrl, caption: image.caption } as unknown as import('@prisma/client').Prisma.InputJsonValue,
+        },
+      });
+    } catch {}
+
+    revalidatePath(`/agent/dashboard/customise-website/gallery`);
+    revalidatePath(`/${agent.slug}`);
+    return { success: true, image };
+  } catch (error) {
+    console.error('Error adding gallery image:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to add gallery image');
+  }
+}
+
+export async function deleteGalleryImage(id: string) {
+  try {
+    const raw = await getServerSession(authOptions);
+    const session = raw as { user?: { id?: string } } | null;
+    if (!session?.user?.id) {
+      throw new Error('You must be signed in to delete gallery images');
+    }
+    const userId = session.user.id as string;
+    const agent = await prisma.agent.findUnique({ where: { userId }, select: { id: true, slug: true } });
+    if (!agent) throw new Error('Agent profile not found');
+
+    const existing = await prisma.agentGalleryImage.findFirst({ where: { id, agentId: agent.id } });
+    if (!existing) throw new Error("Gallery image not found or you don't have permission to delete it");
+
+    await prisma.agentGalleryImage.delete({ where: { id } });
+    revalidatePath(`/agent/dashboard/customise-website/gallery`);
+    revalidatePath(`/${agent.slug}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting gallery image:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to delete gallery image');
+  }
+}
+
+// Builders Management Actions
+export async function addBuilder(data: { name: string; logoUrl: string; websiteUrl?: string | null }) {
+  try {
+    const raw = await getServerSession(authOptions);
+    const session = raw as { user?: { id?: string } } | null;
+    if (!session?.user?.id) {
+      throw new Error('You must be signed in to add builders');
+    }
+    const userId = session.user.id as string;
+    const agent = await prisma.agent.findUnique({ where: { userId }, select: { id: true, slug: true } });
+    if (!agent) throw new Error('Agent profile not found');
+
+    const builder = await prisma.agentBuilder.create({
+      data: {
+        agentId: agent.id,
+        name: data.name.trim(),
+        logoUrl: data.logoUrl,
+        websiteUrl: (data.websiteUrl || null)?.trim?.() || null,
+      },
+    });
+
+    try {
+      await prisma.moderationItem.create({
+        data: {
+          agentId: agent.id,
+          type: 'builder',
+          entityId: builder.id,
+          action: 'created',
+          status: 'pending',
+          snapshot: { name: builder.name, logoUrl: builder.logoUrl, websiteUrl: builder.websiteUrl } as unknown as import('@prisma/client').Prisma.InputJsonValue,
+        },
+      });
+    } catch {}
+
+    revalidatePath(`/agent/dashboard/customise-website/builders`);
+    revalidatePath(`/${agent.slug}`);
+    return { success: true, builder };
+  } catch (error) {
+    console.error('Error adding builder:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to add builder');
+  }
+}
+
+export async function updateBuilder(id: string, data: { name: string; logoUrl: string; websiteUrl?: string | null }) {
+  try {
+    const raw = await getServerSession(authOptions);
+    const session = raw as { user?: { id?: string } } | null;
+    if (!session?.user?.id) {
+      throw new Error('You must be signed in to update builders');
+    }
+    const userId = session.user.id as string;
+    const agent = await prisma.agent.findUnique({ where: { userId }, select: { id: true, slug: true } });
+    if (!agent) throw new Error('Agent profile not found');
+
+    const existing = await prisma.agentBuilder.findFirst({ where: { id, agentId: agent.id } });
+    if (!existing) throw new Error("Builder not found or you don't have permission to edit it");
+
+    const builder = await prisma.agentBuilder.update({
+      where: { id },
+      data: {
+        name: data.name.trim(),
+        logoUrl: data.logoUrl,
+        websiteUrl: (data.websiteUrl || null)?.trim?.() || null,
+      },
+    });
+
+    try {
+      await prisma.moderationItem.create({
+        data: {
+          agentId: agent.id,
+          type: 'builder',
+          entityId: builder.id,
+          action: 'updated',
+          status: 'pending',
+          snapshot: { name: builder.name, logoUrl: builder.logoUrl, websiteUrl: builder.websiteUrl } as unknown as import('@prisma/client').Prisma.InputJsonValue,
+        },
+      });
+    } catch {}
+
+    revalidatePath(`/agent/dashboard/customise-website/builders`);
+    revalidatePath(`/${agent.slug}`);
+    return { success: true, builder };
+  } catch (error) {
+    console.error('Error updating builder:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to update builder');
+  }
+}
+
+export async function deleteBuilder(id: string) {
+  try {
+    const raw = await getServerSession(authOptions);
+    const session = raw as { user?: { id?: string } } | null;
+    if (!session?.user?.id) {
+      throw new Error('You must be signed in to delete builders');
+    }
+    const userId = session.user.id as string;
+    const agent = await prisma.agent.findUnique({ where: { userId }, select: { id: true, slug: true } });
+    if (!agent) throw new Error('Agent profile not found');
+
+    const existing = await prisma.agentBuilder.findFirst({ where: { id, agentId: agent.id } });
+    if (!existing) throw new Error("Builder not found or you don't have permission to delete it");
+
+    await prisma.agentBuilder.delete({ where: { id } });
+    revalidatePath(`/agent/dashboard/customise-website/builders`);
+    revalidatePath(`/${agent.slug}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting builder:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to delete builder');
+  }
+}
+
+// Admin moderation actions (require admin)
+export async function adminModerateAward(id: string, remove: boolean, reason?: string) {
+  try {
+    const admin = await requireAdmin();
+    if (!admin) throw new Error('Unauthorized');
+    const award = await prisma.agentAward.update({
+      where: { id },
+      data: { isRemovedByAdmin: remove, removedReason: reason || null },
+    });
+    return { success: true, award };
+  } catch (error) {
+    console.error('Error moderating award:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to moderate award');
+  }
+}
+
+export async function adminModerateGalleryImage(id: string, remove: boolean, reason?: string) {
+  try {
+    const admin = await requireAdmin();
+    if (!admin) throw new Error('Unauthorized');
+    const image = await prisma.agentGalleryImage.update({
+      where: { id },
+      data: { isRemovedByAdmin: remove, removedReason: reason || null },
+    });
+    return { success: true, image };
+  } catch (error) {
+    console.error('Error moderating gallery image:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to moderate gallery image');
+  }
+}
+
+export async function adminModerateBuilder(id: string, remove: boolean, reason?: string) {
+  try {
+    const admin = await requireAdmin();
+    if (!admin) throw new Error('Unauthorized');
+    const builder = await prisma.agentBuilder.update({
+      where: { id },
+      data: { isRemovedByAdmin: remove, removedReason: reason || null },
+    });
+    return { success: true, builder };
+  } catch (error) {
+    console.error('Error moderating builder:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to moderate builder');
+  }
+}
+
+export async function adminModerateTestimonial(id: string, remove: boolean, reason?: string) {
+  try {
+    const admin = await requireAdmin();
+    if (!admin) throw new Error('Unauthorized');
+    const t = await prisma.testimonial.update({ where: { id }, data: { isRemovedByAdmin: remove, removedReason: reason || null } });
+    return { success: true, testimonial: t };
+  } catch (error) {
+    console.error('Error moderating testimonial:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to moderate testimonial');
+  }
+}
+
+export async function adminModerateFAQ(id: string, remove: boolean, reason?: string) {
+  try {
+    const admin = await requireAdmin();
+    if (!admin) throw new Error('Unauthorized');
+    const faq = await prisma.fAQ.update({ where: { id }, data: { isRemovedByAdmin: remove, removedReason: reason || null } });
+    return { success: true, faq };
+  } catch (error) {
+    console.error('Error moderating FAQ:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to moderate FAQ');
+  }
+}
+
+export async function adminModerateProperty(id: string, remove: boolean, reason?: string) {
+  try {
+    const admin = await requireAdmin();
+    if (!admin) throw new Error('Unauthorized');
+    const property = await prisma.property.update({ where: { id }, data: { isRemovedByAdmin: remove, removedReason: reason || null } });
+    return { success: true, property };
+  } catch (error) {
+    console.error('Error moderating property:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to moderate property');
+  }
+}
+
+export async function adminModerateAgentProfile(agentId: string, remove: boolean, reason?: string) {
+  try {
+    const admin = await requireAdmin();
+    if (!admin) throw new Error('Unauthorized');
+    const agent = await prisma.agent.update({ where: { id: agentId }, data: { isRemovedByAdmin: remove, removedReason: reason || null } });
+    return { success: true, agent };
+  } catch (error) {
+    console.error('Error moderating agent profile:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to moderate agent profile');
   }
 }
 

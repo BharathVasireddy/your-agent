@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import crypto, { randomInt } from 'crypto';
 import { recordAuthEvent } from '@/lib/auth-events';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 
 function generateOtp(length = 6) {
   // Use crypto.randomInt for cryptographically secure OTP
@@ -15,6 +17,38 @@ export async function POST(request: NextRequest) {
     const { phone } = await request.json();
     if (!phone || typeof phone !== 'string') {
       return NextResponse.json({ error: 'Phone is required' }, { status: 400 });
+    }
+
+    // Get current session to check if user is logged in
+    const session = await getServerSession(authOptions);
+    
+    // Check if phone number already exists
+    const existingUser = await prisma.user.findFirst({
+      where: { phone },
+    });
+
+    if (existingUser) {
+      // If user is logged in and trying to link the same number they already own, allow it
+      const currentUserId = (session?.user as unknown as { id?: string })?.id;
+      if (currentUserId && existingUser.id === currentUserId) {
+        // Same user re-verifying their own number - proceed
+      } else {
+        // Phone belongs to different user or user is not logged in - conflict
+        await recordAuthEvent({
+          request,
+          type: 'OTP_SEND_CONFLICT',
+          identifier: phone,
+          metadata: { 
+            provider: 'whatsapp', 
+            reason: 'phone_already_registered',
+            existingUserId: existingUser.id,
+            currentUserId: currentUserId || null
+          },
+        });
+        return NextResponse.json({ 
+          error: 'This phone number is already registered with another account. Please sign in with your existing account first, or use a different phone number to create a new account.' 
+        }, { status: 409 });
+      }
     }
 
     // Clear previous OTPs for this phone to avoid accidental throttling during testing

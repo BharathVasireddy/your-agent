@@ -457,6 +457,37 @@ body {
   body {
     @apply bg-white text-zinc-950;
   }
+  /* Improve text selection contrast across the app */
+  ::selection {
+    background: rgba(245, 86, 37, 0.18); /* brand tint */
+    color: #09090B; /* zinc-950 for readability */
+  }
+  ::-moz-selection {
+    background: rgba(245, 86, 37, 0.18);
+    color: #09090B;
+  }
+  /* Ensure selection is visible inside inputs and textareas */
+  input::selection,
+  textarea::selection {
+    background: rgba(245, 86, 37, 0.18);
+    color: #09090B;
+  }
+  input::-moz-selection,
+  textarea::-moz-selection {
+    background: rgba(245, 86, 37, 0.18);
+    color: #09090B;
+  }
+  /* Force selection colors on our UI primitives */
+  [data-slot="input"]::selection,
+  [data-slot="textarea"]::selection {
+    background: rgba(245, 86, 37, 0.22) !important;
+    color: #09090B !important;
+  }
+  [data-slot="input"]::-moz-selection,
+  [data-slot="textarea"]::-moz-selection {
+    background: rgba(245, 86, 37, 0.22) !important;
+    color: #09090B !important;
+  }
   
   /* Fix placeholder text to be more subtle */
   ::placeholder {

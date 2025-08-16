@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { MapPin, IndianRupee, Download, Home } from 'lucide-react';
 import { generatePropertyBrochure } from '@/lib/pdfGenerator';
@@ -101,9 +102,9 @@ export default function PropertiesSection({ properties, agent }: PropertiesSecti
                 
                 {/* Listing Type Badge */}
                 <div className="absolute top-4 right-4">
-                  <span className="bg-white/95 backdrop-blur-sm text-zinc-700 px-3 py-1.5 text-xs font-medium rounded-lg shadow-sm">
+                  <Badge className="bg-white/95 backdrop-blur-sm text-zinc-700 text-xs font-medium rounded-lg shadow-sm">
                     For {property.listingType}
-                  </span>
+                  </Badge>
                 </div>
               </div>
 

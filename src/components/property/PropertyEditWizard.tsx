@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Sparkles, Upload, X, HelpCircle } from 'lucide-react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { type BasePropertyFormData, type ListingType, type PropertyType, type AgriculturalLandData, type PlotData, type FlatApartmentData, type ITCommercialSpaceData, type VillaIndependentHouseData, type FarmHouseData, FACING_DIRECTIONS, AGRICULTURAL_PURPOSES, PLOT_APPROVALS, BHK_OPTIONS, COMMUNITY_STATUS, TRANSACTION_TYPES, FLAT_CONSTRUCTION_STATUS, FURNISHING_STATUS, FLOORING_TYPES, AGE_OF_PROPERTY, POWER_BACKUP, PARKING_TYPES, WATER_SUPPLY, TITLE_STATUS } from '@/types/property';
 import { type Property } from '@/types/dashboard';
 

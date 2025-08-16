@@ -136,10 +136,12 @@ export default async function TemplateRenderer({ templateName, agentData }: Temp
       {show('testimonials') && <Components.TestimonialsSection testimonials={agentData.testimonials} />}
       {show('faqs') && <Components.FaqSection faqs={agentData.faqs} />}
       {show('contact') && <Components.ContactSection agent={agentData} />}
-      {/* Footer expects only social fields for legacy-pro; cast to a compatible shape */}
+      {/* Footer expects social fields; we also pass optional office details used by some templates */}
       <Components.Footer
         agent={agentData as unknown as {
           websiteUrl?: string | null;
+          officeAddress?: string | null;
+          officeMapUrl?: string | null;
           facebookUrl?: string | null;
           instagramUrl?: string | null;
           linkedinUrl?: string | null;

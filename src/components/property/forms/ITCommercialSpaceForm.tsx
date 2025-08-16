@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Image from 'next/image';
 import BasePropertyForm from './BasePropertyForm';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -68,6 +69,34 @@ export default function ITCommercialSpaceForm({
   const updateItData = (updates: Partial<ITCommercialSpaceData>) => {
     setItData(prev => ({ ...prev, ...updates }));
   };
+
+  async function uploadImages(files: File[], folder: string): Promise<string[]> {
+    const uploads = files.map(async (file) => {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('folder', folder);
+      const res = await fetch('/api/upload-image', { method: 'POST', body: fd });
+      const json = await res.json();
+      if (!res.ok || !json?.success || !json?.url) throw new Error(json?.error || 'Upload failed');
+      return json.url as string;
+    });
+    return Promise.all(uploads);
+  }
+
+  async function handleInteriorUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    const urls = await uploadImages(files, 'property-it/interior');
+    updateItData({ interiorPhotoUrls: [...(itData.interiorPhotoUrls || []), ...urls] });
+    e.currentTarget.value = '';
+  }
+  async function handleExteriorUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    const urls = await uploadImages(files, 'property-it/exterior');
+    updateItData({ exteriorPhotoUrls: [...(itData.exteriorPhotoUrls || []), ...urls] });
+    e.currentTarget.value = '';
+  }
 
   const handleSubmit = (baseData: BasePropertyFormData) => {
     const completeData: BasePropertyFormData = {
@@ -328,21 +357,41 @@ export default function ITCommercialSpaceForm({
         <h3 className="text-lg font-semibold text-zinc-900 mb-4">Media</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <Label htmlFor="interiorUrls">Interior Photo URLs (comma-separated)</Label>
-            <Textarea id="interiorUrls" value={(itData.interiorPhotoUrls || []).join(', ')} onChange={(e) => updateItData({ interiorPhotoUrls: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} className="mt-2" rows={2} />
+            <Label>Interior Photos</Label>
+            <input type="file" accept="image/*" multiple onChange={handleInteriorUpload} className="mt-2" />
+            {(itData.interiorPhotoUrls || []).length > 0 && (
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {(itData.interiorPhotoUrls || []).map((u, i) => (
+                  <div key={u + i} className="relative">
+                    <Image src={u} alt="interior" width={160} height={120} className="w-full h-24 object-cover rounded" />
+                    <button type="button" className="absolute top-1 right-1 text-xs bg-zinc-900 text-white px-2 py-0.5 rounded" onClick={() => updateItData({ interiorPhotoUrls: (itData.interiorPhotoUrls || []).filter((_, idx) => idx !== i) })}>Remove</button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div>
-            <Label htmlFor="exteriorUrls">Exterior Photo URLs (comma-separated)</Label>
-            <Textarea id="exteriorUrls" value={(itData.exteriorPhotoUrls || []).join(', ')} onChange={(e) => updateItData({ exteriorPhotoUrls: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} className="mt-2" rows={2} />
+            <Label>Exterior Photos</Label>
+            <input type="file" accept="image/*" multiple onChange={handleExteriorUpload} className="mt-2" />
+            {(itData.exteriorPhotoUrls || []).length > 0 && (
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {(itData.exteriorPhotoUrls || []).map((u, i) => (
+                  <div key={u + i} className="relative">
+                    <Image src={u} alt="exterior" width={160} height={120} className="w-full h-24 object-cover rounded" />
+                    <button type="button" className="absolute top-1 right-1 text-xs bg-zinc-900 text-white px-2 py-0.5 rounded" onClick={() => updateItData({ exteriorPhotoUrls: (itData.exteriorPhotoUrls || []).filter((_, idx) => idx !== i) })}>Remove</button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <div>
-            <Label htmlFor="floorPlanUrls">Floor Plan URLs (comma-separated)</Label>
+            <Label htmlFor="floorPlanUrls">Floor Plan URLs (optional)</Label>
             <Textarea id="floorPlanUrls" value={(itData.floorPlanUrls || []).join(', ')} onChange={(e) => updateItData({ floorPlanUrls: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} className="mt-2" rows={2} />
           </div>
           <div>
-            <Label htmlFor="locationMapUrl">Location Map URL</Label>
+            <Label htmlFor="locationMapUrl">Location Map URL (optional)</Label>
             <Input id="locationMapUrl" value={itData.locationMapUrl || ''} onChange={(e) => updateItData({ locationMapUrl: e.target.value || null })} className="mt-2" />
           </div>
         </div>

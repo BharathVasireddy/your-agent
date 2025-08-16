@@ -12,7 +12,8 @@ import {
   MessageSquare,
   HelpCircle,
   Wrench,
-  IdCard
+  IdCard,
+  MapPin
 } from 'lucide-react';
 import { ENTITLEMENTS, type Plan } from '@/lib/subscriptions';
 
@@ -37,6 +38,7 @@ const adminNav: NavItem[] = [
   { name: 'Users', href: '/admin/users', icon: Users },
   { name: 'Agents', href: '/admin/agents', icon: UserCheck },
   { name: 'Properties', href: '/admin/properties', icon: Building },
+  { name: 'Location Management', href: '/admin/cities', icon: MapPin },
   { name: 'Deals', href: '/admin/deals', icon: TrendingUp },
   { name: 'Payments', href: '/admin/payments', icon: CreditCard },
   { name: 'Moderation', href: '/admin/moderation', icon: Settings },
@@ -88,6 +90,12 @@ export const NAV_CONFIG: Record<NavRole, NavItem[]> = {
 };
 
 export function getNavItems(role: NavRole, context: Partial<NavVisibilityContext> = {}): NavItem[] {
+  // Safety check for role parameter
+  if (!role || !NAV_CONFIG[role]) {
+    console.error(`Invalid role provided to getNavItems: ${role}`);
+    return [];
+  }
+
   const ctx: NavVisibilityContext = {
     role,
     plan: context.plan ?? 'starter',
@@ -95,15 +103,25 @@ export function getNavItems(role: NavRole, context: Partial<NavVisibilityContext
   };
 
   const filterVisible = (item: NavItem): NavItem | null => {
-    const visible = item.isVisible ? item.isVisible(ctx) : true;
-    if (!visible) return null;
-    const subItems = item.subItems
-      ? (item.subItems.map(filterVisible).filter(Boolean) as NavItem[])
-      : undefined;
-    return { ...item, subItems };
+    try {
+      const visible = item.isVisible ? item.isVisible(ctx) : true;
+      if (!visible) return null;
+      const subItems = item.subItems
+        ? (item.subItems.map(filterVisible).filter(Boolean) as NavItem[])
+        : undefined;
+      return { ...item, subItems };
+    } catch (error) {
+      console.error(`Error filtering nav item: ${item.name}`, error);
+      return null;
+    }
   };
 
-  return NAV_CONFIG[role].map(filterVisible).filter(Boolean) as NavItem[];
+  try {
+    return NAV_CONFIG[role].map(filterVisible).filter(Boolean) as NavItem[];
+  } catch (error) {
+    console.error(`Error getting nav items for role: ${role}`, error);
+    return [];
+  }
 }
 
 

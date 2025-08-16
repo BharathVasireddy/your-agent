@@ -45,15 +45,8 @@ export default function PhoneWhatsAppVerify({
   const [verifying, setVerifying] = useState(false);
   const [cooldown, setCooldown] = useState<number>(0);
 
-  // Initialize stage as verified if value already matches localStorage cached verified value
-  useEffect(() => {
-    try {
-      const cached = localStorage.getItem('wa_phone_e164');
-      if (cached && value && cached === value) {
-        setStage('verified');
-      }
-    } catch {}
-  }, [value]);
+  // Note: Removed automatic verification based on localStorage to ensure proper server-side validation
+  // This prevents bypassing phone number conflict checks during onboarding
 
   // Cooldown timer for resend
   useEffect(() => {
@@ -73,6 +66,7 @@ export default function PhoneWhatsAppVerify({
     try {
       setSending(true);
       setMsg(null);
+      setStage('enter'); // Reset stage to ensure proper flow
       const res = await fetch('/api/auth/whatsapp/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -109,8 +103,12 @@ export default function PhoneWhatsAppVerify({
       const data = await res.json();
       if (!res.ok) {
         setMsg(data.error || 'Invalid or expired code');
+        // Reset to enter stage on error to allow retry
+        setStage('enter');
+        setOtp('');
         return;
       }
+      // Only store in localStorage if verification was successful
       try {
         localStorage.setItem('wa_phone_e164', e164);
         localStorage.setItem('wa_phone_local', local);
@@ -121,6 +119,8 @@ export default function PhoneWhatsAppVerify({
       setMsg('Phone verified successfully');
     } catch (e) {
       setMsg('Network error. Please try again.');
+      setStage('enter');
+      setOtp('');
     } finally {
       setVerifying(false);
     }
@@ -138,7 +138,7 @@ export default function PhoneWhatsAppVerify({
     onValueChange?.(e164);
     // parent can interpret lack of verification
     // do not emit onVerified here
-  }, [e164]);
+  }, [e164, onValueChange, stage]);
 
   return (
     <div className="space-y-2">
@@ -199,9 +199,30 @@ export default function PhoneWhatsAppVerify({
         )}
 
         {msg && (
-          <div className={`text-sm flex items-center gap-2 ${msg.toLowerCase().includes('error') || msg.toLowerCase().includes('invalid') || msg.toLowerCase().includes('fail') ? 'text-brand' : 'text-blue-700'}`}>
-            <AlertCircle className="w-4 h-4" />
-            <span>{msg}</span>
+          <div className={`mt-3 p-4 rounded-lg border flex items-start gap-3 ${
+            msg.toLowerCase().includes('verified') || msg.toLowerCase().includes('sent') 
+              ? 'bg-green-50 border-green-200 text-green-800' 
+              : msg.toLowerCase().includes('error') || msg.toLowerCase().includes('invalid') || msg.toLowerCase().includes('fail') || msg.toLowerCase().includes('already registered') || msg.toLowerCase().includes('conflict')
+              ? 'bg-red-50 border-red-200 text-red-800'
+              : 'bg-blue-50 border-blue-200 text-blue-800'
+          }`}>
+            <div className="flex-shrink-0 mt-0.5">
+              {msg.toLowerCase().includes('verified') || msg.toLowerCase().includes('sent') ? (
+                <Check className="w-5 h-5 text-green-600" />
+              ) : msg.toLowerCase().includes('error') || msg.toLowerCase().includes('invalid') || msg.toLowerCase().includes('fail') || msg.toLowerCase().includes('already registered') || msg.toLowerCase().includes('conflict') ? (
+                <AlertCircle className="w-5 h-5 text-red-600" />
+              ) : (
+                <AlertCircle className="w-5 h-5 text-blue-600" />
+              )}
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium leading-relaxed">{msg}</p>
+              {msg.toLowerCase().includes('already registered') && (
+                <p className="text-xs mt-2 opacity-90">
+                  💡 Try signing in with your existing account or contact support if this is your number.
+                </p>
+              )}
+            </div>
           </div>
         )}
       </div>

@@ -69,6 +69,9 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
       phone: true,
       city: true,
       area: true,
+      stateId: true,
+      districtId: true,
+      cityId: true,
       createdAt: true,
       updatedAt: true
     }
@@ -102,11 +105,12 @@ export async function getUserFlowStatus(): Promise<UserFlowStatus> {
   }
 
   // Check if onboarding is complete (has essential fields)
+  // Note: phone is now optional since we allow skipping phone verification
+  // Location requirement: either legacy city OR new hierarchical cityId
   const hasCompletedOnboarding = !!(
     (agent.experience !== null && agent.experience !== undefined) &&
-    agent.phone && 
-    agent.city && 
-    agent.slug
+    agent.slug &&
+    (agent.cityId || agent.city) // Either new hierarchical location or legacy city
   );
 
   // Subscribed (or bypassed) but needs onboarding

@@ -1,4 +1,3 @@
-// Temporarily use AWS Amplify optimized auth config
-import { handler } from "@/lib/auth-amplify";
+import { handler } from "@/lib/auth";
 
 export { handler as GET, handler as POST };

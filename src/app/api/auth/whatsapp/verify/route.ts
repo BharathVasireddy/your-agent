@@ -79,21 +79,73 @@ export async function POST(request: NextRequest) {
 
     let user;
     if (userWithPhone) {
-      // Not logged in, phone exists: refresh verification timestamp
-      user = await prisma.user.update({ where: { id: userWithPhone.id }, data: { phoneVerifiedAt: new Date() } });
+      // User exists with this phone - allow them to sign in
+      user = userWithPhone;
+      // Update phone verification timestamp
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { phoneVerifiedAt: new Date() }
+      });
+      
+      await recordAuthEvent({
+        request,
+        type: 'OTP_VERIFIED',
+        identifier: phone,
+        userId: user.id,
+        metadata: { provider: 'whatsapp', reason: 'existing_user_signin' },
+      });
     } else {
       // Create new user with phone number (name will be collected during onboarding)
-      user = await prisma.user.create({ data: { phone, phoneVerifiedAt: new Date() } });
+      try {
+        user = await prisma.user.create({ data: { phone, phoneVerifiedAt: new Date() } });
+        
+        await recordAuthEvent({
+          request,
+          type: 'OTP_VERIFIED',
+          identifier: phone,
+          userId: user.id,
+          metadata: { provider: 'whatsapp', reason: 'new_user_created' },
+        });
+      } catch (error) {
+        // Handle race condition where another request created user with same phone
+        if ((error as { code?: string }).code === 'P2002') {
+          // Phone number was just created by another concurrent request
+          const concurrentUser = await prisma.user.findFirst({ where: { phone } });
+          if (concurrentUser) {
+            user = concurrentUser;
+            // Update phone verification timestamp
+            await prisma.user.update({
+              where: { id: user.id },
+              data: { phoneVerifiedAt: new Date() }
+            });
+            
+            await recordAuthEvent({
+              request,
+              type: 'OTP_VERIFIED',
+              identifier: phone,
+              userId: user.id,
+              metadata: { provider: 'whatsapp', reason: 'concurrent_user_signin' },
+            });
+          } else {
+            await recordAuthEvent({
+              request,
+              type: 'OTP_VERIFY_ERROR',
+              identifier: phone,
+              metadata: { provider: 'whatsapp', error: 'Concurrent creation failed' },
+            });
+            return NextResponse.json({ error: 'Failed to create user account' }, { status: 500 });
+          }
+        } else {
+          await recordAuthEvent({
+            request,
+            type: 'OTP_VERIFY_ERROR',
+            identifier: phone,
+            metadata: { provider: 'whatsapp', error: String(error).slice(0, 1000) },
+          });
+          return NextResponse.json({ error: 'Failed to create user account' }, { status: 500 });
+        }
+      }
     }
-
-    // Audit successful verification
-    await recordAuthEvent({
-      request,
-      type: 'OTP_VERIFIED',
-      identifier: phone,
-      userId: user.id,
-      metadata: { provider: 'whatsapp', linkedToExistingAccount: !!(session as unknown as { user?: { id?: string } } | null)?.user?.id },
-    });
 
     // Return user info, check if user was already logged in (do NOT echo OTP)
     return NextResponse.json({

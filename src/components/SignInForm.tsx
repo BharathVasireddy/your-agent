@@ -72,31 +72,22 @@ export default function SignInForm({ onSuccess }: SignInFormProps) {
       
       // Always proceed to establish a session via NextAuth WhatsApp provider.
       // This avoids a state where the number is linked but the app didn't create a session.
-      const result = await signIn('whatsapp', {
-        identifier: data.phone,
-        token: waCode,
-        callbackUrl: '/api/auth/post-signin-redirect',
-        redirect: false,
-      });
-
-      console.log('WhatsApp signIn result:', result);
-
-      if (result?.ok && !result?.error) {
-        try {
-          localStorage.setItem('wa_phone_e164', `+91${waPhone}`);
-          localStorage.setItem('wa_phone_local', waPhone);
-        } catch {}
-        if (onSuccess) onSuccess(); else router.replace(result.url || '/api/auth/post-signin-redirect');
-      } else {
-        // If sign-in was blocked due to an existing session, still navigate forward
-        if (data.wasAlreadyLoggedIn) {
-          setWaMsg('Phone number linked to your account successfully! Redirecting…');
-          if (onSuccess) onSuccess(); else router.replace('/api/auth/post-signin-redirect');
-          return;
-        }
-        console.error('WhatsApp authentication error:', result?.error);
-        setWaMsg(`Authentication failed: ${result?.error || 'Please try again'}`);
+      try {
+        await signIn('whatsapp', {
+          identifier: data.phone,
+          token: waCode,
+          callbackUrl: '/api/auth/post-signin-redirect',
+          redirect: true,
+        });
+      } catch (e) {
+        console.error('WhatsApp signIn redirect failed, falling back', e);
       }
+
+      try {
+        localStorage.setItem('wa_phone_e164', `+91${waPhone}`);
+        localStorage.setItem('wa_phone_local', waPhone);
+      } catch {}
+      if (onSuccess) onSuccess(); else router.replace('/api/auth/post-signin-redirect');
     } catch (error) {
       console.error('WhatsApp verify error:', error);
       setWaMsg('Network error. Please try again.');

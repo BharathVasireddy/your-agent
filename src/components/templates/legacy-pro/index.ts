@@ -11,3 +11,4 @@ export { default as TestimonialsSection } from './TestimonialsSection';
 export { default as FaqSection } from './FaqSection';
 export { default as ContactSection } from './ContactSection';
 export { default as Footer } from './Footer';
+// Legacy template does not implement awards/gallery/builders; renderer guards for missing components

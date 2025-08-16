@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Image from 'next/image';
 import BasePropertyForm from './BasePropertyForm';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -458,24 +459,72 @@ export default function FlatApartmentForm({
 
       {/* Media */}
       <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
-        <h3 className="text-lg font-semibold text-zinc-900 mb-4">Additional Media</h3>
+        <h3 className="text-lg font-semibold text-zinc-900 mb-4">Media</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <Label htmlFor="interiorUrls">Interior Photo URLs (comma-separated)</Label>
-            <Textarea id="interiorUrls" value={(flatData.interiorPhotoUrls || []).join(', ')} onChange={(e) => updateFlatData({ interiorPhotoUrls: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} className="mt-2" rows={2} />
+            <Label>Interior Photos</Label>
+            <input type="file" accept="image/*" multiple onChange={async (e) => {
+              const files = Array.from(e.target.files || []);
+              if (!files.length) return;
+              const urls = await Promise.all(files.map(async (file) => {
+                const fd = new FormData();
+                fd.append('file', file);
+                fd.append('folder', 'property-flat/interior');
+                const res = await fetch('/api/upload-image', { method: 'POST', body: fd });
+                const json = await res.json();
+                if (!res.ok || !json?.success || !json?.url) throw new Error(json?.error || 'Upload failed');
+                return json.url as string;
+              }));
+              updateFlatData({ interiorPhotoUrls: [...(flatData.interiorPhotoUrls || []), ...urls] });
+              e.currentTarget.value = '';
+            }} className="mt-2" />
+            {(flatData.interiorPhotoUrls || []).length > 0 && (
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {(flatData.interiorPhotoUrls || []).map((u, i) => (
+                  <div key={u + i} className="relative">
+                    <Image src={u} alt="interior" width={160} height={120} className="w-full h-24 object-cover rounded" />
+                    <button type="button" className="absolute top-1 right-1 text-xs bg-zinc-900 text-white px-2 py-0.5 rounded" onClick={() => updateFlatData({ interiorPhotoUrls: (flatData.interiorPhotoUrls || []).filter((_, idx) => idx !== i) })}>Remove</button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div>
-            <Label htmlFor="exteriorUrls">Exterior Photo URLs (comma-separated)</Label>
-            <Textarea id="exteriorUrls" value={(flatData.exteriorPhotoUrls || []).join(', ')} onChange={(e) => updateFlatData({ exteriorPhotoUrls: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} className="mt-2" rows={2} />
+            <Label>Exterior Photos</Label>
+            <input type="file" accept="image/*" multiple onChange={async (e) => {
+              const files = Array.from(e.target.files || []);
+              if (!files.length) return;
+              const urls = await Promise.all(files.map(async (file) => {
+                const fd = new FormData();
+                fd.append('file', file);
+                fd.append('folder', 'property-flat/exterior');
+                const res = await fetch('/api/upload-image', { method: 'POST', body: fd });
+                const json = await res.json();
+                if (!res.ok || !json?.success || !json?.url) throw new Error(json?.error || 'Upload failed');
+                return json.url as string;
+              }));
+              updateFlatData({ exteriorPhotoUrls: [...(flatData.exteriorPhotoUrls || []), ...urls] });
+              e.currentTarget.value = '';
+            }} className="mt-2" />
+            {(flatData.exteriorPhotoUrls || []).length > 0 && (
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {(flatData.exteriorPhotoUrls || []).map((u, i) => (
+                  <div key={u + i} className="relative">
+                    <Image src={u} alt="exterior" width={160} height={120} className="w-full h-24 object-cover rounded" />
+                    <button type="button" className="absolute top-1 right-1 text-xs bg-zinc-900 text-white px-2 py-0.5 rounded" onClick={() => updateFlatData({ exteriorPhotoUrls: (flatData.exteriorPhotoUrls || []).filter((_, idx) => idx !== i) })}>Remove</button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <div>
-            <Label htmlFor="floorPlanUrls">Floor Plan URLs (JPG/PNG links, comma-separated)</Label>
+            <Label htmlFor="floorPlanUrls">Floor Plan URLs (optional)</Label>
             <Textarea id="floorPlanUrls" value={(flatData.floorPlanUrls || []).join(', ')} onChange={(e) => updateFlatData({ floorPlanUrls: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} className="mt-2" rows={2} />
           </div>
           <div>
-            <Label htmlFor="videoTourUrl">Video Tour / Drone Shot URL</Label>
+            <Label htmlFor="videoTourUrl">Video Tour / Drone Shot URL (optional)</Label>
             <Input id="videoTourUrl" value={flatData.videoTourUrl || ''} onChange={(e) => updateFlatData({ videoTourUrl: e.target.value || null })} className="mt-2" />
           </div>
         </div>

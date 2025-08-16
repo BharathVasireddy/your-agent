@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
-import DashboardContent from './DashboardContent';
-import type { Property } from '@/types/dashboard';
+import ModernDashboardContent from './ModernDashboardContent';
+import type { Property, AgentProfile } from '@/types/dashboard';
 import { 
   getCachedSession, 
   getCachedAgent, 
@@ -30,8 +30,8 @@ export default async function DashboardPage() {
   const validProperties = properties.filter(p => p.slug !== null) as Property[];
 
   return (
-    <DashboardContent 
-      agent={agent}
+    <ModernDashboardContent 
+      agent={agent as AgentProfile | null}
       properties={validProperties}
       saleProperties={counts.saleProperties}
       rentProperties={counts.rentProperties}

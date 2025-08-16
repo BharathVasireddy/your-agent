@@ -64,12 +64,47 @@ export async function POST(request: NextRequest) {
 
     const isAvailable = !existingAgent || existingAgent.userId === currentUserId;
 
+    if (isAvailable) {
+      return NextResponse.json({
+        available: true,
+        slug: cleanSlug,
+        message: 'Slug is available'
+      });
+    }
+
+    // Generate alternative suggestions if slug is taken
+    let suggestedSlug = cleanSlug;
+    let counter = 1;
+    let foundAvailable = false;
+
+    // Try up to 10 alternatives
+    while (!foundAvailable && counter <= 10) {
+      const candidateSlug = `${cleanSlug}-${counter}`;
+      
+      const existingCandidate = await prisma.agent.findUnique({
+        where: { slug: candidateSlug },
+        select: { userId: true }
+      });
+
+      if (!existingCandidate || existingCandidate.userId === currentUserId) {
+        suggestedSlug = candidateSlug;
+        foundAvailable = true;
+      } else {
+        counter++;
+      }
+    }
+
+    // If we couldn't find an alternative with numbers, try with random suffix
+    if (!foundAvailable) {
+      const randomSuffix = Math.floor(Math.random() * 9999);
+      suggestedSlug = `${cleanSlug}-${randomSuffix}`;
+    }
+
     return NextResponse.json({
-      available: isAvailable,
-      slug: cleanSlug,
-      message: isAvailable 
-        ? 'Slug is available' 
-        : 'This URL is already taken. Please try another one.'
+      available: false,
+      slug: suggestedSlug,
+      originalSlug: cleanSlug,
+      message: `"${cleanSlug}" is already taken. We suggest "${suggestedSlug}" instead.`
     });
 
   } catch (error) {

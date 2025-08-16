@@ -7,8 +7,13 @@ interface AgentProfileState {
   bio: string;
   phone: string;
   phoneVerified: boolean;
+  // Back-compat display fields
   city: string;
   area: string;
+  // New hierarchical location selections
+  stateId: string;
+  districtId: string;
+  cityId: string;
   template: string;
   profilePhotoUrl: string;
   slug: string;
@@ -29,6 +34,9 @@ const initialState: AgentProfileState = {
   phoneVerified: false,
   city: '',
   area: '',
+  stateId: '',
+  districtId: '',
+  cityId: '',
   template: 'classic-professional',
   profilePhotoUrl: '',
   slug: '',

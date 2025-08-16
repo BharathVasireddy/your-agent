@@ -237,7 +237,7 @@ export default function SettingsContent({ user, agent }: SettingsContentProps) {
           </div>
           <button
             onClick={handleSignOut}
-            className="px-4 py-2 bg-brand text-white rounded-lg hover:bg-brand-hover transition-colors text-sm font-medium"
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
           >
             Sign Out
           </button>

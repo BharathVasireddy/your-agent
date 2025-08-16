@@ -98,14 +98,39 @@ export const authOptions: {
             where: { identifier, token: hash, expires: { gt: new Date() } },
           });
           if (!tokenRecord) return null;
-          // consume token
-          await prisma.verificationToken.delete({ where: { token: tokenRecord.token } });
+          // consume token (handle composite unique on [identifier, token])
+          await prisma.verificationToken.deleteMany({ where: { identifier, token: tokenRecord.token } });
           // Find user by phone - use findFirst since findUnique might not work if phone field isn't properly indexed
-          const user = await prisma.user.findFirst({ where: { phone: identifier } });
+          let user = await prisma.user.findFirst({ where: { phone: identifier } });
           if (!user) {
-            console.log('WhatsApp auth: No user found with phone:', identifier);
-            try { await recordAuthEvent({ type: 'SIGNIN_FAILED', identifier, metadata: { provider: 'whatsapp', reason: 'user_not_found' } }); } catch {}
-            return null;
+            console.log('WhatsApp auth: Creating new user with phone:', identifier);
+            try {
+              // Create new user with phone number (name and other details will be collected during onboarding)
+              user = await prisma.user.create({ 
+                data: { 
+                  phone: identifier, 
+                  phoneVerifiedAt: new Date() 
+                } 
+              });
+              await recordAuthEvent({ type: 'USER_CREATED', identifier, userId: user.id, metadata: { provider: 'whatsapp' } });
+            } catch (error) {
+              console.error('WhatsApp auth: Failed to create user:', error);
+              // Check if it's a unique constraint violation (phone already exists)
+              if ((error as { code?: string }).code === 'P2002') {
+                // Phone number was just created by another concurrent request, try to find the user again
+                user = await prisma.user.findFirst({ where: { phone: identifier } });
+                if (user) {
+                  console.log('WhatsApp auth: Found user created by concurrent request:', identifier);
+                  await recordAuthEvent({ type: 'SIGNIN_SUCCESS', userId: user.id, identifier, metadata: { provider: 'whatsapp', reason: 'concurrent_creation' } });
+                } else {
+                  try { await recordAuthEvent({ type: 'SIGNIN_FAILED', identifier, metadata: { provider: 'whatsapp', reason: 'concurrent_creation_failed' } }); } catch {}
+                  return null;
+                }
+              } else {
+                try { await recordAuthEvent({ type: 'SIGNIN_FAILED', identifier, metadata: { provider: 'whatsapp', reason: 'user_creation_failed' } }); } catch {}
+                return null;
+              }
+            }
           }
           try { await recordAuthEvent({ type: 'SIGNIN_SUCCESS', userId: user.id, identifier, metadata: { provider: 'whatsapp' } }); } catch {}
           return { id: user.id, email: user.email, name: user.name, image: user.image };
