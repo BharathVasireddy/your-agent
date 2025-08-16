@@ -13,7 +13,7 @@ import {
   Home, 
   Building, 
   TreePine, 
-  Car,
+  Tag,
   ChevronRight,
   CheckCircle2
 } from 'lucide-react';
@@ -105,7 +105,7 @@ export default function PropertyTypeSelector({ onSelect, onCancel }: PropertyTyp
                       ? 'bg-brand text-white' 
                       : 'bg-gray-100 text-gray-600'
                   }`}>
-                    {listingType === LISTING_TYPES.SALE ? <Car className="w-6 h-6" /> : <Home className="w-6 h-6" />}
+                    {listingType === LISTING_TYPES.SALE ? <Tag className="w-6 h-6" /> : <Home className="w-6 h-6" />}
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg text-gray-900">For {listingType}</h3>

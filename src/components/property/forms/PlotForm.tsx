@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { type ListingType, type PropertyType, type BasePropertyFormData, type PlotData, FACING_DIRECTIONS, PLOT_APPROVALS } from '@/types/property';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 interface PlotFormProps {
   listingType: ListingType;
@@ -22,13 +23,24 @@ export default function PlotForm({
 }: PlotFormProps) {
   const [plotData, setPlotData] = useState<PlotData>({
     village: '',
+    mandal: '',
     city: '',
     district: '',
-    extentSqYds: 0,
+    sizeValue: 0,
+    sizeUnit: 'Sq.Yds',
+    length: undefined,
+    breadth: undefined,
+    dimensionUnit: 'feet',
+    shape: 'Rectangular',
     facing: 'East',
     roadWidth: 0,
+    roadUnit: 'feet',
     openSides: 0,
+    cornerPlot: false,
+    plotNumber: '',
     approval: 'HMDA',
+    approvalRef: '',
+    zoningType: 'R1',
     layoutName: ''
   });
 
@@ -48,18 +60,20 @@ export default function PlotForm({
     const parts: string[] = [];
     if (plotData.layoutName) parts.push(plotData.layoutName);
     parts.push('Plot');
-    if (plotData.extentSqYds > 0) parts.push(`${plotData.extentSqYds} Sq. Yds`);
+    if (plotData.sizeValue && plotData.sizeUnit) parts.push(`${plotData.sizeValue} ${plotData.sizeUnit}`);
     if (plotData.city) parts.push(plotData.city);
     return parts.join(' - ');
   };
 
   const generatePlotDescription = async (): Promise<string> => {
     const facingText = plotData.facing ? `${plotData.facing} facing` : '';
-    const roadText = plotData.roadWidth ? `, ${plotData.roadWidth} ft road` : '';
+    const roadText = plotData.roadWidth ? `, ${plotData.roadWidth} ${plotData.roadUnit === 'meters' ? 'm' : 'ft'} road` : '';
     const approvalText = plotData.approval ? `, ${plotData.approval} approved` : '';
     const locationText = [plotData.village, plotData.city, plotData.district].filter(Boolean).join(', ');
     const layoutText = plotData.layoutName ? ` in ${plotData.layoutName}` : '';
-    return `Premium residential/commercial plot${layoutText} measuring ${plotData.extentSqYds} Sq. Yds, ${facingText}${roadText}${approvalText}. Located at ${locationText}. Ideal for immediate construction and great investment potential.`;
+    const sizeText = plotData.sizeValue && plotData.sizeUnit ? `${plotData.sizeValue} ${plotData.sizeUnit}` : '';
+    const dimText = plotData.length && plotData.breadth ? `, Dimensions ${plotData.length}×${plotData.breadth} ${plotData.dimensionUnit === 'meters' ? 'm' : 'ft'}` : '';
+    return `Premium residential/commercial plot${layoutText} measuring ${sizeText}${dimText}, ${facingText}${roadText}${approvalText}. Located at ${locationText}. Ideal for immediate construction and great investment potential.`;
   };
 
   return (
@@ -83,6 +97,17 @@ export default function PlotForm({
               value={plotData.village}
               onChange={(e) => updatePlotData({ village: e.target.value })}
               placeholder="e.g., Narsingi"
+              className="mt-2"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="mandal">Mandal</Label>
+            <Input
+              id="mandal"
+              value={plotData.mandal || ''}
+              onChange={(e) => updatePlotData({ mandal: e.target.value })}
+              placeholder="e.g., Serilingampally"
               className="mt-2"
             />
           </div>
@@ -121,7 +146,7 @@ export default function PlotForm({
             <Input
               id="extent"
               type="number"
-              value={plotData.extentSqYds === 0 ? '' : plotData.extentSqYds.toString()}
+              value={(plotData.extentSqYds ?? 0) === 0 ? '' : (plotData.extentSqYds ?? 0).toString()}
               onChange={(e) => updatePlotData({ extentSqYds: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 })}
               placeholder="e.g., 200"
               className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"

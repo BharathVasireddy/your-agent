@@ -746,6 +746,8 @@ export async function verifyPayment(paymentData: {
     linkedinUrl: z.string().url().optional().or(z.literal('')),
     youtubeUrl: z.string().url().optional().or(z.literal('')),
     twitterUrl: z.string().url().optional().or(z.literal('')),
+    officeAddress: z.string().max(200).optional().or(z.literal('')),
+    officeMapUrl: z.string().url().optional().or(z.literal('')),
 });
 
 export async function updateAgentProfile(data: {
@@ -774,6 +776,8 @@ export async function updateAgentProfile(data: {
   linkedinUrl?: string;
   youtubeUrl?: string;
   twitterUrl?: string;
+  officeAddress?: string;
+  officeMapUrl?: string;
 }) {
   try {
     // Get the current user's session
@@ -829,6 +833,8 @@ export async function updateAgentProfile(data: {
           heroTitle: validatedData.heroTitle || null,
           heroSubtitle: validatedData.heroSubtitle || null,
           websiteUrl: validatedData.websiteUrl ? validatedData.websiteUrl : null,
+          officeAddress: validatedData.officeAddress ? validatedData.officeAddress : null,
+          officeMapUrl: validatedData.officeMapUrl ? validatedData.officeMapUrl : null,
           facebookUrl: validatedData.facebookUrl ? validatedData.facebookUrl : null,
           instagramUrl: validatedData.instagramUrl ? validatedData.instagramUrl : null,
           linkedinUrl: validatedData.linkedinUrl ? validatedData.linkedinUrl : null,
@@ -892,6 +898,8 @@ export async function updateAgentProfile(data: {
         heroTitle: validatedData.heroTitle || null,
         heroSubtitle: validatedData.heroSubtitle || null,
         websiteUrl: validatedData.websiteUrl ? validatedData.websiteUrl : null,
+        officeAddress: validatedData.officeAddress ? validatedData.officeAddress : null,
+        officeMapUrl: validatedData.officeMapUrl ? validatedData.officeMapUrl : null,
         facebookUrl: validatedData.facebookUrl ? validatedData.facebookUrl : null,
         instagramUrl: validatedData.instagramUrl ? validatedData.instagramUrl : null,
         linkedinUrl: validatedData.linkedinUrl ? validatedData.linkedinUrl : null,

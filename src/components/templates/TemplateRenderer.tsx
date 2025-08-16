@@ -61,6 +61,25 @@ interface AgentDataForTemplateRenderer {
     question: string;
     answer: string;
   }>;
+  awards?: Array<{
+    id: string;
+    title: string;
+    issuedBy: string | null;
+    year: number | null;
+    description: string | null;
+    imageUrl: string | null;
+  }>;
+  galleryImages?: Array<{
+    id: string;
+    imageUrl: string;
+    caption: string | null;
+  }>;
+  builders?: Array<{
+    id: string;
+    name: string;
+    logoUrl: string;
+    websiteUrl: string | null;
+  }>;
   // Optional templateData for per-agent config
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   templateData?: any;
@@ -102,6 +121,18 @@ export default async function TemplateRenderer({ templateName, agentData }: Temp
         <Components.PropertiesSection properties={agentData.properties} agent={agentData} />
       )}
       {show('about') && <Components.AboutSection agent={agentData} />}
+      {show('awards', true) && (Components as unknown as { AwardsSection?: React.ComponentType<{ awards?: AgentDataForTemplateRenderer['awards'] }> }).AwardsSection && (
+        // @ts-expect-error dynamic template component
+        <Components.AwardsSection awards={agentData.awards} />
+      )}
+      {show('gallery', true) && (Components as unknown as { GallerySection?: React.ComponentType<{ images?: AgentDataForTemplateRenderer['galleryImages'] }> }).GallerySection && (
+        // @ts-expect-error dynamic template component
+        <Components.GallerySection images={agentData.galleryImages} />
+      )}
+      {show('builders', true) && (Components as unknown as { BuildersSection?: React.ComponentType<{ builders?: AgentDataForTemplateRenderer['builders'] }> }).BuildersSection && (
+        // @ts-expect-error dynamic template component
+        <Components.BuildersSection builders={agentData.builders} />
+      )}
       {show('testimonials') && <Components.TestimonialsSection testimonials={agentData.testimonials} />}
       {show('faqs') && <Components.FaqSection faqs={agentData.faqs} />}
       {show('contact') && <Components.ContactSection agent={agentData} />}

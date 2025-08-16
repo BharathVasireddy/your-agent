@@ -6,6 +6,7 @@ interface AgentProfileState {
   experience: number;
   bio: string;
   phone: string;
+  phoneVerified: boolean;
   city: string;
   area: string;
   template: string;
@@ -25,6 +26,7 @@ const initialState: AgentProfileState = {
   experience: 0,
   bio: '',
   phone: '',
+  phoneVerified: false,
   city: '',
   area: '',
   template: 'classic-professional',

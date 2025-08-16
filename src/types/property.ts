@@ -112,7 +112,10 @@ export type AgriculturalPurpose = typeof AGRICULTURAL_PURPOSES[keyof typeof AGRI
 export const PLOT_APPROVALS = {
   HMDA: 'HMDA',
   DTCP: 'DTCP',
-  GP: 'GP'
+  GHMC: 'GHMC',
+  PANCHAYAT: 'Panchayat',
+  GP: 'GP',
+  OTHER: 'Other'
 } as const;
 
 export type PlotApproval = typeof PLOT_APPROVALS[keyof typeof PLOT_APPROVALS];
@@ -158,6 +161,59 @@ export const FURNISHING_STATUS = {
 
 export type FurnishingStatus = typeof FURNISHING_STATUS[keyof typeof FURNISHING_STATUS];
 
+// New common enums for extended residential specs
+export const AGE_OF_PROPERTY = {
+  NEW: 'New',
+  YRS_0_5: '0-5 yrs',
+  YRS_5_10: '5-10 yrs',
+  YRS_10_PLUS: '10+ yrs'
+} as const;
+
+export type AgeOfProperty = typeof AGE_OF_PROPERTY[keyof typeof AGE_OF_PROPERTY];
+
+export const FLOORING_TYPES = {
+  VITRIFIED: 'Vitrified',
+  MARBLE: 'Marble',
+  WOODEN: 'Wooden',
+  OTHERS: 'Others'
+} as const;
+
+export type FlooringType = typeof FLOORING_TYPES[keyof typeof FLOORING_TYPES];
+
+export const POWER_BACKUP = {
+  FULL: 'Full',
+  PARTIAL: 'Partial',
+  NONE: 'None'
+} as const;
+
+export type PowerBackup = typeof POWER_BACKUP[keyof typeof POWER_BACKUP];
+
+export const PARKING_TYPES = {
+  COVERED: 'Covered',
+  OPEN: 'Open',
+  BOTH: 'Both'
+} as const;
+
+export type ParkingType = typeof PARKING_TYPES[keyof typeof PARKING_TYPES];
+
+export const WATER_SUPPLY = {
+  BOREWELL: 'Borewell',
+  MUNICIPAL: 'Municipal',
+  BOTH: 'Both'
+} as const;
+
+export type WaterSupply = typeof WATER_SUPPLY[keyof typeof WATER_SUPPLY];
+
+export const TITLE_STATUS = {
+  CLEAR: 'Clear',
+  DISPUTED: 'Disputed',
+  IN_PROCESS: 'In process'
+} as const;
+
+export type TitleStatus = typeof TITLE_STATUS[keyof typeof TITLE_STATUS];
+
+export type AreaUnit = 'Acres' | 'Sq.Yds' | 'Sq.Ft';
+
 // Agricultural Land specific fields
 export interface AgriculturalLandData {
   village: string;
@@ -170,19 +226,85 @@ export interface AgriculturalLandData {
   boundaryWall: boolean;
   openSides: number;
   purpose: AgriculturalPurpose;
+  // New fields for Agricultural Land (capture richer details)
+  // Area helpers
+  totalAreaValue?: number; // Numeric value corresponding to total area
+  totalAreaUnit?: 'Acres' | 'Hectares';
+  // Basic information
+  surveyNumbers?: string; // Comma-separated survey numbers
+  soilType?: 'Red' | 'Black' | 'Sandy' | 'Mixed';
+  irrigationSource?: 'Borewell' | 'Canal' | 'Rainfed';
+  borewellsCount?: number; // 0 when none
+  cropsGrown?: string; // Free text if applicable
+  hasRoadAccess?: boolean; // Explicit yes/no for road access
+  distanceToMarketKm?: number; // Distance to nearest market/town in km
+  zoningType?: 'R1' | 'R2' | 'R3' | 'R4' | 'Commercial' | 'Peri-Urban Zone' | 'Conservation' | 'Industrial' | 'Mixed Use Zone';
+  // Documentation
+  saleDeedAvailable?: boolean;
+  pattadarPassbookAvailable?: boolean;
+  encumbranceCertificateAvailable?: boolean; // EC
+  pahaniAdangalAvailable?: boolean;
+  surveyMapAvailable?: boolean; // Survey Map / FMB
+  // Pricing
+  pricePerAcre?: number;
+  negotiable?: boolean;
+  // Media
+  droneShotUrls?: string[];
+  locationMapUrl?: string | null;
 }
 
 // Plot specific fields
+export type PlotSizeUnit = 'Sq.Yds' | 'Sq.Ft' | 'Acres' | 'Hectares';
+export type LengthUnit = 'feet' | 'meters';
+export type PlotShape = 'Rectangular' | 'Square' | 'Irregular';
+
 export interface PlotData {
+  // Location
   village: string;
+  mandal?: string; // Telangana administrative unit
   city: string;
   district: string;
-  extentSqYds: number; // in square yards
+
+  // Size and dimensions
+  extentSqYds?: number; // legacy compatibility
+  sizeValue?: number;
+  sizeUnit?: PlotSizeUnit;
+  length?: number;
+  breadth?: number;
+  dimensionUnit?: LengthUnit; // feet/meters
+  shape?: PlotShape;
+
+  // Orientation & access
   facing: FacingDirection;
-  roadWidth: number; // in feet
+  roadWidth: number; // numeric value
+  roadUnit?: LengthUnit; // feet/meters
   openSides: number;
-  approval: PlotApproval; // HMDA, DTCP, GP
+  cornerPlot?: boolean;
+  plotNumber?: string;
+
+  // Approvals & zoning
+  approval: PlotApproval; // HMDA, DTCP, GHMC, Panchayat, GP, Other
+  approvalRef?: string;
+  zoningType?: string; // e.g., R1, R2, Commercial, Peri-Urban, Conservation, Industrial, Mixed
   layoutName: string;
+
+  // Legal documentation
+  encumbranceCertificate?: 'Yes' | 'No' | 'Pending';
+  linkDocuments?: boolean;
+  saleDeedOrGpa?: boolean;
+  nocAvailable?: boolean;
+
+  // Pricing & payment
+  pricePerUnit?: number; // numeric
+  pricePerUnitUnit?: 'Sq.Yd' | 'Sq.Ft';
+  negotiable?: boolean;
+  bookingAmount?: number;
+  paymentModes?: Array<'Bank Transfer' | 'Cheque' | 'Cash' | 'Loan'>;
+  loanApprovedBanks?: string[];
+
+  // Media
+  layoutPlanUrls?: string[];
+  locationMapUrl?: string | null;
 }
 
 // Flat/Apartment specific fields
@@ -200,6 +322,61 @@ export interface FlatApartmentData {
   parkingCount: number; // number of car parkings
   transactionType: TransactionType; // Resale, Brand New
   facing: FacingDirection;
+  // New extended fields
+  builtUpAreaSqFt?: number;
+  carpetAreaSqFt?: number;
+  bedroomsCount?: number;
+  totalFloors?: number; // total floors in the building
+  totalFlats?: number; // total number of flats in the project/building
+  bathroomsCount?: number;
+  balconiesCount?: number;
+  furnishingStatus?: FurnishingStatus;
+  flooringType?: FlooringType;
+  ceilingHeightFeet?: number;
+  propertyAreaValue?: number;
+  propertyAreaUnit?: AreaUnit;
+  readinessStatus?: 'Ready to Move' | 'Under Construction' | 'Pre-launch';
+  possessionDateIso?: string; // ISO date string
+  ageOfProperty?: AgeOfProperty;
+  // Amenities & utilities
+  hasClubhouse?: boolean;
+  hasGym?: boolean;
+  hasSwimmingPool?: boolean;
+  hasChildrenPlayArea?: boolean;
+  hasGardenPark?: boolean;
+  hasSecurityCctv?: boolean;
+  hasLift?: boolean;
+  powerBackup?: PowerBackup;
+  parkingType?: ParkingType;
+  parkingSlots?: number;
+  waterSupply?: WaterSupply;
+  roadWidthFeet?: number;
+  // Legal
+  approvedBuildingPlan?: boolean;
+  reraRegistrationNumber?: string | null;
+  titleStatus?: TitleStatus;
+  loanApprovedBanks?: string[];
+  // Pricing
+  pricePerSqFt?: number;
+  maintenanceMonthly?: number;
+  negotiable?: boolean;
+  // Media (categorized)
+  interiorPhotoUrls?: string[];
+  exteriorPhotoUrls?: string[];
+  floorPlanUrls?: string[];
+  videoTourUrl?: string | null;
+  // Resale specific
+  previousOwners?: 'Single' | 'Multiple';
+  originalConstructionYear?: number;
+  purchaseYearCurrentOwner?: number;
+  renovationsDone?: boolean;
+  renovationsDescription?: string;
+  occupancyStatus?: 'Owner-occupied' | 'Tenanted' | 'Vacant';
+  existingLoanOrMortgage?: boolean;
+  societyTransferCharges?: number;
+  pendingMaintenanceDues?: boolean;
+  pendingMaintenanceAmount?: number;
+  utilityConnectionsActive?: Array<'Electricity' | 'Water' | 'Gas'>;
 }
 
 // Villa/Independent House specific fields
@@ -218,6 +395,58 @@ export interface VillaIndependentHouseData {
   transactionType: TransactionType;
   facing: FacingDirection;
   furnishingStatus: FurnishingStatus;
+  // New extended fields
+  builtUpAreaSqFt?: number;
+  carpetAreaSqFt?: number;
+  bedroomsCount?: number;
+  bathroomsCount?: number;
+  balconiesCount?: number;
+  flooringType?: FlooringType;
+  ceilingHeightFeet?: number;
+  plotSizeValue?: number;
+  plotSizeUnit?: AreaUnit; // Acres, Sq.Yds, Sq.Ft
+  readinessStatus?: 'Ready to Move' | 'Under Construction' | 'Pre-launch';
+  possessionDateIso?: string; // ISO date string
+  ageOfProperty?: AgeOfProperty;
+  // Amenities & utilities
+  hasClubhouse?: boolean;
+  hasGym?: boolean;
+  hasSwimmingPool?: boolean;
+  hasChildrenPlayArea?: boolean;
+  hasGardenPark?: boolean;
+  hasSecurityCctv?: boolean;
+  hasLift?: boolean; // usually N/A but keep for independent houses in gated communities
+  powerBackup?: PowerBackup;
+  parkingType?: ParkingType;
+  parkingSlots?: number;
+  waterSupply?: WaterSupply;
+  roadWidthFeet?: number;
+  // Legal
+  approvedBuildingPlan?: boolean;
+  reraRegistrationNumber?: string | null;
+  titleStatus?: TitleStatus;
+  loanApprovedBanks?: string[];
+  // Pricing
+  pricePerSqFt?: number;
+  maintenanceMonthly?: number;
+  negotiable?: boolean;
+  // Media (categorized)
+  interiorPhotoUrls?: string[];
+  exteriorPhotoUrls?: string[];
+  floorPlanUrls?: string[];
+  videoTourUrl?: string | null;
+  // Resale specific
+  previousOwners?: 'Single' | 'Multiple';
+  originalConstructionYear?: number;
+  purchaseYearCurrentOwner?: number;
+  renovationsDone?: boolean;
+  renovationsDescription?: string;
+  occupancyStatus?: 'Owner-occupied' | 'Tenanted' | 'Vacant';
+  existingLoanOrMortgage?: boolean;
+  societyTransferCharges?: number;
+  pendingMaintenanceDues?: boolean;
+  pendingMaintenanceAmount?: number;
+  utilityConnectionsActive?: Array<'Electricity' | 'Water' | 'Gas'>;
 }
 
 // IT Commercial Space specific fields
@@ -235,7 +464,35 @@ export interface ITCommercialSpaceData {
   bikeParkingCount: number;
   transactionType: TransactionType; // Resale, Brand New
   furnishingStatus: FurnishingStatus; // Unfurnished, Semi furnished, Fully furnished
-  airConditioned: boolean; // yes/no
+  airConditioned: boolean; // yes/no (legacy)
+  // Extended commercial fields
+  commercialType?: 'IT Office Space' | 'Retail Space' | 'Showroom' | 'Warehouse';
+  readinessStatus?: 'Ready' | 'Under Construction' | 'Shell';
+  possessionDateIso?: string; // ISO date string
+  builtUpAreaSqFt?: number;
+  carpetAreaSqFt?: number;
+  floorLevel?: 'Ground' | 'Upper' | 'Multiple floors';
+  ceilingHeightFeet?: number;
+  coveredParkingSlots?: number;
+  openParkingSlots?: number;
+  liftType?: 'Passenger' | 'Service' | 'Freight';
+  powerBackup?: PowerBackup;
+  acType?: 'Central' | 'Split' | 'None';
+  roadWidthFeet?: number;
+  furnishingCommercial?: 'Bare shell' | 'Warm shell' | 'Fully furnished';
+  // Legal
+  commercialApprovalCertificate?: boolean;
+  fireNoc?: boolean;
+  reraRegistrationNumber?: string | null;
+  // Pricing
+  pricePerSqFt?: number;
+  maintenanceMonthly?: number;
+  negotiable?: boolean;
+  // Media
+  interiorPhotoUrls?: string[];
+  exteriorPhotoUrls?: string[];
+  floorPlanUrls?: string[];
+  locationMapUrl?: string | null;
 }
 
 // Base property form interface
@@ -270,4 +527,24 @@ export interface FarmHouseData {
   swimmingPool: boolean;
   ageYears: number;
   furnishingStatus: FurnishingStatus;
+  // Extended fields
+  plotSizeValue?: number;
+  plotSizeUnit?: 'Acres' | 'Sq.Yds';
+  bedrooms?: number;
+  bathrooms?: number;
+  landscapedGarden?: boolean;
+  roadWidthFt?: number;
+  facing?: FacingDirection;
+  nearestCityKm?: number;
+  nearestHighwayKm?: number;
+  landStatus?: 'Agricultural' | 'Converted';
+  titleStatus?: 'Clear' | 'Disputed';
+  encumbranceCertificate?: boolean;
+  pricePerUnit?: number;
+  pricePerUnitUnit?: 'Acre' | 'Sq.Yd';
+  negotiable?: boolean;
+  interiorPhotosUrls?: string[];
+  exteriorPhotosUrls?: string[];
+  droneFootageUrls?: string[];
+  locationMapUrl?: string | null;
 }

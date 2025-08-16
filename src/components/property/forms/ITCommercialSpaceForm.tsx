@@ -6,7 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { type ListingType, type PropertyType, type BasePropertyFormData, type ITCommercialSpaceData, FACING_DIRECTIONS, TRANSACTION_TYPES, FLAT_CONSTRUCTION_STATUS, FURNISHING_STATUS } from '@/types/property';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { type ListingType, type PropertyType, type BasePropertyFormData, type ITCommercialSpaceData, FACING_DIRECTIONS, TRANSACTION_TYPES, FLAT_CONSTRUCTION_STATUS, FURNISHING_STATUS, POWER_BACKUP } from '@/types/property';
 
 interface ITCommercialSpaceFormProps {
   listingType: ListingType;
@@ -35,7 +37,32 @@ export default function ITCommercialSpaceForm({
     bikeParkingCount: 0,
     transactionType: 'Resale',
     furnishingStatus: 'Unfurnished',
-    airConditioned: false
+    airConditioned: false,
+    // extended
+    commercialType: undefined,
+    readinessStatus: 'Ready',
+    possessionDateIso: '',
+    builtUpAreaSqFt: undefined,
+    carpetAreaSqFt: undefined,
+    floorLevel: undefined,
+    ceilingHeightFeet: undefined,
+    coveredParkingSlots: undefined,
+    openParkingSlots: undefined,
+    liftType: undefined,
+    powerBackup: undefined,
+    acType: undefined,
+    roadWidthFeet: undefined,
+    furnishingCommercial: undefined,
+    commercialApprovalCertificate: undefined,
+    fireNoc: undefined,
+    reraRegistrationNumber: null,
+    pricePerSqFt: undefined,
+    maintenanceMonthly: undefined,
+    negotiable: undefined,
+    interiorPhotoUrls: [],
+    exteriorPhotoUrls: [],
+    floorPlanUrls: [],
+    locationMapUrl: ''
   });
 
   const updateItData = (updates: Partial<ITCommercialSpaceData>) => {
@@ -53,18 +80,18 @@ export default function ITCommercialSpaceForm({
   const generateItTitle = async (): Promise<string> => {
     const parts: string[] = [];
     if (itData.projectName) parts.push(itData.projectName);
-    parts.push('IT Commercial Space');
-    if (itData.perUnitAreaSqFt > 0) parts.push(`${itData.perUnitAreaSqFt} Sq.ft/unit`);
+    parts.push(itData.commercialType || 'IT Commercial Space');
+    if (itData.builtUpAreaSqFt) parts.push(`${itData.builtUpAreaSqFt} Sq.ft`);
     if (itData.city) parts.push(itData.city);
     return parts.join(' - ');
   };
 
   const generateItDescription = async (): Promise<string> => {
-    const statusText = itData.constructionStatus === 'Ready to move'
-      ? 'Ready to move'
-      : `Handover in ${itData.handoverInMonths || 0} months`;
-    const acText = itData.airConditioned ? 'Air-conditioned' : 'Non AC';
-    return `${itData.projectName}, ${itData.city}. Project ${itData.projectAreaSqFt} Sq.ft, ${itData.numUnits} units, ${itData.perUnitAreaSqFt} Sq.ft per unit. ${statusText}, Floor ${itData.floorInfo}, ${itData.facing} facing. ${itData.carParkingCount} car + ${itData.bikeParkingCount} bike parking. ${itData.transactionType}, ${itData.furnishingStatus}. ${acText}.`;
+    const statusText = itData.readinessStatus === 'Under Construction'
+      ? `Possession by ${(itData.possessionDateIso && new Date(itData.possessionDateIso).toLocaleDateString()) || 'TBD'}`
+      : itData.readinessStatus || 'Ready';
+    const ac = itData.acType || (itData.airConditioned ? 'Central' : 'None');
+    return `${itData.commercialType || 'IT Commercial Space'} in ${itData.projectName}, ${itData.city}. Built-up ${itData.builtUpAreaSqFt || 0} Sq.ft, Carpet ${itData.carpetAreaSqFt || 0} Sq.ft. ${statusText}. Floor: ${itData.floorLevel || itData.floorInfo}. Ceiling ${itData.ceilingHeightFeet || 0} ft. Parking: ${itData.coveredParkingSlots || 0} covered / ${itData.openParkingSlots || 0} open. Lift: ${itData.liftType || 'N/A'}. Power backup: ${itData.powerBackup || 'None'}. AC: ${ac}. Road ${itData.roadWidthFeet || 0} ft. Furnishing: ${itData.furnishingCommercial || itData.furnishingStatus}.`;
   };
 
   return (
@@ -149,46 +176,53 @@ export default function ITCommercialSpaceForm({
         </div>
       </div>
 
-      {/* Status & Specs */}
+      {/* Basic Information */}
       <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
-        <h3 className="text-lg font-semibold text-zinc-900 mb-4">Status & Specifications</h3>
+        <h3 className="text-lg font-semibold text-zinc-900 mb-4">Basic Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <Label>Construction Status</Label>
-            <Select value={itData.constructionStatus} onValueChange={(value) => updateItData({ constructionStatus: value as ITCommercialSpaceData['constructionStatus'] })}>
+            <Label>Type</Label>
+            <Select value={itData.commercialType} onValueChange={(value) => updateItData({ commercialType: value as NonNullable<ITCommercialSpaceData['commercialType']> })}>
+              <SelectTrigger className="mt-2"><SelectValue placeholder="Select type" /></SelectTrigger>
+              <SelectContent>
+                {['IT Office Space','Retail Space','Showroom','Warehouse'].map((t) => (<SelectItem key={t} value={t}>{t}</SelectItem>))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Status</Label>
+            <Select value={itData.readinessStatus} onValueChange={(value) => updateItData({ readinessStatus: value as NonNullable<ITCommercialSpaceData['readinessStatus']> })}>
               <SelectTrigger className="mt-2">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
-                {Object.values(FLAT_CONSTRUCTION_STATUS).map((s) => (
-                  <SelectItem key={s} value={s}>{s}</SelectItem>
-                ))}
+                {['Ready','Under Construction','Shell'].map((s) => (<SelectItem key={s} value={s}>{s}</SelectItem>))}
               </SelectContent>
             </Select>
           </div>
-          {itData.constructionStatus === 'Handover in' && (
+          {itData.readinessStatus === 'Under Construction' && (
             <div>
-              <Label htmlFor="handoverIn">Handover In (months)</Label>
-              <Input
-                id="handoverIn"
-                type="number"
-                value={itData.handoverInMonths?.toString() || ''}
-                onChange={(e) => updateItData({ handoverInMonths: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })}
-                placeholder="e.g., 6"
-                className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              />
+              <Label htmlFor="possessionDate">Possession Date</Label>
+              <Input id="possessionDate" type="date" value={itData.possessionDateIso || ''} onChange={(e) => updateItData({ possessionDateIso: e.target.value })} className="mt-2" />
             </div>
           )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
           <div>
-            <Label>Facing</Label>
-            <Select value={itData.facing} onValueChange={(value) => updateItData({ facing: value as ITCommercialSpaceData['facing'] })}>
-              <SelectTrigger className="mt-2">
-                <SelectValue placeholder="Select facing" />
-              </SelectTrigger>
+            <Label htmlFor="builtUpArea">Built-up Area (Sq.ft)</Label>
+            <Input id="builtUpArea" type="number" value={itData.builtUpAreaSqFt?.toString() || ''} onChange={(e) => updateItData({ builtUpAreaSqFt: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })} className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+          </div>
+          <div>
+            <Label htmlFor="carpetArea">Carpet Area (Sq.ft)</Label>
+            <Input id="carpetArea" type="number" value={itData.carpetAreaSqFt?.toString() || ''} onChange={(e) => updateItData({ carpetAreaSqFt: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })} className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+          </div>
+          <div>
+            <Label>Floor Level</Label>
+            <Select value={itData.floorLevel} onValueChange={(value) => updateItData({ floorLevel: value as NonNullable<ITCommercialSpaceData['floorLevel']> })}>
+              <SelectTrigger className="mt-2"><SelectValue placeholder="Select floor level" /></SelectTrigger>
               <SelectContent>
-                {Object.values(FACING_DIRECTIONS).map((dir) => (
-                  <SelectItem key={dir} value={dir}>{dir}</SelectItem>
-                ))}
+                {['Ground','Upper','Multiple floors'].map((v) => (<SelectItem key={v} value={v}>{v}</SelectItem>))}
               </SelectContent>
             </Select>
           </div>
@@ -196,37 +230,22 @@ export default function ITCommercialSpaceForm({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
           <div>
-            <Label htmlFor="carParkingCount">Car Parking</Label>
-            <Input
-              id="carParkingCount"
-              type="number"
-              value={itData.carParkingCount === 0 ? '' : itData.carParkingCount.toString()}
-              onChange={(e) => updateItData({ carParkingCount: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 })}
-              placeholder="e.g., 4"
-              className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-            />
+            <Label htmlFor="ceilingHeight">Ceiling Height (ft)</Label>
+            <Input id="ceilingHeight" type="number" value={itData.ceilingHeightFeet?.toString() || ''} onChange={(e) => updateItData({ ceilingHeightFeet: e.target.value === '' ? undefined : parseFloat(e.target.value) || 0 })} className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
           </div>
           <div>
-            <Label htmlFor="bikeParkingCount">Bike Parking</Label>
-            <Input
-              id="bikeParkingCount"
-              type="number"
-              value={itData.bikeParkingCount === 0 ? '' : itData.bikeParkingCount.toString()}
-              onChange={(e) => updateItData({ bikeParkingCount: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 })}
-              placeholder="e.g., 10"
-              className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-            />
+            <Label>Parking Slots</Label>
+            <div className="grid grid-cols-2 gap-3 mt-2">
+              <Input type="number" placeholder="Covered" value={itData.coveredParkingSlots?.toString() || ''} onChange={(e) => updateItData({ coveredParkingSlots: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })} className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+              <Input type="number" placeholder="Open" value={itData.openParkingSlots?.toString() || ''} onChange={(e) => updateItData({ openParkingSlots: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })} className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+            </div>
           </div>
           <div>
-            <Label>Transaction Type</Label>
-            <Select value={itData.transactionType} onValueChange={(value) => updateItData({ transactionType: value as ITCommercialSpaceData['transactionType'] })}>
-              <SelectTrigger className="mt-2">
-                <SelectValue placeholder="Select transaction type" />
-              </SelectTrigger>
+            <Label>Lift Type</Label>
+            <Select value={itData.liftType} onValueChange={(value) => updateItData({ liftType: value as NonNullable<ITCommercialSpaceData['liftType']> })}>
+              <SelectTrigger className="mt-2"><SelectValue placeholder="Select lift" /></SelectTrigger>
               <SelectContent>
-                {Object.values(TRANSACTION_TYPES).map((t) => (
-                  <SelectItem key={t} value={t}>{t}</SelectItem>
-                ))}
+                {['Passenger','Service','Freight'].map((v) => (<SelectItem key={v} value={v}>{v}</SelectItem>))}
               </SelectContent>
             </Select>
           </div>
@@ -234,34 +253,97 @@ export default function ITCommercialSpaceForm({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
           <div>
-            <Label>Furnishing Status</Label>
-            <Select value={itData.furnishingStatus} onValueChange={(value) => updateItData({ furnishingStatus: value as ITCommercialSpaceData['furnishingStatus'] })}>
+            <Label>Power Backup</Label>
+            <Select value={itData.powerBackup} onValueChange={(value) => updateItData({ powerBackup: value as NonNullable<ITCommercialSpaceData['powerBackup']> })}>
               <SelectTrigger className="mt-2">
-                <SelectValue placeholder="Select furnishing status" />
+                <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>
-                {Object.values(FURNISHING_STATUS).map((f) => (
-                  <SelectItem key={f} value={f}>{f}</SelectItem>
-                ))}
+                {Object.values(POWER_BACKUP).map((v) => (<SelectItem key={v} value={v}>{v}</SelectItem>))}
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label className="flex items-center">Air Conditioned</Label>
-            <RadioGroup
-              value={itData.airConditioned.toString()}
-              onValueChange={(value) => updateItData({ airConditioned: value === 'true' })}
-              className="mt-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="true" id="ac-yes" />
-                <Label htmlFor="ac-yes">Yes</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="false" id="ac-no" />
-                <Label htmlFor="ac-no">No</Label>
-              </div>
-            </RadioGroup>
+            <Label>Air Conditioning</Label>
+            <Select value={itData.acType} onValueChange={(value) => updateItData({ acType: value as NonNullable<ITCommercialSpaceData['acType']> })}>
+              <SelectTrigger className="mt-2"><SelectValue placeholder="Select AC type" /></SelectTrigger>
+              <SelectContent>
+                {['Central','Split','None'].map((v) => (<SelectItem key={v} value={v}>{v}</SelectItem>))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="roadWidth">Road Width in front (ft)</Label>
+            <Input id="roadWidth" type="number" value={itData.roadWidthFeet?.toString() || ''} onChange={(e) => updateItData({ roadWidthFeet: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })} className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          <div>
+            <Label>Furnishing</Label>
+            <Select value={itData.furnishingCommercial} onValueChange={(value) => updateItData({ furnishingCommercial: value as NonNullable<ITCommercialSpaceData['furnishingCommercial']> })}>
+              <SelectTrigger className="mt-2"><SelectValue placeholder="Select furnishing" /></SelectTrigger>
+              <SelectContent>
+                {['Bare shell','Warm shell','Fully furnished'].map((v) => (<SelectItem key={v} value={v}>{v}</SelectItem>))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+
+      {/* Legal */}
+      <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+        <h3 className="text-lg font-semibold text-zinc-900 mb-4">Legal</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="flex items-center space-x-2"><Checkbox checked={!!itData.commercialApprovalCertificate} onCheckedChange={(v) => updateItData({ commercialApprovalCertificate: !!v })} /><Label>Commercial Approval Certificate</Label></div>
+          <div className="flex items-center space-x-2"><Checkbox checked={!!itData.fireNoc} onCheckedChange={(v) => updateItData({ fireNoc: !!v })} /><Label>Fire NOC</Label></div>
+          <div>
+            <Label htmlFor="rera">RERA Number</Label>
+            <Input id="rera" value={itData.reraRegistrationNumber || ''} onChange={(e) => updateItData({ reraRegistrationNumber: e.target.value || null })} className="mt-2" />
+          </div>
+        </div>
+      </div>
+
+      {/* Pricing */}
+      <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+        <h3 className="text-lg font-semibold text-zinc-900 mb-4">Pricing</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <Label htmlFor="pricePerSqFt">Price per Sq.Ft</Label>
+            <Input id="pricePerSqFt" type="number" value={itData.pricePerSqFt?.toString() || ''} onChange={(e) => updateItData({ pricePerSqFt: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })} className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+          </div>
+          <div>
+            <Label htmlFor="maintenanceMonthly">Maintenance Charges</Label>
+            <Input id="maintenanceMonthly" type="number" value={itData.maintenanceMonthly?.toString() || ''} onChange={(e) => updateItData({ maintenanceMonthly: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })} className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+          </div>
+          <div className="flex items-center space-x-2 mt-8">
+            <Checkbox checked={!!itData.negotiable} onCheckedChange={(v) => updateItData({ negotiable: !!v })} />
+            <Label>Negotiable?</Label>
+          </div>
+        </div>
+      </div>
+
+      {/* Media */}
+      <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+        <h3 className="text-lg font-semibold text-zinc-900 mb-4">Media</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <Label htmlFor="interiorUrls">Interior Photo URLs (comma-separated)</Label>
+            <Textarea id="interiorUrls" value={(itData.interiorPhotoUrls || []).join(', ')} onChange={(e) => updateItData({ interiorPhotoUrls: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} className="mt-2" rows={2} />
+          </div>
+          <div>
+            <Label htmlFor="exteriorUrls">Exterior Photo URLs (comma-separated)</Label>
+            <Textarea id="exteriorUrls" value={(itData.exteriorPhotoUrls || []).join(', ')} onChange={(e) => updateItData({ exteriorPhotoUrls: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} className="mt-2" rows={2} />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <div>
+            <Label htmlFor="floorPlanUrls">Floor Plan URLs (comma-separated)</Label>
+            <Textarea id="floorPlanUrls" value={(itData.floorPlanUrls || []).join(', ')} onChange={(e) => updateItData({ floorPlanUrls: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} className="mt-2" rows={2} />
+          </div>
+          <div>
+            <Label htmlFor="locationMapUrl">Location Map URL</Label>
+            <Input id="locationMapUrl" value={itData.locationMapUrl || ''} onChange={(e) => updateItData({ locationMapUrl: e.target.value || null })} className="mt-2" />
           </div>
         </div>
       </div>

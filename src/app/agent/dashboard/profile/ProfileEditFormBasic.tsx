@@ -32,6 +32,8 @@ interface Agent {
   linkedinUrl?: string | null;
   youtubeUrl?: string | null;
   twitterUrl?: string | null;
+  officeAddress?: string | null;
+  officeMapUrl?: string | null;
   user: {
     id: string;
     name: string | null;
@@ -66,6 +68,8 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
     linkedinUrl: (agent as unknown as { linkedinUrl?: string | null }).linkedinUrl || '',
     youtubeUrl: (agent as unknown as { youtubeUrl?: string | null }).youtubeUrl || '',
     twitterUrl: (agent as unknown as { twitterUrl?: string | null }).twitterUrl || '',
+    officeAddress: (agent as unknown as { officeAddress?: string | null }).officeAddress || '',
+    officeMapUrl: (agent as unknown as { officeMapUrl?: string | null }).officeMapUrl || '',
   });
 
   // Determine plan restrictions for template selection
@@ -727,6 +731,28 @@ export default function ProfileEditFormBasic({ agent }: ProfileEditFormBasicProp
                 value={formData.twitterUrl}
                 onChange={(e) => handleInputChange('twitterUrl', e.target.value)}
               />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="officeAddress" className="text-zinc-600">Office Address</Label>
+              <Textarea
+                id="officeAddress"
+                placeholder="Flat/Plot No, Street, Locality, City, State, Pincode"
+                value={formData.officeAddress}
+                onChange={(e) => handleInputChange('officeAddress', e.target.value)}
+                maxLength={200}
+              />
+              <p className="text-xs text-zinc-500">Shown in your profile footer. Keep it concise (max 200 chars).</p>
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="officeMapUrl" className="text-zinc-600">Office Google Maps Link</Label>
+              <Input
+                id="officeMapUrl"
+                type="url"
+                placeholder="https://maps.google.com/..."
+                value={formData.officeMapUrl}
+                onChange={(e) => handleInputChange('officeMapUrl', e.target.value)}
+              />
+              <p className="text-xs text-zinc-500">Paste a shareable Google Maps URL for your office location.</p>
             </div>
           </div>
         </div>

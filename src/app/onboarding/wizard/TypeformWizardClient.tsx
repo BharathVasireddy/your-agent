@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 import { useWizardStore } from '@/store/wizard-store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import PhoneWhatsAppVerify from '@/components/PhoneWhatsAppVerify';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -110,7 +111,8 @@ export default function TypeformWizardClient() {
     if (index === 2) return true; // email is from session for Google, optional input for Whatsapp users
     if (index === 3) return !!store.city;
     if (index === 4) return !!store.area;
-    if (index === 5) return !!store.phone && isPhoneValid(store.phone);
+    // Require verified WhatsApp number (PhoneWhatsAppVerify sets phoneVerified=true on success)
+    if (index === 5) return !!store.phone && isPhoneValid(store.phone) && !!store.phoneVerified;
     if (index === 6) return !!store.dateOfBirth;
     if (index === 7) return Number.isFinite(store.experience) && store.experience >= 0;
     if (index === 8) {
@@ -161,7 +163,7 @@ export default function TypeformWizardClient() {
   const finish = async () => {
     try {
       setBusy(true);
-      if (!store.slug || !store.phone || !store.city || !store.dateOfBirth) {
+      if (!store.slug || !store.phone || !store.phoneVerified || !store.city || !store.dateOfBirth) {
         setError('Please complete all required fields.');
         return;
       }
@@ -314,30 +316,20 @@ export default function TypeformWizardClient() {
 
                {index === 5 && (
                 <div className="space-y-4">
-                  <h2 className="text-2xl font-semibold text-zinc-950">What is your WhatsApp number?</h2>
-                  <div>
-                    <Label htmlFor="phone" className="text-sm text-zinc-700">Phone (India only)</Label>
-                    <div className="mt-2 relative flex items-center border border-zinc-300 rounded-md overflow-hidden">
-                      <span className="pl-3 pr-2 text-sm text-zinc-700 font-medium select-none">+91</span>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        maxLength={10}
-                        value={(store.phone || '').replace(/^\+91/, '')}
-                        onChange={(e) => {
-                          const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
-                          store.setData({ phone: digits ? `+91${digits}` : '' });
-                        }}
-                        placeholder="9876543210"
-                        className="flex-1 h-11 border-0 px-2 focus:ring-2 focus:ring-brand focus:border-transparent"
-                      />
-                    </div>
-                     {!!store.phone && !isPhoneValid(store.phone) && (
-                      <p className="mt-1 text-xs text-brand-hover">Enter a valid 10-digit Indian number (e.g., +919876543210)</p>
-                    )}
-                  </div>
+                  <h2 className="text-2xl font-semibold text-zinc-950">Verify your WhatsApp number</h2>
+                  <PhoneWhatsAppVerify
+                    label="Phone (India only)"
+                    value={store.phone}
+                    onValueChange={(e164)=>store.setData({ phone: e164, phoneVerified: false })}
+                    onVerified={(e164)=>store.setData({ phone: e164, phoneVerified: true })}
+                    required
+                  />
+                  {!!store.phone && !isPhoneValid(store.phone) && (
+                    <p className="mt-1 text-xs text-brand-hover">Enter a valid 10-digit Indian number (e.g., +919876543210)</p>
+                  )}
+                  {!!store.phone && isPhoneValid(store.phone) && !store.phoneVerified && (
+                    <p className="mt-1 text-xs text-brand-hover">Please verify your WhatsApp number to continue.</p>
+                  )}
                 </div>
               )}
 

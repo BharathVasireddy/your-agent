@@ -113,17 +113,54 @@ export async function POST(request: NextRequest) {
 
     // Handle property-type specific fields
     if (data.propertyType === 'Agricultural Land' && data.agriculturalLandData) {
-      // For agricultural land, calculate total area from acres and guntas
-      const totalAcres = data.agriculturalLandData.extentAcres + (data.agriculturalLandData.extentGuntas / 40);
-      const totalSqFt = Math.round(totalAcres * 43560); // 1 acre = 43,560 sq ft
+      // For agricultural land, calculate total area using available inputs
+      const acresFromAcresGuntas = (data.agriculturalLandData.extentAcres || 0) + ((data.agriculturalLandData.extentGuntas || 0) / 40);
+      let totalAcres = acresFromAcresGuntas;
+      if (data.agriculturalLandData.totalAreaValue && data.agriculturalLandData.totalAreaUnit) {
+        const v = data.agriculturalLandData.totalAreaValue;
+        totalAcres = data.agriculturalLandData.totalAreaUnit === 'Hectares' ? (v * 2.47105) : v;
+      }
+      const totalSqFt = Math.round((totalAcres || 0) * 43560); // 1 acre = 43,560 sq ft
       
       propertyData.area = totalSqFt;
       propertyData.bedrooms = null;
       propertyData.bathrooms = null;
       propertyData.propertyData = data.agriculturalLandData;
     } else if (data.propertyType === 'Plot' && data.plotData) {
-      // For plots, convert square yards to square feet (1 sq yd = 9 sq ft)
-      const totalSqFt = Math.round(data.plotData.extentSqYds * 9);
+      // For plots, compute area in sq.ft from provided size or dimensions
+      const pd = data.plotData;
+      let totalSqFt = 0;
+      if (typeof pd.sizeValue === 'number' && pd.sizeValue > 0 && pd.sizeUnit) {
+        switch (pd.sizeUnit) {
+          case 'Sq.Yds':
+            totalSqFt = Math.round(pd.sizeValue * 9);
+            break;
+          case 'Sq.Ft':
+            totalSqFt = Math.round(pd.sizeValue);
+            break;
+          case 'Acres':
+            totalSqFt = Math.round(pd.sizeValue * 43560);
+            break;
+          case 'Hectares':
+            totalSqFt = Math.round(pd.sizeValue * 107639.104);
+            break;
+          default:
+            totalSqFt = 0;
+        }
+      } else if (
+        typeof pd.length === 'number' && pd.length > 0 &&
+        typeof pd.breadth === 'number' && pd.breadth > 0
+      ) {
+        const isMeters = pd.dimensionUnit === 'meters';
+        if (isMeters) {
+          // 1 m^2 = 10.7639 ft^2
+          totalSqFt = Math.round(pd.length * pd.breadth * 10.7639);
+        } else {
+          totalSqFt = Math.round(pd.length * pd.breadth);
+        }
+      } else if (typeof pd.extentSqYds === 'number' && pd.extentSqYds > 0) {
+        totalSqFt = Math.round(pd.extentSqYds * 9);
+      }
 
       propertyData.area = totalSqFt;
       propertyData.bedrooms = null;

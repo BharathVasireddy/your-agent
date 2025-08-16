@@ -41,5 +41,6 @@ export const authOptions = {
   debug: false, // Disable debug in production for AWS Amplify
 };
 
+// @ts-expect-error NextAuth v4 type compatibility issue
 const handler = NextAuth(authOptions);
 export { handler };

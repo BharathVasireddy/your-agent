@@ -40,6 +40,9 @@ export default function BasePropertyForm({
     propertyType
   });
 
+  // Display state for price with Indian-style commas (e.g., 30,00,000)
+  const [priceDisplay, setPriceDisplay] = useState<string>('');
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
@@ -47,6 +50,27 @@ export default function BasePropertyForm({
 
   const updateFormData = (updates: Partial<BasePropertyFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
+  };
+
+  const formatIndianNumber = (value: number): string => {
+    try {
+      return new Intl.NumberFormat('en-IN').format(value);
+    } catch {
+      return String(value);
+    }
+  };
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    const digitsOnly = raw.replace(/\D/g, '');
+    if (digitsOnly.length === 0) {
+      setPriceDisplay('');
+      updateFormData({ price: 0 });
+      return;
+    }
+    const numeric = parseInt(digitsOnly, 10) || 0;
+    updateFormData({ price: numeric });
+    setPriceDisplay(formatIndianNumber(numeric));
   };
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,12 +207,13 @@ export default function BasePropertyForm({
               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500 text-sm">₹</span>
               <Input
                 id="price"
-                type="number"
-                value={formData.price === 0 ? '' : formData.price.toString()}
-                onChange={(e) => updateFormData({ price: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 })}
+                type="text"
+                inputMode="numeric"
+                value={priceDisplay}
+                onChange={handlePriceChange}
                 placeholder={listingType === 'Sale' ? 'Sale Price' : 'Monthly Rent'}
                 required
-                className="pl-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                className="pl-8"
               />
             </div>
           </div>

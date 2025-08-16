@@ -36,6 +36,13 @@ export default function AboutSection({ agent }: AboutSectionProps) {
     }
   };
 
+  const downloadVisitingCard = async () => {
+    try {
+      const url = `/agent/dashboard/tools/visiting-card`;
+      window.open(url, '_blank');
+    } catch {}
+  };
+
   // Professional highlights
   const highlights = [
     {
@@ -158,12 +165,19 @@ I believe in building lasting relationships with my clients based on trust, tran
             </div>
 
             {/* Call to Action */}
-            <div className="pt-4">
+            <div className="pt-4 flex gap-3 flex-wrap">
               <Button
                 onClick={scrollToContact}
                 className="bg-template-primary hover:bg-template-primary-hover text-white px-8 py-3 rounded-template-button font-template-primary font-semibold transition-all duration-300 shadow-template-md hover:shadow-template-lg"
               >
                 Schedule a Consultation
+              </Button>
+              <Button
+                onClick={downloadVisitingCard}
+                variant="outline"
+                className="border-template-primary text-template-primary hover:bg-template-primary/10 px-8 py-3 rounded-template-button font-template-primary"
+              >
+                Download Visiting Card
               </Button>
             </div>
           </div>

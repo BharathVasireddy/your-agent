@@ -4,6 +4,8 @@ import { IconWebsite, IconFacebook, IconInstagram, IconLinkedIn, IconYouTube, Ic
 
 type Agent = {
   websiteUrl?: string | null;
+  officeAddress?: string | null;
+  officeMapUrl?: string | null;
   facebookUrl?: string | null;
   instagramUrl?: string | null;
   linkedinUrl?: string | null;
@@ -18,6 +20,18 @@ export default function Footer({ agent }: { agent: Agent }) {
     <footer className="bg-template-background border-t border-template-border-light py-8">
       <div className="max-w-7xl mx-auto px-template-container">
         <div className="text-center">
+          {(agent.officeAddress || agent.officeMapUrl) && (
+            <div className="mb-4">
+              {agent.officeAddress && (
+                <p className="text-template-text-secondary text-sm font-template-primary">{agent.officeAddress}</p>
+              )}
+              {agent.officeMapUrl && (
+                <p className="mt-1">
+                  <a href={agent.officeMapUrl} target="_blank" rel="noopener noreferrer" className="text-template-primary hover:underline text-sm">View on Map</a>
+                </p>
+              )}
+            </div>
+          )}
           <p className="text-template-text-muted font-template-primary text-sm">
             © {currentYear} Professional Real Estate Services. All rights reserved.
           </p>

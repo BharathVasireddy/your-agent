@@ -86,6 +86,21 @@ async function getAgentData(agentSlug: string) {
           id: 'desc',
         },
       },
+      awards: {
+        where: { isRemovedByAdmin: false },
+        orderBy: { createdAt: 'desc' },
+        take: 12,
+      },
+      galleryImages: {
+        where: { isRemovedByAdmin: false },
+        orderBy: { createdAt: 'desc' },
+        take: 24,
+      },
+      builders: {
+        where: { isRemovedByAdmin: false },
+        orderBy: { createdAt: 'desc' },
+        take: 24,
+      },
     },
   });
 }

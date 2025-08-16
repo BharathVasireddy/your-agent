@@ -9,8 +9,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Sparkles, Upload, X, HelpCircle } from 'lucide-react';
-import { type BasePropertyFormData, type ListingType, type PropertyType, type AgriculturalLandData, type PlotData, type FlatApartmentData, type ITCommercialSpaceData, type VillaIndependentHouseData, type FarmHouseData, FACING_DIRECTIONS, AGRICULTURAL_PURPOSES, PLOT_APPROVALS, BHK_OPTIONS, COMMUNITY_STATUS, TRANSACTION_TYPES, FLAT_CONSTRUCTION_STATUS, FURNISHING_STATUS } from '@/types/property';
+import { type BasePropertyFormData, type ListingType, type PropertyType, type AgriculturalLandData, type PlotData, type FlatApartmentData, type ITCommercialSpaceData, type VillaIndependentHouseData, type FarmHouseData, FACING_DIRECTIONS, AGRICULTURAL_PURPOSES, PLOT_APPROVALS, BHK_OPTIONS, COMMUNITY_STATUS, TRANSACTION_TYPES, FLAT_CONSTRUCTION_STATUS, FURNISHING_STATUS, FLOORING_TYPES, AGE_OF_PROPERTY, POWER_BACKUP, PARKING_TYPES, WATER_SUPPLY, TITLE_STATUS } from '@/types/property';
 import { type Property } from '@/types/dashboard';
 
 interface PropertyEditWizardProps {
@@ -50,7 +51,26 @@ export default function PropertyEditWizard({ property }: PropertyEditWizardProps
     roadWidth: propertyDataObj?.roadWidth || 0,
     boundaryWall: propertyDataObj?.boundaryWall || false,
     openSides: propertyDataObj?.openSides || 0,
-    purpose: propertyDataObj?.purpose || 'Farming'
+    purpose: propertyDataObj?.purpose || 'Farming',
+    totalAreaValue: propertyDataObj?.totalAreaValue,
+    totalAreaUnit: propertyDataObj?.totalAreaUnit,
+    surveyNumbers: propertyDataObj?.surveyNumbers,
+    soilType: propertyDataObj?.soilType,
+    irrigationSource: propertyDataObj?.irrigationSource,
+    borewellsCount: propertyDataObj?.borewellsCount,
+    cropsGrown: propertyDataObj?.cropsGrown,
+    hasRoadAccess: propertyDataObj?.hasRoadAccess,
+    distanceToMarketKm: propertyDataObj?.distanceToMarketKm,
+    zoningType: propertyDataObj?.zoningType,
+    saleDeedAvailable: propertyDataObj?.saleDeedAvailable,
+    pattadarPassbookAvailable: propertyDataObj?.pattadarPassbookAvailable,
+    encumbranceCertificateAvailable: propertyDataObj?.encumbranceCertificateAvailable,
+    pahaniAdangalAvailable: propertyDataObj?.pahaniAdangalAvailable,
+    surveyMapAvailable: propertyDataObj?.surveyMapAvailable,
+    pricePerAcre: propertyDataObj?.pricePerAcre,
+    negotiable: propertyDataObj?.negotiable,
+    droneShotUrls: propertyDataObj?.droneShotUrls,
+    locationMapUrl: propertyDataObj?.locationMapUrl
   });
 
   // Initialize plot data if property is Plot
@@ -59,14 +79,38 @@ export default function PropertyEditWizard({ property }: PropertyEditWizardProps
     : null;
   const [plotData, setPlotData] = useState<PlotData>({
     village: propertyPlotDataObj?.village || '',
+    mandal: propertyPlotDataObj?.mandal || '',
     city: propertyPlotDataObj?.city || '',
     district: propertyPlotDataObj?.district || '',
-    extentSqYds: propertyPlotDataObj?.extentSqYds || 0,
+    extentSqYds: propertyPlotDataObj?.extentSqYds || 0, // legacy fallback if present
+    sizeValue: propertyPlotDataObj?.sizeValue || (propertyPlotDataObj?.extentSqYds || 0),
+    sizeUnit: propertyPlotDataObj?.sizeUnit || (typeof propertyPlotDataObj?.extentSqYds === 'number' ? 'Sq.Yds' : 'Sq.Yds'),
+    length: propertyPlotDataObj?.length,
+    breadth: propertyPlotDataObj?.breadth,
+    dimensionUnit: propertyPlotDataObj?.dimensionUnit || 'feet',
+    shape: propertyPlotDataObj?.shape || 'Rectangular',
     facing: propertyPlotDataObj?.facing || 'East',
     roadWidth: propertyPlotDataObj?.roadWidth || 0,
+    roadUnit: propertyPlotDataObj?.roadUnit || 'feet',
     openSides: propertyPlotDataObj?.openSides || 0,
+    cornerPlot: propertyPlotDataObj?.cornerPlot || false,
+    plotNumber: propertyPlotDataObj?.plotNumber || '',
     approval: propertyPlotDataObj?.approval || 'HMDA',
-    layoutName: propertyPlotDataObj?.layoutName || ''
+    approvalRef: propertyPlotDataObj?.approvalRef || '',
+    zoningType: propertyPlotDataObj?.zoningType || 'R1',
+    layoutName: propertyPlotDataObj?.layoutName || '',
+    encumbranceCertificate: propertyPlotDataObj?.encumbranceCertificate || 'Pending',
+    linkDocuments: propertyPlotDataObj?.linkDocuments || false,
+    saleDeedOrGpa: propertyPlotDataObj?.saleDeedOrGpa || false,
+    nocAvailable: propertyPlotDataObj?.nocAvailable || false,
+    pricePerUnit: propertyPlotDataObj?.pricePerUnit,
+    pricePerUnitUnit: propertyPlotDataObj?.pricePerUnitUnit,
+    negotiable: propertyPlotDataObj?.negotiable || false,
+    bookingAmount: propertyPlotDataObj?.bookingAmount,
+    paymentModes: propertyPlotDataObj?.paymentModes || [],
+    loanApprovedBanks: propertyPlotDataObj?.loanApprovedBanks || [],
+    layoutPlanUrls: propertyPlotDataObj?.layoutPlanUrls || [],
+    locationMapUrl: propertyPlotDataObj?.locationMapUrl || null,
   });
 
   // Initialize villa data if property is Villa/Independent House
@@ -88,6 +132,51 @@ export default function PropertyEditWizard({ property }: PropertyEditWizardProps
     transactionType: propertyVillaDataObj?.transactionType || 'Resale',
     facing: propertyVillaDataObj?.facing || 'East',
     furnishingStatus: propertyVillaDataObj?.furnishingStatus || 'Unfurnished',
+    readinessStatus: (propertyVillaDataObj as any)?.readinessStatus || 'Ready to Move',
+    possessionDateIso: (propertyVillaDataObj as any)?.possessionDateIso || '',
+    ageOfProperty: (propertyVillaDataObj as any)?.ageOfProperty,
+    builtUpAreaSqFt: (propertyVillaDataObj as any)?.builtUpAreaSqFt,
+    carpetAreaSqFt: (propertyVillaDataObj as any)?.carpetAreaSqFt,
+    bathroomsCount: (propertyVillaDataObj as any)?.bathroomsCount,
+    balconiesCount: (propertyVillaDataObj as any)?.balconiesCount,
+    flooringType: (propertyVillaDataObj as any)?.flooringType,
+    ceilingHeightFeet: (propertyVillaDataObj as any)?.ceilingHeightFeet,
+    plotSizeValue: (propertyVillaDataObj as any)?.plotSizeValue,
+    plotSizeUnit: (propertyVillaDataObj as any)?.plotSizeUnit,
+    hasClubhouse: (propertyVillaDataObj as any)?.hasClubhouse,
+    hasGym: (propertyVillaDataObj as any)?.hasGym,
+    hasSwimmingPool: (propertyVillaDataObj as any)?.hasSwimmingPool,
+    hasChildrenPlayArea: (propertyVillaDataObj as any)?.hasChildrenPlayArea,
+    hasGardenPark: (propertyVillaDataObj as any)?.hasGardenPark,
+    hasSecurityCctv: (propertyVillaDataObj as any)?.hasSecurityCctv,
+    hasLift: (propertyVillaDataObj as any)?.hasLift,
+    powerBackup: (propertyVillaDataObj as any)?.powerBackup,
+    parkingType: (propertyVillaDataObj as any)?.parkingType,
+    parkingSlots: (propertyVillaDataObj as any)?.parkingSlots,
+    waterSupply: (propertyVillaDataObj as any)?.waterSupply,
+    roadWidthFeet: (propertyVillaDataObj as any)?.roadWidthFeet,
+    approvedBuildingPlan: (propertyVillaDataObj as any)?.approvedBuildingPlan,
+    reraRegistrationNumber: (propertyVillaDataObj as any)?.reraRegistrationNumber,
+    titleStatus: (propertyVillaDataObj as any)?.titleStatus,
+    loanApprovedBanks: (propertyVillaDataObj as any)?.loanApprovedBanks || [],
+    pricePerSqFt: (propertyVillaDataObj as any)?.pricePerSqFt,
+    maintenanceMonthly: (propertyVillaDataObj as any)?.maintenanceMonthly,
+    negotiable: (propertyVillaDataObj as any)?.negotiable,
+    interiorPhotoUrls: (propertyVillaDataObj as any)?.interiorPhotoUrls || [],
+    exteriorPhotoUrls: (propertyVillaDataObj as any)?.exteriorPhotoUrls || [],
+    floorPlanUrls: (propertyVillaDataObj as any)?.floorPlanUrls || [],
+    videoTourUrl: (propertyVillaDataObj as any)?.videoTourUrl || null,
+    previousOwners: (propertyVillaDataObj as any)?.previousOwners,
+    originalConstructionYear: (propertyVillaDataObj as any)?.originalConstructionYear,
+    purchaseYearCurrentOwner: (propertyVillaDataObj as any)?.purchaseYearCurrentOwner,
+    renovationsDone: (propertyVillaDataObj as any)?.renovationsDone,
+    renovationsDescription: (propertyVillaDataObj as any)?.renovationsDescription,
+    occupancyStatus: (propertyVillaDataObj as any)?.occupancyStatus,
+    existingLoanOrMortgage: (propertyVillaDataObj as any)?.existingLoanOrMortgage,
+    societyTransferCharges: (propertyVillaDataObj as any)?.societyTransferCharges,
+    pendingMaintenanceDues: (propertyVillaDataObj as any)?.pendingMaintenanceDues,
+    pendingMaintenanceAmount: (propertyVillaDataObj as any)?.pendingMaintenanceAmount,
+    utilityConnectionsActive: (propertyVillaDataObj as any)?.utilityConnectionsActive || [],
   });
 
   // Initialize flat/apartment data if property is Flat/Apartment
@@ -107,7 +196,54 @@ export default function PropertyEditWizard({ property }: PropertyEditWizardProps
     floor: propertyFlatDataObj?.floor || 0,
     parkingCount: propertyFlatDataObj?.parkingCount || 0,
     transactionType: propertyFlatDataObj?.transactionType || 'Resale',
-    facing: propertyFlatDataObj?.facing || 'East'
+    facing: propertyFlatDataObj?.facing || 'East',
+    readinessStatus: (propertyFlatDataObj as any)?.readinessStatus || (propertyFlatDataObj?.constructionStatus ? (propertyFlatDataObj?.handoverInMonths ? 'Under Construction' : 'Ready to Move') : 'Ready to Move'),
+    possessionDateIso: (propertyFlatDataObj as any)?.possessionDateIso || '',
+    ageOfProperty: (propertyFlatDataObj as any)?.ageOfProperty,
+    builtUpAreaSqFt: (propertyFlatDataObj as any)?.builtUpAreaSqFt,
+    carpetAreaSqFt: (propertyFlatDataObj as any)?.carpetAreaSqFt,
+    totalFloors: (propertyFlatDataObj as any)?.totalFloors,
+    bathroomsCount: (propertyFlatDataObj as any)?.bathroomsCount,
+    balconiesCount: (propertyFlatDataObj as any)?.balconiesCount,
+    furnishingStatus: (propertyFlatDataObj as any)?.furnishingStatus,
+    flooringType: (propertyFlatDataObj as any)?.flooringType,
+    ceilingHeightFeet: (propertyFlatDataObj as any)?.ceilingHeightFeet,
+    propertyAreaValue: (propertyFlatDataObj as any)?.propertyAreaValue,
+    propertyAreaUnit: (propertyFlatDataObj as any)?.propertyAreaUnit,
+    hasClubhouse: (propertyFlatDataObj as any)?.hasClubhouse,
+    hasGym: (propertyFlatDataObj as any)?.hasGym,
+    hasSwimmingPool: (propertyFlatDataObj as any)?.hasSwimmingPool,
+    hasChildrenPlayArea: (propertyFlatDataObj as any)?.hasChildrenPlayArea,
+    hasGardenPark: (propertyFlatDataObj as any)?.hasGardenPark,
+    hasSecurityCctv: (propertyFlatDataObj as any)?.hasSecurityCctv,
+    hasLift: (propertyFlatDataObj as any)?.hasLift,
+    powerBackup: (propertyFlatDataObj as any)?.powerBackup,
+    parkingType: (propertyFlatDataObj as any)?.parkingType,
+    parkingSlots: (propertyFlatDataObj as any)?.parkingSlots,
+    waterSupply: (propertyFlatDataObj as any)?.waterSupply,
+    roadWidthFeet: (propertyFlatDataObj as any)?.roadWidthFeet,
+    approvedBuildingPlan: (propertyFlatDataObj as any)?.approvedBuildingPlan,
+    reraRegistrationNumber: (propertyFlatDataObj as any)?.reraRegistrationNumber,
+    titleStatus: (propertyFlatDataObj as any)?.titleStatus,
+    loanApprovedBanks: (propertyFlatDataObj as any)?.loanApprovedBanks || [],
+    pricePerSqFt: (propertyFlatDataObj as any)?.pricePerSqFt,
+    maintenanceMonthly: (propertyFlatDataObj as any)?.maintenanceMonthly,
+    negotiable: (propertyFlatDataObj as any)?.negotiable,
+    interiorPhotoUrls: (propertyFlatDataObj as any)?.interiorPhotoUrls || [],
+    exteriorPhotoUrls: (propertyFlatDataObj as any)?.exteriorPhotoUrls || [],
+    floorPlanUrls: (propertyFlatDataObj as any)?.floorPlanUrls || [],
+    videoTourUrl: (propertyFlatDataObj as any)?.videoTourUrl || null,
+    previousOwners: (propertyFlatDataObj as any)?.previousOwners,
+    originalConstructionYear: (propertyFlatDataObj as any)?.originalConstructionYear,
+    purchaseYearCurrentOwner: (propertyFlatDataObj as any)?.purchaseYearCurrentOwner,
+    renovationsDone: (propertyFlatDataObj as any)?.renovationsDone,
+    renovationsDescription: (propertyFlatDataObj as any)?.renovationsDescription,
+    occupancyStatus: (propertyFlatDataObj as any)?.occupancyStatus,
+    existingLoanOrMortgage: (propertyFlatDataObj as any)?.existingLoanOrMortgage,
+    societyTransferCharges: (propertyFlatDataObj as any)?.societyTransferCharges,
+    pendingMaintenanceDues: (propertyFlatDataObj as any)?.pendingMaintenanceDues,
+    pendingMaintenanceAmount: (propertyFlatDataObj as any)?.pendingMaintenanceAmount,
+    utilityConnectionsActive: (propertyFlatDataObj as any)?.utilityConnectionsActive || [],
   });
 
   // Initialize IT Commercial Space data if property type matches
@@ -321,7 +457,8 @@ export default function PropertyEditWizard({ property }: PropertyEditWizardProps
       const parts: string[] = [];
       if (plotData.layoutName) parts.push(plotData.layoutName);
       parts.push('Plot');
-      if (plotData.extentSqYds > 0) parts.push(`${plotData.extentSqYds} Sq. Yds`);
+      if (plotData.sizeValue && plotData.sizeUnit) parts.push(`${plotData.sizeValue} ${plotData.sizeUnit}`);
+      else if (plotData.extentSqYds && plotData.extentSqYds > 0) parts.push(`${plotData.extentSqYds} Sq. Yds`);
       if (plotData.city) parts.push(plotData.city);
       updateFormData({ title: parts.join(' - ') });
     } else {
@@ -347,11 +484,13 @@ export default function PropertyEditWizard({ property }: PropertyEditWizardProps
       updateFormData({ description });
     } else if (property.propertyType === 'Plot') {
       const facingText = plotData.facing ? `${plotData.facing} facing` : '';
-      const roadText = plotData.roadWidth ? `, ${plotData.roadWidth} ft road` : '';
+      const roadText = plotData.roadWidth ? `, ${plotData.roadWidth} ${plotData.roadUnit === 'meters' ? 'm' : 'ft'} road` : '';
       const approvalText = plotData.approval ? `, ${plotData.approval} approved` : '';
       const locationText = [plotData.village, plotData.city, plotData.district].filter(Boolean).join(', ');
       const layoutText = plotData.layoutName ? ` in ${plotData.layoutName}` : '';
-      const description = `Premium residential/commercial plot${layoutText} measuring ${plotData.extentSqYds} Sq. Yds, ${facingText}${roadText}${approvalText}. Located at ${locationText}. Ideal for immediate construction and great investment potential.`;
+      const sizeText = plotData.sizeValue && plotData.sizeUnit ? `${plotData.sizeValue} ${plotData.sizeUnit}` : (plotData.extentSqYds ? `${plotData.extentSqYds} Sq. Yds` : '');
+      const dimText = plotData.length && plotData.breadth ? `, Dimensions ${plotData.length}×${plotData.breadth} ${plotData.dimensionUnit === 'meters' ? 'm' : 'ft'}` : '';
+      const description = `Premium residential/commercial plot${layoutText} measuring ${sizeText}${dimText}, ${facingText}${roadText}${approvalText}. Located at ${locationText}. Ideal for immediate construction and great investment potential.`;
       updateFormData({ description });
     } else {
       const descriptions = [
@@ -619,6 +758,36 @@ export default function PropertyEditWizard({ property }: PropertyEditWizardProps
                 />
               </div>
             </div>
+            {/* Total Area (Acres/Hectares) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <div className="md:col-span-2">
+                <Label htmlFor="totalAreaValue" className="flex items-center">
+                  Total Area
+                </Label>
+                <Input
+                  id="totalAreaValue"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={agriculturalData.totalAreaValue === undefined || agriculturalData.totalAreaValue === 0 ? '' : agriculturalData.totalAreaValue}
+                  onChange={(e) => updateAgriculturalData({ totalAreaValue: e.target.value === '' ? undefined : parseFloat(e.target.value) || 0 })}
+                  placeholder="e.g., 3.5"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <div>
+                <Label className="flex items-center">Unit</Label>
+                <Select value={(agriculturalData.totalAreaUnit as string) || ''} onValueChange={(value) => updateAgriculturalData({ totalAreaUnit: value as 'Acres' | 'Hectares' })}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select unit" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Acres">Acres</SelectItem>
+                    <SelectItem value="Hectares">Hectares</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
 
           {/* Property Characteristics */}
@@ -705,6 +874,349 @@ export default function PropertyEditWizard({ property }: PropertyEditWizardProps
                   placeholder="2"
                   required
                   className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <div>
+                <Label className="flex items-center">Road Access</Label>
+                <RadioGroup 
+                  value={(agriculturalData.hasRoadAccess ?? false).toString()} 
+                  onValueChange={(value) => updateAgriculturalData({ hasRoadAccess: value === 'true' })}
+                  className="mt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="true" id="roadaccess-yes" />
+                    <Label htmlFor="roadaccess-yes">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="false" id="roadaccess-no" />
+                    <Label htmlFor="roadaccess-no">No</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              <div>
+                <Label htmlFor="distanceMarket" className="flex items-center">Distance to Market/Town (km)</Label>
+                <Input
+                  id="distanceMarket"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={agriculturalData.distanceToMarketKm === undefined || agriculturalData.distanceToMarketKm === 0 ? '' : agriculturalData.distanceToMarketKm}
+                  onChange={(e) => updateAgriculturalData({ distanceToMarketKm: e.target.value === '' ? undefined : parseFloat(e.target.value) || 0 })}
+                  placeholder="e.g., 5"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <div>
+                <Label className="flex items-center">Zoning Type (Hyderabad)</Label>
+                <Select value={(agriculturalData.zoningType as string) || ''} onValueChange={(value) => updateAgriculturalData({ zoningType: value as AgriculturalLandData['zoningType'] })}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select zoning" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="R1">R1</SelectItem>
+                    <SelectItem value="R2">R2</SelectItem>
+                    <SelectItem value="R3">R3</SelectItem>
+                    <SelectItem value="R4">R4</SelectItem>
+                    <SelectItem value="Commercial">Commercial</SelectItem>
+                    <SelectItem value="Peri-Urban Zone">Peri Urban Zone</SelectItem>
+                    <SelectItem value="Conservation">Conservation</SelectItem>
+                    <SelectItem value="Industrial">Industrial</SelectItem>
+                    <SelectItem value="Mixed Use Zone">Mixed Use Zone</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          {/* Agricultural Details */}
+          <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+            <h3 className="text-lg font-semibold text-zinc-900 mb-4">Agricultural Details</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <Label htmlFor="surveyNumbers" className="flex items-center">Survey Number(s)</Label>
+                <Input
+                  id="surveyNumbers"
+                  value={agriculturalData.surveyNumbers || ''}
+                  onChange={(e) => updateAgriculturalData({ surveyNumbers: e.target.value })}
+                  placeholder="e.g., 123/AA, 124/B"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label className="flex items-center">Soil Type</Label>
+                <Select value={(agriculturalData.soilType as string) || ''} onValueChange={(value) => updateAgriculturalData({ soilType: value as 'Red' | 'Black' | 'Sandy' | 'Mixed' })}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select soil type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Red">Red</SelectItem>
+                    <SelectItem value="Black">Black</SelectItem>
+                    <SelectItem value="Sandy">Sandy</SelectItem>
+                    <SelectItem value="Mixed">Mixed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="flex items-center">Irrigation Source</Label>
+                <Select value={(agriculturalData.irrigationSource as string) || ''} onValueChange={(value) => updateAgriculturalData({ irrigationSource: value as 'Borewell' | 'Canal' | 'Rainfed' })}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select irrigation" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Borewell">Borewell</SelectItem>
+                    <SelectItem value="Canal">Canal</SelectItem>
+                    <SelectItem value="Rainfed">Rainfed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <div>
+                <Label className="flex items-center">Borewells Present</Label>
+                <RadioGroup 
+                  value={(!!(agriculturalData.borewellsCount && agriculturalData.borewellsCount > 0)).toString()} 
+                  onValueChange={(value) => updateAgriculturalData({ borewellsCount: value === 'true' ? (agriculturalData.borewellsCount && agriculturalData.borewellsCount > 0 ? agriculturalData.borewellsCount : 1) : 0 })}
+                  className="mt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="true" id="borewell-yes" />
+                    <Label htmlFor="borewell-yes">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="false" id="borewell-no" />
+                    <Label htmlFor="borewell-no">No</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              <div>
+                <Label htmlFor="borewellsCount" className="flex items-center">Quantity</Label>
+                <Input
+                  id="borewellsCount"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={agriculturalData.borewellsCount === undefined ? '' : agriculturalData.borewellsCount}
+                  onChange={(e) => updateAgriculturalData({ borewellsCount: e.target.value === '' ? undefined : Math.max(0, parseInt(e.target.value) || 0) })}
+                  placeholder="e.g., 2"
+                  className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <div>
+                <Label htmlFor="cropsGrown" className="flex items-center">Crops Grown (if applicable)</Label>
+                <Input
+                  id="cropsGrown"
+                  value={agriculturalData.cropsGrown || ''}
+                  onChange={(e) => updateAgriculturalData({ cropsGrown: e.target.value })}
+                  placeholder="e.g., Cotton, Maize"
+                  className="mt-2"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Documentation */}
+          <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+            <h3 className="text-lg font-semibold text-zinc-900 mb-4">Documentation</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <Label className="flex items-center">Sale Deed Available</Label>
+                <RadioGroup 
+                  value={(agriculturalData.saleDeedAvailable ?? false).toString()} 
+                  onValueChange={(value) => updateAgriculturalData({ saleDeedAvailable: value === 'true' })}
+                  className="mt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="true" id="sd-yes" />
+                    <Label htmlFor="sd-yes">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="false" id="sd-no" />
+                    <Label htmlFor="sd-no">No</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              <div>
+                <Label className="flex items-center">Pattadar Passbook</Label>
+                <RadioGroup 
+                  value={(agriculturalData.pattadarPassbookAvailable ?? false).toString()} 
+                  onValueChange={(value) => updateAgriculturalData({ pattadarPassbookAvailable: value === 'true' })}
+                  className="mt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="true" id="pp-yes" />
+                    <Label htmlFor="pp-yes">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="false" id="pp-no" />
+                    <Label htmlFor="pp-no">No</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              <div>
+                <Label className="flex items-center">EC (Encumbrance Certificate)</Label>
+                <RadioGroup 
+                  value={(agriculturalData.encumbranceCertificateAvailable ?? false).toString()} 
+                  onValueChange={(value) => updateAgriculturalData({ encumbranceCertificateAvailable: value === 'true' })}
+                  className="mt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="true" id="ec-yes" />
+                    <Label htmlFor="ec-yes">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="false" id="ec-no" />
+                    <Label htmlFor="ec-no">No</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <div>
+                <Label className="flex items-center">Pahani/Adangal</Label>
+                <RadioGroup 
+                  value={(agriculturalData.pahaniAdangalAvailable ?? false).toString()} 
+                  onValueChange={(value) => updateAgriculturalData({ pahaniAdangalAvailable: value === 'true' })}
+                  className="mt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="true" id="pa-yes" />
+                    <Label htmlFor="pa-yes">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="false" id="pa-no" />
+                    <Label htmlFor="pa-no">No</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              <div>
+                <Label className="flex items-center">Survey Map / FMB</Label>
+                <RadioGroup 
+                  value={(agriculturalData.surveyMapAvailable ?? false).toString()} 
+                  onValueChange={(value) => updateAgriculturalData({ surveyMapAvailable: value === 'true' })}
+                  className="mt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="true" id="sm-yes" />
+                    <Label htmlFor="sm-yes">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="false" id="sm-no" />
+                    <Label htmlFor="sm-no">No</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+          </div>
+
+          {/* Pricing */}
+          <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+            <h3 className="text-lg font-semibold text-zinc-900 mb-4">Pricing</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <Label htmlFor="pricePerAcre" className="flex items-center">Price per Acre</Label>
+                <div className="relative mt-2">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500 text-sm">₹</span>
+                  <Input
+                    id="pricePerAcre"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={agriculturalData.pricePerAcre === undefined || agriculturalData.pricePerAcre === 0 ? '' : agriculturalData.pricePerAcre}
+                    onChange={(e) => updateAgriculturalData({ pricePerAcre: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })}
+                    placeholder="e.g., 1200000"
+                    className="pl-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label className="flex items-center">Negotiable</Label>
+                <RadioGroup 
+                  value={(agriculturalData.negotiable ?? false).toString()} 
+                  onValueChange={(value) => updateAgriculturalData({ negotiable: value === 'true' })}
+                  className="mt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="true" id="neg-yes" />
+                    <Label htmlFor="neg-yes">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="false" id="neg-no" />
+                    <Label htmlFor="neg-no">No</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Media */}
+          <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+            <h3 className="text-lg font-semibold text-zinc-900 mb-4">Additional Media</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-2">
+                <Label htmlFor="droneUrl" className="flex items-center">Drone Shot URL</Label>
+                <div className="flex gap-2 mt-2">
+                  <Input
+                    id="droneUrl"
+                    value={""}
+                    onChange={() => { /* noop: single-add via prompt */ }}
+                    placeholder="Paste a drone shot image URL and click Add"
+                    disabled
+                  />
+                </div>
+                {(agriculturalData.droneShotUrls || []).length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    {(agriculturalData.droneShotUrls || []).map((u, idx) => (
+                      <div key={idx} className="flex items-center justify-between border border-zinc-200 rounded-md px-3 py-2 text-sm">
+                        <span className="truncate mr-3">{u}</span>
+                        <button
+                          type="button"
+                          className="text-sm text-brand hover:text-brand-hover"
+                          onClick={() => {
+                            const url = window.prompt('Update drone shot URL', u) || '';
+                            if (!url) return;
+                            const cloned = [...(agriculturalData.droneShotUrls || [])];
+                            cloned[idx] = url;
+                            updateAgriculturalData({ droneShotUrls: cloned });
+                          }}
+                        >Edit</button>
+                        <button
+                          type="button"
+                          className="text-sm text-zinc-600 hover:text-zinc-800 ml-3"
+                          onClick={() => {
+                            const next = (agriculturalData.droneShotUrls || []).filter((_, i) => i !== idx);
+                            updateAgriculturalData({ droneShotUrls: next });
+                          }}
+                        >Remove</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="mt-2">
+                  <button
+                    type="button"
+                    className="px-3 py-2 rounded-md border border-zinc-300 text-sm"
+                    onClick={() => {
+                      const url = window.prompt('Add a drone shot image URL') || '';
+                      const trimmed = url.trim();
+                      if (!trimmed) return;
+                      const existing = agriculturalData.droneShotUrls || [];
+                      updateAgriculturalData({ droneShotUrls: [...existing, trimmed] });
+                    }}
+                  >Add Drone URL</button>
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="locationMapUrl" className="flex items-center">Location Map URL</Label>
+                <Input
+                  id="locationMapUrl"
+                  value={agriculturalData.locationMapUrl || ''}
+                  onChange={(e) => updateAgriculturalData({ locationMapUrl: e.target.value })}
+                  placeholder="Paste a map image URL"
+                  className="mt-2"
                 />
               </div>
             </div>
@@ -1143,7 +1655,7 @@ export default function PropertyEditWizard({ property }: PropertyEditWizardProps
                 <Input
                   id="extent"
                   type="number"
-                  value={plotData.extentSqYds === 0 ? '' : plotData.extentSqYds.toString()}
+                  value={(plotData.extentSqYds ?? 0) === 0 ? '' : (plotData.extentSqYds ?? 0).toString()}
                   onChange={(e) => setPlotData(prev => ({ ...prev, extentSqYds: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
                   placeholder="e.g., 200"
                   className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"

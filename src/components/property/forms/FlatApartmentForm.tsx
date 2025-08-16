@@ -4,8 +4,10 @@ import { useState } from 'react';
 import BasePropertyForm from './BasePropertyForm';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { type ListingType, type PropertyType, type BasePropertyFormData, type FlatApartmentData, BHK_OPTIONS, COMMUNITY_STATUS, TRANSACTION_TYPES, FLAT_CONSTRUCTION_STATUS, FACING_DIRECTIONS } from '@/types/property';
+import { type ListingType, type PropertyType, type BasePropertyFormData, type FlatApartmentData, BHK_OPTIONS, COMMUNITY_STATUS, TRANSACTION_TYPES, FACING_DIRECTIONS, FURNISHING_STATUS, FLOORING_TYPES, AGE_OF_PROPERTY, POWER_BACKUP, PARKING_TYPES, WATER_SUPPLY, TITLE_STATUS } from '@/types/property';
 
 interface FlatApartmentFormProps {
   listingType: ListingType;
@@ -58,10 +60,11 @@ export default function FlatApartmentForm({
   };
 
   const generateFlatDescription = async (): Promise<string> => {
-    const statusText = flatData.constructionStatus === 'Ready to move'
-      ? 'Ready to move'
-      : `Handover in ${flatData.handoverInMonths || 0} months`;
-    return `${flatData.bhk} apartment in ${flatData.projectName}, ${flatData.city}. ${flatData.flatAreaSqFt} Sq.ft, ${flatData.communityStatus} community, ${statusText}. ${flatData.parkingCount} car parking(s). ${flatData.transactionType}. ${flatData.facing} facing.`;
+    const statusText = flatData.readinessStatus === 'Under Construction'
+      ? `Possession by ${(flatData.possessionDateIso && new Date(flatData.possessionDateIso).toLocaleDateString()) || 'TBD'}`
+      : flatData.readinessStatus || 'Ready to Move';
+    const area = flatData.flatAreaSqFt || flatData.builtUpAreaSqFt || 0;
+    return `${flatData.bhk} apartment in ${flatData.projectName}, ${flatData.city}. ${area} Sq.ft, ${flatData.communityStatus} community, ${statusText}. ${flatData.parkingCount} car parking(s). ${flatData.transactionType}. ${flatData.facing} facing.`;
   };
 
   return (
@@ -114,7 +117,7 @@ export default function FlatApartmentForm({
             />
           </div>
           <div>
-            <Label htmlFor="numUnits">No. of Units</Label>
+            <Label htmlFor="numUnits">Total number of flats</Label>
             <Input
               id="numUnits"
               type="number"
@@ -169,13 +172,13 @@ export default function FlatApartmentForm({
             </Select>
           </div>
           <div>
-            <Label>Construction Status</Label>
-            <Select value={flatData.constructionStatus} onValueChange={(value) => updateFlatData({ constructionStatus: value as FlatApartmentData['constructionStatus'] })}>
+            <Label>Readiness Status</Label>
+            <Select value={flatData.readinessStatus} onValueChange={(value) => updateFlatData({ readinessStatus: value as NonNullable<FlatApartmentData['readinessStatus']> })}>
               <SelectTrigger className="mt-2">
-                <SelectValue placeholder="Select construction status" />
+                <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
-                {Object.values(FLAT_CONSTRUCTION_STATUS).map((s) => (
+                {['Ready to Move','Under Construction','Pre-launch'].map((s) => (
                   <SelectItem key={s} value={s}>{s}</SelectItem>
                 ))}
               </SelectContent>
@@ -183,27 +186,76 @@ export default function FlatApartmentForm({
           </div>
         </div>
 
-        {flatData.constructionStatus === 'Handover in' && (
+        {flatData.readinessStatus === 'Under Construction' && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
             <div>
-              <Label htmlFor="handoverIn">Handover In (months)</Label>
+              <Label htmlFor="possessionDate">Possession Date</Label>
               <Input
-                id="handoverIn"
-                type="number"
-                value={flatData.handoverInMonths?.toString() || ''}
-                onChange={(e) => updateFlatData({ handoverInMonths: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })}
-                placeholder="e.g., 6"
-                className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                id="possessionDate"
+                type="date"
+                value={flatData.possessionDateIso || ''}
+                onChange={(e) => updateFlatData({ possessionDateIso: e.target.value })}
+                className="mt-2"
               />
             </div>
           </div>
         )}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          <div>
+            <Label>Ownership Type</Label>
+            <Select value={flatData.transactionType} onValueChange={(value) => updateFlatData({ transactionType: value as FlatApartmentData['transactionType'] })}>
+              <SelectTrigger className="mt-2">
+                <SelectValue placeholder="Select ownership" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(TRANSACTION_TYPES).map((t) => (
+                  <SelectItem key={t} value={t}>{t === 'Brand New' ? 'New' : 'Resale'}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Age of Property</Label>
+            <Select value={flatData.ageOfProperty} onValueChange={(value) => updateFlatData({ ageOfProperty: value as NonNullable<FlatApartmentData['ageOfProperty']> })}>
+              <SelectTrigger className="mt-2">
+                <SelectValue placeholder="Select age" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(AGE_OF_PROPERTY).map((v) => (
+                  <SelectItem key={v} value={v}>{v}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </div>
 
-      {/* Other Details */}
+      {/* Areas & Other Details */}
       <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
-        <h3 className="text-lg font-semibold text-zinc-900 mb-4">Other Details</h3>
+        <h3 className="text-lg font-semibold text-zinc-900 mb-4">Areas & Other Details</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <Label htmlFor="builtUpArea">Built-up Area (Sq.ft)</Label>
+            <Input
+              id="builtUpArea"
+              type="number"
+              value={flatData.builtUpAreaSqFt?.toString() || ''}
+              onChange={(e) => updateFlatData({ builtUpAreaSqFt: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })}
+              placeholder="e.g., 1600"
+              className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+          </div>
+          <div>
+            <Label htmlFor="carpetArea">Carpet Area (Sq.ft)</Label>
+            <Input
+              id="carpetArea"
+              type="number"
+              value={flatData.carpetAreaSqFt?.toString() || ''}
+              onChange={(e) => updateFlatData({ carpetAreaSqFt: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })}
+              placeholder="e.g., 1200"
+              className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+          </div>
           <div>
             <Label htmlFor="floor">Floor</Label>
             <Input
@@ -214,6 +266,34 @@ export default function FlatApartmentForm({
               placeholder="e.g., 5"
               className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          <div>
+            <Label htmlFor="totalFloors">Total Floors (building)</Label>
+            <Input
+              id="totalFloors"
+              type="number"
+              value={flatData.totalFloors?.toString() || ''}
+              onChange={(e) => updateFlatData({ totalFloors: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })}
+              placeholder="e.g., 10"
+              className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+          </div>
+          <div>
+            <Label htmlFor="propertyArea">Property Area</Label>
+            <div className="grid grid-cols-2 gap-3 mt-2">
+              <Input id="propertyArea" type="number" value={flatData.propertyAreaValue?.toString() || ''} onChange={(e) => updateFlatData({ propertyAreaValue: e.target.value === '' ? undefined : parseFloat(e.target.value) || 0 })} className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+              <Select value={flatData.propertyAreaUnit} onValueChange={(value) => updateFlatData({ propertyAreaUnit: value as NonNullable<FlatApartmentData['propertyAreaUnit']> })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Unit" />
+                </SelectTrigger>
+                <SelectContent>
+                  {['Acres','Sq.Yds','Sq.Ft'].map((u) => (<SelectItem key={u} value={u}>{u}</SelectItem>))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <div>
             <Label htmlFor="parkingCount">Parking (No. of Car Parkings)</Label>
@@ -255,8 +335,215 @@ export default function FlatApartmentForm({
               </SelectContent>
             </Select>
           </div>
+          <div>
+            <Label htmlFor="bathrooms">No. of Bathrooms</Label>
+            <Input id="bathrooms" type="number" value={flatData.bathroomsCount?.toString() || ''} onChange={(e) => updateFlatData({ bathroomsCount: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })} className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+          </div>
+          <div>
+            <Label htmlFor="balconies">No. of Balconies</Label>
+            <Input id="balconies" type="number" value={flatData.balconiesCount?.toString() || ''} onChange={(e) => updateFlatData({ balconiesCount: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })} className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          <div>
+            <Label htmlFor="ceilingHeight">Ceiling Height (feet)</Label>
+            <Input
+              id="ceilingHeight"
+              type="number"
+              value={flatData.ceilingHeightFeet?.toString() || ''}
+              onChange={(e) => updateFlatData({ ceilingHeightFeet: e.target.value === '' ? undefined : parseFloat(e.target.value) || 0 })}
+              placeholder="e.g., 10"
+              className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+          </div>
         </div>
       </div>
+
+      {/* Amenities */}
+      <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+        <h3 className="text-lg font-semibold text-zinc-900 mb-4">Amenities</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="flex items-center space-x-2"><Checkbox checked={!!flatData.hasClubhouse} onCheckedChange={(v) => updateFlatData({ hasClubhouse: !!v })} /><Label>Clubhouse</Label></div>
+          <div className="flex items-center space-x-2"><Checkbox checked={!!flatData.hasGym} onCheckedChange={(v) => updateFlatData({ hasGym: !!v })} /><Label>Gym</Label></div>
+          <div className="flex items-center space-x-2"><Checkbox checked={!!flatData.hasSwimmingPool} onCheckedChange={(v) => updateFlatData({ hasSwimmingPool: !!v })} /><Label>Swimming Pool</Label></div>
+          <div className="flex items-center space-x-2"><Checkbox checked={!!flatData.hasChildrenPlayArea} onCheckedChange={(v) => updateFlatData({ hasChildrenPlayArea: !!v })} /><Label>Children’s Play Area</Label></div>
+          <div className="flex items-center space-x-2"><Checkbox checked={!!flatData.hasGardenPark} onCheckedChange={(v) => updateFlatData({ hasGardenPark: !!v })} /><Label>Garden / Park</Label></div>
+          <div className="flex items-center space-x-2"><Checkbox checked={!!flatData.hasSecurityCctv} onCheckedChange={(v) => updateFlatData({ hasSecurityCctv: !!v })} /><Label>Security / CCTV</Label></div>
+          <div className="flex items-center space-x-2"><Checkbox checked={!!flatData.hasLift} onCheckedChange={(v) => updateFlatData({ hasLift: !!v })} /><Label>Lift Availability</Label></div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          <div>
+            <Label>Power Backup</Label>
+            <Select value={flatData.powerBackup} onValueChange={(value) => updateFlatData({ powerBackup: value as NonNullable<FlatApartmentData['powerBackup']> })}>
+              <SelectTrigger className="mt-2"><SelectValue placeholder="Select" /></SelectTrigger>
+              <SelectContent>
+                {Object.values(POWER_BACKUP).map((v) => (<SelectItem key={v} value={v}>{v}</SelectItem>))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Parking Type</Label>
+            <Select value={flatData.parkingType} onValueChange={(value) => updateFlatData({ parkingType: value as NonNullable<FlatApartmentData['parkingType']> })}>
+              <SelectTrigger className="mt-2"><SelectValue placeholder="Select" /></SelectTrigger>
+              <SelectContent>
+                {Object.values(PARKING_TYPES).map((v) => (<SelectItem key={v} value={v}>{v}</SelectItem>))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="parkingSlots">Number of Parking Slots</Label>
+            <Input id="parkingSlots" type="number" value={flatData.parkingSlots?.toString() || ''} onChange={(e) => updateFlatData({ parkingSlots: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })} className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          <div>
+            <Label>Water Supply</Label>
+            <Select value={flatData.waterSupply} onValueChange={(value) => updateFlatData({ waterSupply: value as NonNullable<FlatApartmentData['waterSupply']> })}>
+              <SelectTrigger className="mt-2"><SelectValue placeholder="Select" /></SelectTrigger>
+              <SelectContent>
+                {Object.values(WATER_SUPPLY).map((v) => (<SelectItem key={v} value={v}>{v}</SelectItem>))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="roadWidth">Road Width to Property (feet)</Label>
+            <Input id="roadWidth" type="number" value={flatData.roadWidthFeet?.toString() || ''} onChange={(e) => updateFlatData({ roadWidthFeet: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })} className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+          </div>
+        </div>
+      </div>
+
+      {/* Legal Documentation */}
+      <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+        <h3 className="text-lg font-semibold text-zinc-900 mb-4">Legal Documentation</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="flex items-center space-x-2"><Checkbox checked={!!flatData.approvedBuildingPlan} onCheckedChange={(v) => updateFlatData({ approvedBuildingPlan: !!v })} /><Label>Approved Building Plan</Label></div>
+          <div>
+            <Label htmlFor="rera">RERA Registration Number</Label>
+            <Input id="rera" value={flatData.reraRegistrationNumber || ''} onChange={(e) => updateFlatData({ reraRegistrationNumber: e.target.value || null })} className="mt-2" />
+          </div>
+          <div>
+            <Label>Title Status</Label>
+            <Select value={flatData.titleStatus} onValueChange={(value) => updateFlatData({ titleStatus: value as NonNullable<FlatApartmentData['titleStatus']> })}>
+              <SelectTrigger className="mt-2"><SelectValue placeholder="Select" /></SelectTrigger>
+              <SelectContent>
+                {Object.values(TITLE_STATUS).map((v) => (<SelectItem key={v} value={v}>{v}</SelectItem>))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div className="mt-6">
+          <Label htmlFor="loanBanks">Loan Approval by Banks (comma-separated)</Label>
+          <Textarea id="loanBanks" value={(flatData.loanApprovedBanks || []).join(', ')} onChange={(e) => updateFlatData({ loanApprovedBanks: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} className="mt-2" rows={2} />
+        </div>
+      </div>
+
+      {/* Pricing */}
+      <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+        <h3 className="text-lg font-semibold text-zinc-900 mb-4">Pricing</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <Label htmlFor="pricePerSqFt">Price per Sq.Ft</Label>
+            <Input id="pricePerSqFt" type="number" value={flatData.pricePerSqFt?.toString() || ''} onChange={(e) => updateFlatData({ pricePerSqFt: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })} className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+          </div>
+          <div>
+            <Label htmlFor="maintenanceMonthly">Maintenance Charges (Monthly)</Label>
+            <Input id="maintenanceMonthly" type="number" value={flatData.maintenanceMonthly?.toString() || ''} onChange={(e) => updateFlatData({ maintenanceMonthly: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })} className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+          </div>
+          <div className="flex items-center space-x-2 mt-8">
+            <Checkbox checked={!!flatData.negotiable} onCheckedChange={(v) => updateFlatData({ negotiable: !!v })} />
+            <Label>Negotiable?</Label>
+          </div>
+        </div>
+      </div>
+
+      {/* Media */}
+      <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+        <h3 className="text-lg font-semibold text-zinc-900 mb-4">Additional Media</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <Label htmlFor="interiorUrls">Interior Photo URLs (comma-separated)</Label>
+            <Textarea id="interiorUrls" value={(flatData.interiorPhotoUrls || []).join(', ')} onChange={(e) => updateFlatData({ interiorPhotoUrls: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} className="mt-2" rows={2} />
+          </div>
+          <div>
+            <Label htmlFor="exteriorUrls">Exterior Photo URLs (comma-separated)</Label>
+            <Textarea id="exteriorUrls" value={(flatData.exteriorPhotoUrls || []).join(', ')} onChange={(e) => updateFlatData({ exteriorPhotoUrls: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} className="mt-2" rows={2} />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <div>
+            <Label htmlFor="floorPlanUrls">Floor Plan URLs (JPG/PNG links, comma-separated)</Label>
+            <Textarea id="floorPlanUrls" value={(flatData.floorPlanUrls || []).join(', ')} onChange={(e) => updateFlatData({ floorPlanUrls: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} className="mt-2" rows={2} />
+          </div>
+          <div>
+            <Label htmlFor="videoTourUrl">Video Tour / Drone Shot URL</Label>
+            <Input id="videoTourUrl" value={flatData.videoTourUrl || ''} onChange={(e) => updateFlatData({ videoTourUrl: e.target.value || null })} className="mt-2" />
+          </div>
+        </div>
+      </div>
+
+      {/* Resale Specific */}
+      {flatData.transactionType === 'Resale' && (
+        <div className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+          <h3 className="text-lg font-semibold text-zinc-900 mb-4">Resale Specific</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <Label>Number of Previous Owners</Label>
+              <Select value={flatData.previousOwners} onValueChange={(value) => updateFlatData({ previousOwners: value as NonNullable<FlatApartmentData['previousOwners']> })}>
+                <SelectTrigger className="mt-2"><SelectValue placeholder="Select" /></SelectTrigger>
+                <SelectContent>
+                  {['Single','Multiple'].map((v) => (<SelectItem key={v} value={v}>{v}</SelectItem>))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="originalYear">Year of Original Construction</Label>
+              <Input id="originalYear" type="number" value={flatData.originalConstructionYear?.toString() || ''} onChange={(e) => updateFlatData({ originalConstructionYear: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })} className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+            </div>
+            <div>
+              <Label htmlFor="purchaseYear">Year of Purchase by Current Owner</Label>
+              <Input id="purchaseYear" type="number" value={flatData.purchaseYearCurrentOwner?.toString() || ''} onChange={(e) => updateFlatData({ purchaseYearCurrentOwner: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })} className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <div className="flex items-center space-x-2"><Checkbox checked={!!flatData.renovationsDone} onCheckedChange={(v) => updateFlatData({ renovationsDone: !!v })} /><Label>Renovations / Modifications Done?</Label></div>
+            {flatData.renovationsDone && (
+              <div className="md:col-span-2">
+                <Label htmlFor="renovationsDesc">Renovations Description</Label>
+                <Textarea id="renovationsDesc" value={flatData.renovationsDescription || ''} onChange={(e) => updateFlatData({ renovationsDescription: e.target.value })} className="mt-2" rows={3} />
+              </div>
+            )}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <div>
+              <Label>Occupancy Status</Label>
+              <Select value={flatData.occupancyStatus} onValueChange={(value) => updateFlatData({ occupancyStatus: value as NonNullable<FlatApartmentData['occupancyStatus']> })}>
+                <SelectTrigger className="mt-2"><SelectValue placeholder="Select" /></SelectTrigger>
+                <SelectContent>
+                  {['Owner-occupied','Tenanted','Vacant'].map((v) => (<SelectItem key={v} value={v}>{v}</SelectItem>))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center space-x-2"><Checkbox checked={!!flatData.existingLoanOrMortgage} onCheckedChange={(v) => updateFlatData({ existingLoanOrMortgage: !!v })} /><Label>Existing Loan / Mortgage?</Label></div>
+            <div>
+              <Label htmlFor="societyCharges">Society Transfer Charges</Label>
+              <Input id="societyCharges" type="number" value={flatData.societyTransferCharges?.toString() || ''} onChange={(e) => updateFlatData({ societyTransferCharges: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })} className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <div className="flex items-center space-x-2"><Checkbox checked={!!flatData.pendingMaintenanceDues} onCheckedChange={(v) => updateFlatData({ pendingMaintenanceDues: !!v })} /><Label>Pending Maintenance Dues?</Label></div>
+            {flatData.pendingMaintenanceDues && (
+              <div>
+                <Label htmlFor="pendingMaintenanceAmount">Pending Amount</Label>
+                <Input id="pendingMaintenanceAmount" type="number" value={flatData.pendingMaintenanceAmount?.toString() || ''} onChange={(e) => updateFlatData({ pendingMaintenanceAmount: e.target.value === '' ? undefined : parseInt(e.target.value) || 0 })} className="mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+              </div>
+            )}
+            <div>
+              <Label>Utility Connections Active</Label>
+              <Textarea id="utilActive" value={(flatData.utilityConnectionsActive || []).join(', ')} onChange={(e) => updateFlatData({ utilityConnectionsActive: e.target.value.split(',').map(s => s.trim()).filter(Boolean) as Array<'Electricity'|'Water'|'Gas'> })} className="mt-2" rows={2} />
+            </div>
+          </div>
+        </div>
+      )}
     </BasePropertyForm>
   );
 }

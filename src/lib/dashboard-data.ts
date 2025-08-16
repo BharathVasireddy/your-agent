@@ -24,7 +24,10 @@ export const getCachedAgentProfile = cache(async (userId: string) => {
     include: { 
       user: true,
       testimonials: true,
-      faqs: true
+      faqs: true,
+      awards: { orderBy: { createdAt: 'desc' } },
+      galleryImages: { orderBy: { createdAt: 'desc' } },
+      builders: { orderBy: { createdAt: 'desc' } },
     }
   });
 });

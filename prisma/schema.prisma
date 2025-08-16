@@ -57,6 +57,8 @@ model Agent {
   subscriptionInterval  String?
   subscriptionPlan      String?
   websiteUrl            String?
+  officeAddress         String?
+  officeMapUrl          String?
   facebookUrl           String?
   instagramUrl          String?
   linkedinUrl           String?
@@ -70,6 +72,9 @@ model Agent {
   payments              Payment[]
   properties            Property[]
   testimonials          Testimonial[]
+  awards                AgentAward[]
+  galleryImages         AgentGalleryImage[]
+  builders              AgentBuilder[]
 
   @@index([city, area])
 }
@@ -299,4 +304,53 @@ model LeadActivity {
   user      User?    @relation(fields: [userId], references: [id])
 
   @@index([leadId, createdAt])
+}
+
+/// Awards and recognitions shown on agent profile
+model AgentAward {
+  id               String   @id @default(cuid())
+  agentId          String
+  title            String
+  issuedBy         String?
+  year             Int?
+  description      String?
+  imageUrl         String?
+  isRemovedByAdmin Boolean  @default(false)
+  removedReason    String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  agent            Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId, createdAt])
+}
+
+/// Gallery images uploaded by agent
+model AgentGalleryImage {
+  id               String   @id @default(cuid())
+  agentId          String
+  imageUrl         String
+  caption          String?
+  isRemovedByAdmin Boolean  @default(false)
+  removedReason    String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  agent            Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId, createdAt])
+}
+
+/// Builders the agent has worked with
+model AgentBuilder {
+  id               String   @id @default(cuid())
+  agentId          String
+  name             String
+  logoUrl          String
+  websiteUrl       String?
+  isRemovedByAdmin Boolean  @default(false)
+  removedReason    String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  agent            Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId, createdAt])
 }

@@ -11,6 +11,8 @@ import {
   Palette,
   MessageSquare,
   HelpCircle,
+  Wrench,
+  IdCard
 } from 'lucide-react';
 import { ENTITLEMENTS, type Plan } from '@/lib/subscriptions';
 
@@ -37,6 +39,7 @@ const adminNav: NavItem[] = [
   { name: 'Properties', href: '/admin/properties', icon: Building },
   { name: 'Deals', href: '/admin/deals', icon: TrendingUp },
   { name: 'Payments', href: '/admin/payments', icon: CreditCard },
+  { name: 'Moderation', href: '/admin/moderation', icon: Settings },
   { name: 'System', href: '/admin/system', icon: Settings },
 ];
 
@@ -53,6 +56,17 @@ const agentNav: NavItem[] = [
     subItems: [
       { name: 'Testimonials', href: '/agent/dashboard/customise-website/testimonials', icon: MessageSquare },
       { name: 'FAQs', href: '/agent/dashboard/customise-website/faqs', icon: HelpCircle },
+      { name: 'Awards', href: '/agent/dashboard/customise-website/awards', icon: IdCard },
+      { name: 'Gallery', href: '/agent/dashboard/customise-website/gallery', icon: IdCard },
+      { name: 'Builders', href: '/agent/dashboard/customise-website/builders', icon: Users },
+    ],
+  },
+  {
+    name: 'Tools & Utilities',
+    href: '/agent/dashboard/tools',
+    icon: Wrench,
+    subItems: [
+      { name: 'Visiting Card', href: '/agent/dashboard/tools/visiting-card', icon: IdCard },
     ],
   },
   {
